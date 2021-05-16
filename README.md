@@ -20,7 +20,7 @@ Streamlined planning and tracking of your life goals, actions, and outcomes.
 
 #### Data Model
 
-- Person/User
+- Person/User/Client
 - Actions
    - An action the user takes that is related to one or more of their goals or outcomes.
 

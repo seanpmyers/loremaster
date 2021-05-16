@@ -1,0 +1,6 @@
+ALTER ROLE developer CREATEDB, CREATEROLE, NOSUPERUSER;
+
+GRANT developer TO naes;
+GRANT broker TO loremaster_broker;
+
+--ALTER ROLE '' WITH PASSWORD NULL;
