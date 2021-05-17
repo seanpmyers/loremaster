@@ -1,0 +1,1 @@
+CREATE DATABASE loremaster_dev_1 OWNER naes;
