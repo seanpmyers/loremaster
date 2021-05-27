@@ -4,3 +4,5 @@ GRANT developer TO naes;
 GRANT broker TO loremaster_broker;
 
 --ALTER ROLE '' WITH PASSWORD NULL;
+
+GRANT SELECT, INSERT, UPDATE, DELETE ON ALL TABLES IN SCHEMA  public TO loremaster_broker;
