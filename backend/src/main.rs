@@ -1,7 +1,7 @@
 mod utility;
 use env_logger::{Builder, Target};
 use log::{LevelFilter, info};
-use sqlx::Pool;
+use sqlx::{Pool, types::chrono::NaiveDate};
 use chrono::{Date, Local, Utc};
 use utility::toml_reader;
 use uuid::Uuid;
@@ -48,8 +48,7 @@ async fn main() -> Result<()>{
         .connect(&connection_string)
         .await?;
     info!("LOREMASTER: Connected to database.");
-
-    let thing = sqlx::query("
+    let query_result = sqlx::query("
     SELECT DISTINCT
         chronicle.id
         , chronicle.date_recorded
@@ -58,14 +57,50 @@ async fn main() -> Result<()>{
     WHERE
        chronicle.date_recorded = CURRENT_DATE
     ;"
-    ).execute(&pool)
+    ).fetch_optional(&pool)
     .await?;
+    
+    let mut current_chronicle : Chronicle;
+    
+    if let Some(row) = query_result {
+        info!("LOREMASTER: Existing daily chronicle found.");
+    } else {
+        info!("LOREMASTER: No chronicle found for today. Generating new chronicle.");
+        current_chronicle = GenerateChronicle(&pool).await?;
+        info!("LOREMASTER: New chronicle created.");
+    }
+    
 
     info!("LOREMASTER: Shutting down...");
     return Ok(());
 }
 
-pub struct chronicle {
+pub struct Chronicle {
     id : Uuid,
     date_recorded : Date<Utc>
+}
+
+async fn GenerateChronicle(pool: &Pool<sqlx::Postgres>) -> Result<Chronicle> {
+    let today = chrono::offset::Utc::today();
+    let today2  = sqlx::types::chrono::Utc::today();
+    let insert_result = sqlx::query(
+        "
+        INSERT INTO
+            public.chronicle (date_recorded)
+        VALUES 
+        ($1)
+        RETURNING
+            id"
+    )
+    .bind(today2)
+    .fetch_one(pool)
+    .await?;
+
+    let mut new_chronicle: Chronicle = Chronicle{
+        id: Uuid::new_v4(),
+        date_recorded: today
+    };
+
+
+    return Ok(new_chronicle);
 }
