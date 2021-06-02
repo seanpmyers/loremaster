@@ -1,11 +1,13 @@
 # loremaster
 
-Streamlined planning and tracking of your life goals, actions, and outcomes.
+Streamlined planning and tracking of life goals, actions, and outcomes.
 
 ## Concept
-a mix between a quest log, documentation, and a journal  
-get all important information out of your head in one organized location  
-reduce effort to organize your personal information  
+A mix between a quest log, documentation, and a journal.
+
+## Intentions
+Attempt to remove all important information from ones head in put it into one organized location.
+Reduce effort to organize and plan past and future actions taken in life.  
 
 
 ## Design
