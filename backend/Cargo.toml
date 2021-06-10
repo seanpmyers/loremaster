@@ -8,11 +8,13 @@ edition = "2018"
 
 [dependencies]
 anyhow = "1.0.38"
+cap = "0.1.0"
 chrono = "0.4.19"
 env_logger = "0.8.3"
 log = "0.4.14"
+mobc = "0.7.2"
+mobc-postgres = "0.7.0"
 serde = { version = "1.0", features = ["derive"] }
-sqlx = { version = "0.5.2", features = [ "runtime-tokio-rustls", "postgres", "tls", "chrono", "time" ] }
 thiserror = "1.0.23"
 tokio = { version = "1.2.0", features = ["full"] }
 toml = "0.5.8"
