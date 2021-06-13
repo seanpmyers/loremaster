@@ -1,9 +1,10 @@
 use anyhow::{Context, Result};
-use chrono::{Date, Local, Utc};
+use chrono::{Date, Local, TimeZone, Utc};
 use env_logger::{Builder, Target};
 use log::{LevelFilter, info};
 use mobc::{Connection, Pool};
 use mobc_postgres::{PgConnectionManager, tokio_postgres::{self, Config}};
+use core::str;
 use std::{io::Write, str::FromStr, time::Duration};
 use tokio_postgres::NoTls;
 mod utility;
@@ -16,6 +17,23 @@ const DB_POOL_TIMEOUT_SECONDS: u64 = 15;
 const SECRET_FILE_PATH : &str = "./../../../secrets/loremaster.toml";
 const POSTGRES_TOML_FIELD : &str = "POSTGRESQL";
 
+const CURRENT_CHRONICLE_QUERY : &str = "
+    SELECT DISTINCT
+        chronicle.id
+        , chronicle.date_recorded
+    FROM
+        public.chronicle
+    WHERE
+        chronicle.date_recorded = CURRENT_DATE
+    ;";
+
+// const ALL_CHRONICLES_QUERY : &str = "
+//     SELECT
+//         *
+//     FROM
+//         public.chronicle
+//     LIMIT 1
+//     ;";
 
 #[tokio::main]
 async fn main() -> Result<()>{
@@ -41,35 +59,26 @@ async fn main() -> Result<()>{
 
     let database_pool = create_database_pool(&connection_string).context(format!("Something went wrong while creating a database pool!"))?;
 
-
-    let pool: Pool<sqlx::Postgres> = PgPoolOptions::new()
-        .max_connections(5)
-        .connect(&connection_string)
-        .await?;
     info!("LOREMASTER: Connected to database.");
-    let query_result = sqlx::query_as::<_, Chronicle>("
-    SELECT DISTINCT
-        chronicle.id
-        , chronicle.date_recorded
-    FROM
-       public.chronicle
-    WHERE
-       chronicle.date_recorded = CURRENT_DATE
-    ;"
-    ).fetch_optional(&pool)
-    .await?;
+
+    let database_connection = database_pool.get().await.context(format!("Failed to get database connection!"))?;
     
-    let mut current_chronicle : Chronicle;
+    info!("LOREMASTER: Querying for today's chronicle.");
+
+    let query_result = get_current_chronicle_query(&database_connection).await.context(format!("Failed to execute query for current chronicle!"))?;
     
-    if let Some(row) = query_result {
-        info!("LOREMASTER: Existing daily chronicle found.");
-        println!("{}, {}", row.id, row.date_recorded);
-    } else {
-        info!("LOREMASTER: No chronicle found for today. Generating new chronicle.");
-        current_chronicle = GenerateChronicle(&pool).await?;
-        info!("LOREMASTER: New chronicle created.");
+    match query_result {
+        Some(chronicle_result) => {
+            info!("LOREMASTER: Existing chronicle found!");
+            println!("{}, {}", chronicle_result.id, chronicle_result.date_recorded);
+        }
+        None => {
+            info!("LOREMASTER: No chronicle found for today. Generating new chronicle...");
+            let chronicle_result = generate_chronicle(&&database_connection).await.context(format!("Failed to execute create new chronicle query!"))?;
+            println!("{}, {}", chronicle_result.id, chronicle_result.date_recorded);
+        }
     }
-    
+       
 
     info!("LOREMASTER: Shutting down...");
     return Ok(());
@@ -87,35 +96,48 @@ pub fn create_database_pool(connection_string: &str) -> Result<Pool<PgConnection
     return Ok(result);
 }
 
+#[derive(Debug)]
 pub struct Chronicle {
     id : Uuid,
     date_recorded : Date<Utc>
 }
 
-async fn GenerateChronicle(pool: &Pool<sqlx::Postgres>) -> Result<Chronicle> {
+const NEW_CHRONICLE_QUERY : &str = "
+    INSERT INTO
+        public.chronicle (date_recorded)
+    VALUES 
+    (TO_DATE($1, 'YYYY-MM-DD'))
+    RETURNING
+        id
+    ;";
+
+async fn generate_chronicle(database_connection: &Connection<PgConnectionManager<NoTls>>) -> Result<Chronicle> {
     let today = chrono::offset::Utc::today();
-    let insert_result = sqlx::query(
-        "
-        INSERT INTO
-            public.chronicle (date_recorded)
-        VALUES 
-        (TO_DATE($1, 'YYYY-MM-DD'))
-        RETURNING
-            id
-        ;"
-    )
-    .bind(today.to_string())
-    .fetch_one(pool)
-    .await?;
+    let query_result = database_connection.query_one(NEW_CHRONICLE_QUERY, &[&today.to_string()]).await.context(format!("An error occurred while querying the database."))?;
+    let result_id: Uuid = query_result.get::<_, Uuid>("id");
 
-
-
-    //TODO: FIX ID
-    let mut new_chronicle: Chronicle = Chronicle{
-        id: Uuid::new_v4(),
+    let new_chronicle: Chronicle = Chronicle{
+        id: result_id,
         date_recorded: today
     };
 
-
     return Ok(new_chronicle);
+}
+
+async fn get_current_chronicle_query(database_connection: &Connection<PgConnectionManager<NoTls>>) -> Result<Option<Chronicle>> {
+    let query_result = database_connection.query(CURRENT_CHRONICLE_QUERY, &[]).await.context(format!("An error occurred while querying the database."))?;
+    if query_result.len() == 0 { return Ok(None);}
+    
+    match query_result.get(0) {
+        Some(chronicle_result) => {
+            let result = Chronicle {
+                id: chronicle_result.get::<_, Uuid>("id"),
+                date_recorded: Utc.from_utc_date(&chronicle_result.get::<_, chrono::NaiveDate>("date_recorded")) 
+            };
+            return Ok(Some(result));
+        }
+        None => {
+            return Ok(None);
+        }
+    }
 }
