@@ -23,26 +23,32 @@ Reduce effort to organize and plan past and future actions taken in life.
 ### Dependencies 
 
 ### Rust Crates
- - [anyhow](https://crates.io/crates/anyhow)
-   - This library provides anyhow::Error, a trait object based error type for easy idiomatic error handling in Rust applications.
- - [chrono](https://crates.io/crates/chrono)
-   - Date and time library for Rust
- - [env_logger](https://crates.io/crates/env_logger)
-   - Implements a logger that can be configured via environment variables.
- - [log](https://crates.io/crates/log)
-   - A Rust library providing a lightweight logging facade.
- - [thiserror](https://crates.io/crates/thiserror)
-   - This library provides a convenient derive macro for the standard library's std::error::Error trait.
- - [tokio](https://crates.io/crates/tokio)
-   - A runtime for writing reliable, asynchronous, and slim applications with the Rust programming language. It is:
- - [toml](https://crates.io/crates/toml)
-   - A TOML decoder and encoder for Rust. 
- - [serde](https://crates.io/crates/serde)
-   - Serde is a framework for serializing and deserializing Rust data structures efficiently and generically.
- - [SQLx](https://crates.io/crates/sqlx)
-   - SQLx is an async, pure Rust† SQL crate featuring compile-time checked queries without a DSL. Used to interact with database.
+- [anyhow](https://crates.io/crates/anyhow)
+  - This library provides anyhow::Error, a trait object based error type for easy idiomatic error handling in Rust applications.
+- [cap](https://crates.io/crates/cap)
+  - An allocator that can track and limit memory usage. This crate provides a generic allocator that wraps another allocator, tracking memory usage and enabling limits to be set. 
+- [chrono](https://crates.io/crates/chrono)
+  - Date and time library for Rust
+- [env_logger](https://crates.io/crates/env_logger)
+  - Implements a logger that can be configured via environment variables.
+- [log](https://crates.io/crates/log)
+  - A Rust library providing a lightweight logging facade.
+- [mobc](https://crates.io/crates/mobc)
+  - A generic connection pool with async/await support.
+- [mobc-postgres](https://crates.io/crates/mobc-postgres)
+  - Postgres support for the mobc connection pool
+- [serde](https://crates.io/crates/serde)
+  - Serde is a framework for serializing and deserializing Rust data structures efficiently and generically.
+- [thiserror](https://crates.io/crates/thiserror)
+  - This library provides a convenient derive macro for the standard library's std::error::Error trait.
+- [tokio](https://crates.io/crates/tokio)
+  - A runtime for writing reliable, asynchronous, and slim applications with the Rust programming language. It is:
+- [tokio-postgres](https://crates.io/crates/tokio-postgres)
+  - A native, asynchronous PostgreSQL client
+- [toml](https://crates.io/crates/toml)
+  - A TOML decoder and encoder for Rust. 
 - [uuid](https://crates.io/crates/uuid)
-   - Generate and parse UUIDs.
+  - Generate and parse UUIDs.
 
 
 ### Data Model
