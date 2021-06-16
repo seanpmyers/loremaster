@@ -45,6 +45,8 @@ Reduce effort to organize and plan past and future actions taken in life.
   - A runtime for writing reliable, asynchronous, and slim applications with the Rust programming language. It is:
 - [tokio-postgres](https://crates.io/crates/tokio-postgres)
   - A native, asynchronous PostgreSQL client
+- [tokio-test](https://crates.io/crates/tokio-test)
+  - Testing utilities for Tokio- and futures-based code 
 - [toml](https://crates.io/crates/toml)
   - A TOML decoder and encoder for Rust. 
 - [uuid](https://crates.io/crates/uuid)
