@@ -1,5 +1,6 @@
 # Person
 
+## Description
 User of the application.
 
 The main focus of the application is the user.  
@@ -11,3 +12,17 @@ Encrypting all user's data using their password might be possible, although the 
 This application's functionality and utility require the user to provide detailed private and personal information.  
 Being able to leverage user data to improve the quality and functionality of the application is also a possibility that must be considered.  
 Certain data entities like actions, schedules, and intentions can possibly be reused by other users. This would reduce the overall required effort by individual users.  
+
+## Attributes
+- Email Address
+- Password
+- Date of Birth (?)
+- Username/Alias (?)
+- Real Name (?)
+
+## Related Entites
+
+- [Action](./action.md)
+- [Chronicle](./chronicle.md)
+- [Document](./document.md)
+- [Intention](./intention.md)
