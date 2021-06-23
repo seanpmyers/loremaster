@@ -1,5 +1,4 @@
 use anyhow::{Context, Result};
-use chrono::{Date, Utc};
 use mobc::Connection;
 use mobc_postgres::PgConnectionManager;
 use tokio_postgres::NoTls;
