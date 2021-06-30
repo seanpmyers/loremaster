@@ -37,6 +37,8 @@ Reduce effort to organize and plan past and future actions taken in life.
   - A generic connection pool with async/await support.
 - [mobc-postgres](https://crates.io/crates/mobc-postgres)
   - Postgres support for the mobc connection pool
+- [Rocket](https://crates.io/crates/rocket)
+  - Web framework with a focus on usability, security, extensibility, and speed. 
 - [serde](https://crates.io/crates/serde)
   - Serde is a framework for serializing and deserializing Rust data structures efficiently and generically.
 - [thiserror](https://crates.io/crates/thiserror)
