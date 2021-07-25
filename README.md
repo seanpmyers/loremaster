@@ -25,6 +25,8 @@ Reduce effort to organize and plan past and future actions taken in life.
 ### Rust Crates
 - [anyhow](https://crates.io/crates/anyhow)
   - This library provides anyhow::Error, a trait object based error type for easy idiomatic error handling in Rust applications.
+- [base64](https://crates.io/crates/base64)
+  - Encodes and decodes base64 as bytes or utf8
 - [cap](https://crates.io/crates/cap)
   - An allocator that can track and limit memory usage. This crate provides a generic allocator that wraps another allocator, tracking memory usage and enabling limits to be set. 
 - [chrono](https://crates.io/crates/chrono)
@@ -37,6 +39,10 @@ Reduce effort to organize and plan past and future actions taken in life.
   - A generic connection pool with async/await support.
 - [mobc-postgres](https://crates.io/crates/mobc-postgres)
   - Postgres support for the mobc connection pool
+- [pbkdf2](https://crates.io/crates/pbkdf2)
+  - Pure Rust implementation of the Password-Based Key Derivation Function v2 (PBKDF2).
+- [ring](https://crates.io/crates/ring)
+  - Safe, fast, small crypto using Rust.
 - [Rocket](https://crates.io/crates/rocket)
   - Web framework with a focus on usability, security, extensibility, and speed. 
 - [serde](https://crates.io/crates/serde)

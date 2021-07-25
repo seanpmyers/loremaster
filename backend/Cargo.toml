@@ -8,16 +8,20 @@ edition = "2018"
 
 [dependencies]
 anyhow = "1.0.41"
+base64 = "0.13.0"
 cap = "0.1.0"
 chrono = "0.4.19"
+data-encoding = "2.3.2"
 env_logger = "0.8.4"
 log = "0.4.14"
 mobc = "0.7.2"
 mobc-postgres = "0.7.0"
+pbkdf2 = "0.8.0"
+ring = "0.16.20"
 rocket = "0.5.0-rc.1"
 serde = { version = "1.0", features = ["derive"] }
 thiserror = "1.0.25"
-tokio = { version = "1.6.1", features = ["full"] }
+tokio = { version = "1.8.2", features = ["full"] }
 tokio-postgres = { version = "0.7.2", features = ["with-uuid-0_8", "with-chrono-0_4"]}
 tokio-test = "0.4.2"
 toml = "0.5.8"
