@@ -39,10 +39,11 @@ Reduce effort to organize and plan past and future actions taken in life.
   - A generic connection pool with async/await support.
 - [mobc-postgres](https://crates.io/crates/mobc-postgres)
   - Postgres support for the mobc connection pool
-- [pbkdf2](https://crates.io/crates/pbkdf2)
-  - Pure Rust implementation of the Password-Based Key Derivation Function v2 (PBKDF2).
 - [ring](https://crates.io/crates/ring)
   - Safe, fast, small crypto using Rust.
+  - Alternatives:
+    - [pbkdf2](https://crates.io/crates/pbkdf2) 
+      - Didn't go with this as the examples for ring were better.
 - [Rocket](https://crates.io/crates/rocket)
   - Web framework with a focus on usability, security, extensibility, and speed. 
 - [serde](https://crates.io/crates/serde)
