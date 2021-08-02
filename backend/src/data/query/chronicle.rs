@@ -5,7 +5,7 @@ pub mod delete_chronicle;
 pub mod chronicle_by_id;
 pub mod chronicle_by_date;
 
-
+//TODO: Change test date to be in the past 
 #[cfg(test)]
 mod tests {
     use std::str::FromStr;
