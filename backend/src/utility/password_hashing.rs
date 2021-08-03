@@ -4,7 +4,7 @@ use rand::SystemRandom;
 use ring::rand::SecureRandom;
 use ring::{pbkdf2, rand};
 use std::num::NonZeroU32;
-//TODO: Fix trait 
+//TODO: redo this using ring documentation example 
 pub trait IHashEncryptionService {
     const SALT_SIZE: usize;
     const KEY_SIZE: usize;
@@ -14,12 +14,12 @@ pub trait IHashEncryptionService {
     fn check(hash: &str, input: &str) -> Result<(bool, bool)>;
 }
 
-pub struct HashEncryptionService();
+pub struct HashEncryptionService{}
 
 impl IHashEncryptionService for HashEncryptionService {
     const SALT_SIZE: usize = 16;
     const KEY_SIZE: usize = 32;
-    const ITERATIONS: u32 = 10000;
+    const ITERATIONS: u32 = 100000;
 
     fn new() -> HashEncryptionService {
         return HashEncryptionService {};
