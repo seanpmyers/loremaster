@@ -4,7 +4,7 @@ use mobc_postgres::{PgConnectionManager, tokio_postgres::{self, Config}};
 use std::{str::FromStr, time::Duration};
 use tokio_postgres::NoTls;
 
-use crate::utility::toml_reader;
+use crate::utility::toml_reader::{self, SECRET_FILE_PATH};
 
 
 pub struct PostgresHandler {
@@ -16,7 +16,6 @@ const DB_POOL_MAX_OPEN: u64 = 32;
 const DB_POOL_MAX_IDLE: u64 = 8;
 const DB_POOL_TIMEOUT_SECONDS: u64 = 15;
 const POSTGRES_TOML_FIELD : &str = "POSTGRESQL";
-const SECRET_FILE_PATH : &str = "./../../../secrets/loremaster.toml";
 
 impl PostgresHandler {
    pub async fn new() -> Result<Self> {
