@@ -3,5 +3,6 @@ CREATE TABLE public.person (
 	email_address text NOT NULL,
 	hashed_password text NOT NULL,
 	alias text NULL,
+	creation_date date NOT NULL,
 	CONSTRAINT pk_person PRIMARY KEY (id)
 );
