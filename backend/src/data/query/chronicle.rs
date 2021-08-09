@@ -11,7 +11,7 @@ mod tests {
     use std::str::FromStr;
 
     use anyhow::{Result};
-    use chrono::{Duration, Utc};
+    use chrono::{Duration, Local};
     use uuid::Uuid;
 
     use crate::data::{
@@ -38,7 +38,7 @@ mod tests {
     async fn test_create_chronicle() -> Result<()> {
       let postgres_context: PostgresHandler = PostgresHandler::new().await?;
       let database_connection = postgres_context.database_pool.get().await?;
-      let test_date = Utc::today() + Duration::days(7);
+      let test_date = Local::today() + Duration::days(7);
       let query_result = create_chronicle_query(&database_connection, &test_date).await?;
       assert_eq!(test_date, query_result.date_recorded);
       return Ok(());
@@ -61,7 +61,7 @@ mod tests {
     async fn test_get_chronicle_by_date() -> Result<()>{
       let postgres_context: PostgresHandler = PostgresHandler::new().await?;
       let database_connection = postgres_context.database_pool.get().await?;
-      let test_date = Utc::today() + Duration::days(7);
+      let test_date = Local::today() + Duration::days(7);
       let query_result = chronicle_by_date_query(&database_connection, &test_date).await?;
       match query_result {
         Some(chronicle) => {
@@ -76,7 +76,7 @@ mod tests {
     async fn test_update_chronicle() -> Result<()> {
       let postgres_context: PostgresHandler = PostgresHandler::new().await?;
       let database_connection = postgres_context.database_pool.get().await?;
-      let test_date = Utc::today() + Duration::days(7);
+      let test_date = Local::today() + Duration::days(7);
       let query_result = chronicle_by_date_query(&database_connection, &test_date).await?;
       if let Some(mut chronicle) = query_result {
         println!("{}", chronicle.date_recorded);

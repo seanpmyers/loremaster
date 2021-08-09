@@ -1,5 +1,5 @@
 use anyhow::{Context};
-use chrono::Utc;
+use chrono::Local;
 use log::info;
 use mobc::Connection;
 use mobc_postgres::PgConnectionManager;
@@ -20,7 +20,7 @@ pub async fn current(postgres_service: &State<PostgresHandler>) -> String {
     let database_connection: Connection<PgConnectionManager<NoTls>> = postgres_service.database_pool.get().await.context(format!("Failed to get database connection!")).unwrap();
     info!("LOREMASTER: Connected to database.");
     info!("LOREMASTER: Querying for today's chronicle.");
-    let today = Utc::today();
+    let today = Local::today();
     let query_result = get_current_chronicle_query(&database_connection).await.context(format!("Failed to execute query for current chronicle!")).unwrap();
     
     match query_result {
