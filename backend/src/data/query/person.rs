@@ -6,18 +6,20 @@ mod tests {
 
     use anyhow::{Result};
     use chrono::{Duration, Local, Utc};
+    use mobc::Connection;
+    use mobc_postgres::PgConnectionManager;
     use uuid::Uuid;
 
-    use crate::data::{postgres_handler::PostgresHandler, query::person::create_person::create_person_query};
+    use crate::{data::{entity::person::Person, postgres_handler::PostgresHandler, query::person::create_person::create_person_query}, utility::password_hashing::HashEncryptionService};
 
 
     #[tokio::test]
     async fn test_create_person() -> Result<()> {
       let postgres_context: PostgresHandler = PostgresHandler::new().await?;
-      let database_connection = postgres_context.database_pool.get().await?;
-      let test_date = Local::today();
-      let query_result = create_person_query(&database_connection, &"testemail@email.com".to_string(), &"".to_string(),&test_date).await?;
-      assert_eq!(test_date, query_result.date_recorded);
+      let database_connection: Connection<PgConnectionManager<tokio_postgres::NoTls>> = postgres_context.database_pool.get().await?;
+      let test_date: chrono::Date<Local> = Local::today();
+      let hashed_password: String = HashEncryptionService::hash("testPassword123!")?;
+      let query_result: Person = create_person_query(&database_connection, &"testemail@email.com".to_string(), &hashed_password,&test_date).await?;
       return Ok(());
     }
 }

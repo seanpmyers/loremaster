@@ -1,8 +1,8 @@
 use anyhow::{Context, Result};
-use chrono::{Date, NaiveDate, TimeZone, Utc};
+use chrono::{NaiveDate, TimeZone, Local};
 use mobc::Connection;
 use mobc_postgres::PgConnectionManager;
-use tokio_postgres::NoTls;
+use tokio_postgres::{NoTls, Row};
 use uuid::Uuid;
 
 use crate::data::entity::chronicle::Chronicle;
@@ -20,14 +20,13 @@ const UPDATE_CHRONICLE_QUERY : &str = "
     ;";
 
 pub async fn update_chronicle_query(database_connection: &Connection<PgConnectionManager<NoTls>>, chronicle_to_update: &Chronicle) -> Result<Chronicle> {
-    let query_result = database_connection.query_one(UPDATE_CHRONICLE_QUERY, &[&chronicle_to_update.date_recorded.to_string(), &chronicle_to_update.id])
-    .await.context(format!("An error occurred while querying the database."))?;
-    let result_id: Uuid = query_result.get::<_, Uuid>("id");
-    let result_date: Date<Utc> = Utc.from_utc_date(&query_result.get::<_, NaiveDate>("date_recorded"));
+    let query_result: Row = database_connection
+      .query_one(UPDATE_CHRONICLE_QUERY, &[&chronicle_to_update.date_recorded.to_string(), &chronicle_to_update.id])
+      .await.context(format!("An error occurred while querying the database."))?;
 
     let updated_chronicle: Chronicle = Chronicle{
-        id: result_id,
-        date_recorded: result_date
+        id: query_result.get::<_, Uuid>("id"),
+        date_recorded: Local.from_local_date(&query_result.get::<_, NaiveDate>("date_recorded")).unwrap()
     };
 
     return Ok(updated_chronicle);

@@ -24,7 +24,7 @@ impl HashEncryptionService {
     const SALT_SIZE: usize = 16;
     const KEY_SIZE: usize = 32;
 
-    fn hash(input: &str) -> Result<String> {
+    pub fn hash(input: &str) -> Result<String> {
         let site_secret: String = toml_reader::get_toml_field_value(SECRET_FILE_PATH, SITE_SECRET_FIELD)?;
         let iterations_setting: u32 = toml_reader::get_toml_field_value(SECRET_FILE_PATH, ITERATIONS_FIELD)?.parse::<u32>()?;
 
@@ -63,7 +63,7 @@ impl HashEncryptionService {
         return Ok(hashed_input);
     }
 
-    fn verify(hash: &str, user_input: &str) -> Result<(bool, bool)> {
+    pub fn verify(hash: &str, user_input: &str) -> Result<(bool, bool)> {
         let site_secret: String = toml_reader::get_toml_field_value(SECRET_FILE_PATH, SITE_SECRET_FIELD)?;
         let iterations_setting: u32 = toml_reader::get_toml_field_value(SECRET_FILE_PATH, ITERATIONS_FIELD)?.parse::<u32>()?;
 
