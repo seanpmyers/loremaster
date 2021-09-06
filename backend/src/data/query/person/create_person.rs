@@ -11,7 +11,7 @@ const CREATE_PERSON_QUERY : &str = "
     INSERT INTO
         public.person (email_address, hashed_password, creation_date, alias)
     VALUES 
-    ('$1', '$2',TO_DATE($3, 'YYYY-MM-DD'), null)
+    ($1, $2,TO_DATE($3, 'YYYY-MM-DD'), null)
     RETURNING
         id
     ;";
