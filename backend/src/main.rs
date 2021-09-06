@@ -1,4 +1,4 @@
-use anyhow::{Context, Result};
+use anyhow::{Result};
 use chrono::{Local};
 use env_logger::{Builder, Target};
 use log::{LevelFilter, info};
@@ -29,7 +29,7 @@ async fn main() -> Result<()>{
     info!("LOREMASTER: Starting up...");
 
     info!("LOREMASTER: Configuring database connection...");
-    let postgres_service: PostgresHandler = PostgresHandler::new().await.context("Failed to create postgres handler!")?;
+    let postgres_service: PostgresHandler = PostgresHandler::new().await?;
     info!("LOREMASTER: Connection configured.");
 
     info!("LOREMASTER: Launching http server...");
