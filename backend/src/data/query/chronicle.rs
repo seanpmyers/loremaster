@@ -39,8 +39,20 @@ mod tests {
       let postgres_context: PostgresHandler = PostgresHandler::new().await?;
       let database_connection = postgres_context.database_pool.get().await?;
       let test_date = Local::today() + Duration::days(7);
-      let query_result = create_chronicle_query(&database_connection, &test_date).await?;
+      let query_result = create_chronicle_query(&database_connection, &test_date, &None).await?;
       assert_eq!(test_date, query_result.date_recorded);
+      return Ok(());
+    }
+
+    #[tokio::test]
+    async fn test_create_chronicle_with_id() -> Result<()> {
+      let id = Uuid::from_str("98e94305-78c6-44f7-85fa-33f485647f7e")?;
+      let postgres_context: PostgresHandler = PostgresHandler::new().await?;
+      let database_connection = postgres_context.database_pool.get().await?;
+      let test_date = Local::today() + Duration::days(8);
+      let query_result = create_chronicle_query(&database_connection, &test_date, &Some(id)).await?;
+      assert_eq!(test_date, query_result.date_recorded);
+      assert_eq!(id, query_result.id);
       return Ok(());
     }
 
