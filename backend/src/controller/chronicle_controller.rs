@@ -30,7 +30,9 @@ pub async fn current(postgres_service: &State<PostgresHandler>) -> String {
         }
         None => {
             info!("LOREMASTER: No chronicle found for today. Generating new chronicle...");
-            let chronicle_result = create_chronicle_query(&database_connection, &today).await.context(format!("Failed to execute create new chronicle query!")).unwrap();
+            let chronicle_result = create_chronicle_query(&database_connection, &today, &None)
+                .await.context(format!("Failed to execute create new chronicle query!"))
+                .unwrap();
             return format!("{}, {}", chronicle_result.id, chronicle_result.date_recorded);
         }
     }
