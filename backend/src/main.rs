@@ -11,6 +11,8 @@ pub mod controller;
 
 use data::{postgres_handler::PostgresHandler};
 
+use crate::controller::chronicle_controller;
+
 #[rocket::main]
 async fn main() -> Result<()>{
     Builder::new()
@@ -35,9 +37,8 @@ async fn main() -> Result<()>{
     info!("LOREMASTER: Launching http server...");
     rocket::build()
     .manage(postgres_service)
-    .mount("/", routes![
-        controller::chronicle_controller::current
-        ])
+    .mount("/", )
+    .mount("/chronicle", chronicle_controller::routes())
     .launch()
     .await?;
     

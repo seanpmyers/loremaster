@@ -3,7 +3,7 @@ use chrono::Local;
 use log::info;
 use mobc::Connection;
 use mobc_postgres::PgConnectionManager;
-use rocket::{State, get};
+use rocket::{State, get, routes};
 use tokio_postgres::NoTls;
 
 use crate::data::{
@@ -37,3 +37,7 @@ pub async fn current(postgres_service: &State<PostgresHandler>) -> String {
         }
     }
 }
+
+pub fn routes() -> Vec<rocket::Route> {
+    routes![current]
+ }
