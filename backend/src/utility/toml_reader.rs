@@ -2,8 +2,6 @@ use anyhow::{anyhow, Context, Result};
 use std::fs;
 use toml::Value;
 
-pub const SECRET_FILE_PATH : &str = "./../../../secrets/loremaster.toml";
-
 pub fn get_toml_field_value(file_name: &str, field_name: &str) -> Result<String> {
    let string_file_content : String = fs::read_to_string(file_name).context(format!("Something went wrong reading the file"))?;
    let value_map: Value =  string_file_content.parse::<Value>().context(format!("Something went wrong while parsing toml file's string content!"))?;

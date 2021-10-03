@@ -4,22 +4,20 @@ use mobc_postgres::{PgConnectionManager, tokio_postgres::{self, Config}};
 use std::{str::FromStr, time::Duration};
 use tokio_postgres::NoTls;
 
-use crate::utility::toml_reader::{self, SECRET_FILE_PATH};
+use crate::utility::secret_service::{get_secret, POSTGRES_TOML_FIELD};
 
+const DB_POOL_MAX_OPEN: u64 = 32;
+const DB_POOL_MAX_IDLE: u64 = 8;
+const DB_POOL_TIMEOUT_SECONDS: u64 = 15;
 
 pub struct PostgresHandler {
    pub connection_string: String,
    pub database_pool: Pool<PgConnectionManager<NoTls>>
 }
 
-const DB_POOL_MAX_OPEN: u64 = 32;
-const DB_POOL_MAX_IDLE: u64 = 8;
-const DB_POOL_TIMEOUT_SECONDS: u64 = 15;
-const POSTGRES_TOML_FIELD : &str = "POSTGRESQL";
-
 impl PostgresHandler {
    pub async fn new() -> Result<Self> {
-      let connection_string : String = toml_reader::get_toml_field_value(SECRET_FILE_PATH, POSTGRES_TOML_FIELD).context(format!("Failed to get connection string from file!"))?;
+      let connection_string : String = get_secret(POSTGRES_TOML_FIELD).context(format!("Failed to get connection string from secret file!"))?;
       let database_pool = create_database_pool(&connection_string).context(format!("Something went wrong while creating a database pool!"))?; 
       let new_handler: PostgresHandler = PostgresHandler{connection_string: connection_string, database_pool};
       return Ok(new_handler);

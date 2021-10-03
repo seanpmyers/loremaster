@@ -1,16 +1,11 @@
 use std::str::FromStr;
 
-use rocket::{
-   form::{
+use rocket::{Request, form::{
       FromForm
-   },
-   routes, 
-   Request, 
-   request::{
+   }, http::CookieJar, outcome::IntoOutcome, request::{
       self,
       FromRequest
-   }
-};
+   }, routes};
 use uuid::Uuid;
 use crate::{
    data::entity::person::Credentials, 
@@ -33,11 +28,7 @@ impl<'r> FromRequest<'r> for UserId {
         return request.cookies()
             .get_private("user_id")
             .and_then(|cookie| cookie.value().parse().ok())
-            .map(|value| -> UserId {UserId(Uuid::from_str(value?)})
+            .map(UserId)
             .or_forward(())
     }
-}
-
-pub fn routes() -> Vec<rocket::Route> {
-   routes![index, no_auth_index, login, login_page, post_login, logout]
 }

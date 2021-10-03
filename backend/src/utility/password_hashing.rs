@@ -4,37 +4,48 @@ use rand::SystemRandom;
 use ring::rand::SecureRandom;
 use ring::{digest, pbkdf2, rand};
 use std::num::NonZeroU32;
+use crate::utility::secret_service::{ITERATIONS_FIELD, SITE_SECRET_FIELD, get_secret};
 
-use crate::utility::toml_reader::{self, SECRET_FILE_PATH};
+const SALT_SIZE: usize = 16;
+const CREDENTIAL_LENGTH: usize = digest::SHA256_OUTPUT_LEN;
 
-const CREDENTIAL_LEN: usize = digest::SHA256_OUTPUT_LEN;
-const ITERATIONS_FIELD : &str = "HASH_ITERATIONS";
-const SITE_SECRET_FIELD : &str = "SITE_SECRET";
+pub type Credential = [u8; CREDENTIAL_LENGTH];
+pub type Salt = [u8; SALT_SIZE];
+
 static PBKDF2_ALG: pbkdf2::Algorithm = pbkdf2::PBKDF2_HMAC_SHA256;
-pub type Credential = [u8; CREDENTIAL_LEN];
+pub struct PasswordEncryptionService {}
 
-//TODO: redo this using ring documentation example 
-pub struct HashEncryptionService {
-    salt_size: usize,
-    key_size: usize,
-    iterations: u32,
+pub trait PasswordBasedHashEncryption {
+    fn hash_password(input: &str) -> Result<String>;
+    fn verify_password(hash: &str, user_input: &str) -> Result<(bool, bool)>;
 }
 
-impl HashEncryptionService {
-    const SALT_SIZE: usize = 16;
-    const KEY_SIZE: usize = 32;
+impl PasswordEncryptionService {
+    //format: {iterations.salt.key}
+    pub fn format_hashed_password(iterations_count: &u32, salt: &Salt, hashed_password: &Credential) -> String {
+        return format!(
+            "{}.{}.{}",
+            iterations_count,
+            base64::encode(&salt),
+            base64::encode(&hashed_password)
+        );
+    }
+}
 
-    pub fn hash(input: &str) -> Result<String> {
-        let site_secret: String = toml_reader::get_toml_field_value(SECRET_FILE_PATH, SITE_SECRET_FIELD)?;
-        let iterations_setting: u32 = toml_reader::get_toml_field_value(SECRET_FILE_PATH, ITERATIONS_FIELD)?.parse::<u32>()?;
+impl PasswordBasedHashEncryption for PasswordEncryptionService {
+
+    fn hash_password(credential: &str) -> Result<String> {
+        let site_secret: String = get_secret( SITE_SECRET_FIELD)?;
+        let iterations_setting: u32 = get_secret( ITERATIONS_FIELD)?.parse::<u32>()?;
 
         let iterations = NonZeroU32::new(iterations_setting).unwrap();
         let random_number_generator = SystemRandom::new();
 
-        let mut salt = [0u8; Self::SALT_SIZE];
-        random_number_generator.fill(&mut salt).unwrap();
+        let mut salt: Salt = [0u8; SALT_SIZE];
+        random_number_generator.fill(&mut salt).unwrap(); // How should unspecified errors be handeled
 
-        let mut hashed_secret = [0u8; Self::SALT_SIZE];
+        //To improve security of the salt, we hash our site secret and use it as the password's salt
+        let mut hashed_secret: Salt = [0u8; SALT_SIZE];
         pbkdf2::derive(
             PBKDF2_ALG, 
             iterations, 
@@ -43,29 +54,23 @@ impl HashEncryptionService {
             &mut hashed_secret
         );
 
-        let mut hashed_input = [0u8; Self::KEY_SIZE];
+        let mut hashed_credential: Credential = [0u8; CREDENTIAL_LENGTH];
         pbkdf2::derive(
             PBKDF2_ALG,
             iterations,
             &hashed_secret,
-            input.as_bytes(),
-            &mut hashed_input,
+            credential.as_bytes(),
+            &mut hashed_credential,
         );
 
-        //format: {iterations.salt.key}
-        let hashed_input = format!(
-            "{}.{}.{}",
-            iterations_setting,
-            base64::encode(&salt),
-            base64::encode(&hashed_input)
-        );
+        let hashed_input = Self::format_hashed_password(&iterations_setting, &salt, &hashed_credential);
 
         return Ok(hashed_input);
     }
 
-    pub fn verify(hash: &str, user_input: &str) -> Result<(bool, bool)> {
-        let site_secret: String = toml_reader::get_toml_field_value(SECRET_FILE_PATH, SITE_SECRET_FIELD)?;
-        let iterations_setting: u32 = toml_reader::get_toml_field_value(SECRET_FILE_PATH, ITERATIONS_FIELD)?.parse::<u32>()?;
+    fn verify_password(hash: &str, user_input: &str) -> Result<(bool, bool)> {
+        let site_secret: String = get_secret(SITE_SECRET_FIELD)?;
+        let iterations_setting: u32 = get_secret(ITERATIONS_FIELD)?.parse::<u32>()?;
 
         let hash_parts: Vec<&str> = hash.split(".").collect();
         if hash_parts.len() < 3 {
@@ -78,7 +83,7 @@ impl HashEncryptionService {
         let salt: Vec<u8> = base64::decode(hash_parts[1])?;
         let key: Vec<u8> = base64::decode(hash_parts[2])?;
 
-        let mut hashed_secret = [0u8; Self::SALT_SIZE];
+        let mut hashed_secret = [0u8; SALT_SIZE];
         pbkdf2::derive(
             PBKDF2_ALG, 
             iterations, 
@@ -104,16 +109,16 @@ impl HashEncryptionService {
     }
 }
 
+
 #[cfg(test)]
 mod tests {
-
-    use super::{HashEncryptionService};
+    use crate::utility::password_hashing::{PasswordBasedHashEncryption, PasswordEncryptionService};
 
     #[test]
     fn verify_same_key() {
-        let hashed_key: String = HashEncryptionService::hash("input").unwrap();
-        let hashed_key2: String = HashEncryptionService::hash("input").unwrap();
-        let check = HashEncryptionService::verify(&hashed_key, "input").unwrap();
+        let hashed_key: String = PasswordEncryptionService::hash_password("input").unwrap();
+        let hashed_key2: String = PasswordEncryptionService::hash_password("input").unwrap();
+        let check = PasswordEncryptionService::verify_password(&hashed_key, "input").unwrap();
         // println!("{}", check.1);
         assert_ne!(hashed_key, hashed_key2);
         assert_ne!("input", hashed_key);
@@ -123,8 +128,8 @@ mod tests {
     #[test]
     fn verify_different_keys() {
         // The check function should return false if
-        let hashed_key: String = HashEncryptionService::hash("pancakes123!").unwrap();
-        let check_result: (bool, bool) = HashEncryptionService::verify(&hashed_key, "blueberries325&").unwrap();
+        let hashed_key: String = PasswordEncryptionService::hash_password("pancakes123!").unwrap();
+        let check_result: (bool, bool) = PasswordEncryptionService::verify_password(&hashed_key, "blueberries325&").unwrap();
         assert_eq!(check_result.0, false);
     }
 

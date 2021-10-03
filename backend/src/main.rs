@@ -2,7 +2,6 @@ use anyhow::{Result};
 use chrono::{Local};
 use env_logger::{Builder, Target};
 use log::{LevelFilter, info};
-use rocket::{routes};
 use std::{io::Write};
 
 mod data;
@@ -37,7 +36,7 @@ async fn main() -> Result<()>{
     info!("LOREMASTER: Launching http server...");
     rocket::build()
     .manage(postgres_service)
-    .mount("/", )
+    // .mount("/", )
     .mount("/chronicle", chronicle_controller::routes())
     .launch()
     .await?;
