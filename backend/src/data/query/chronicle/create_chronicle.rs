@@ -1,5 +1,5 @@
 use anyhow::{Context, Result};
-use chrono::{Date, Local};
+use chrono::{DateTime, Utc};
 use mobc::Connection;
 use mobc_postgres::PgConnectionManager;
 use tokio_postgres::NoTls;
@@ -25,7 +25,7 @@ const CREATE_CHRONICLE_QUERY_WITH_ID : &str = "
         id
     ;";
 
-pub async fn create_chronicle_query(database_connection: &Connection<PgConnectionManager<NoTls>>, chronicle_date: &Date<Local>, chronicle_id:  &Option<Uuid>) -> Result<Chronicle> {
+pub async fn create_chronicle_query(database_connection: &Connection<PgConnectionManager<NoTls>>, chronicle_date: &DateTime<Utc>, chronicle_id:  &Option<Uuid>) -> Result<Chronicle> {
     match chronicle_id {
         Some(id) => {
             let query_result = database_connection
@@ -36,7 +36,7 @@ pub async fn create_chronicle_query(database_connection: &Connection<PgConnectio
 
             let new_chronicle: Chronicle = Chronicle{
                 id: result_id,
-                date_recorded: chronicle_date.to_owned()
+                date_recorded: chronicle_date.clone()
             };
 
             return Ok(new_chronicle);
@@ -50,7 +50,7 @@ pub async fn create_chronicle_query(database_connection: &Connection<PgConnectio
         
             let new_chronicle: Chronicle = Chronicle{
                 id: result_id,
-                date_recorded: chronicle_date.to_owned()
+                date_recorded: chronicle_date.clone()
             };
         
             return Ok(new_chronicle);

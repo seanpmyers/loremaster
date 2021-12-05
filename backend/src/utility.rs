@@ -1,4 +1,4 @@
-pub mod password_hashing;
+pub mod password_encryption;
 pub mod toml_reader;
 pub mod scheduler;
 pub mod secret_service;

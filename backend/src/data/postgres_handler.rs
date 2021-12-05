@@ -17,8 +17,10 @@ pub struct PostgresHandler {
 
 impl PostgresHandler {
    pub async fn new() -> Result<Self> {
-      let connection_string : String = get_secret(POSTGRES_TOML_FIELD).context(format!("Failed to get connection string from secret file!"))?;
-      let database_pool = create_database_pool(&connection_string).context(format!("Something went wrong while creating a database pool!"))?; 
+      let connection_string : String = get_secret(POSTGRES_TOML_FIELD)
+         .context(format!("Failed to get connection string from secret file!"))?;
+      let database_pool = create_database_pool(&connection_string)
+         .context(format!("Something went wrong while creating a database pool!"))?; 
       let new_handler: PostgresHandler = PostgresHandler{connection_string: connection_string, database_pool};
       return Ok(new_handler);
    }
@@ -29,9 +31,9 @@ pub fn create_database_pool(connection_string: &str) -> Result<Pool<PgConnection
    let config = Config::from_str(connection_string).context(format!("Failed to create database config from connection string!"))?;
    let manager = PgConnectionManager::new(config, NoTls);
    let result = Pool::builder()
-   .max_open(DB_POOL_MAX_OPEN)
-   .max_idle(DB_POOL_MAX_IDLE)
-   .get_timeout(Some(Duration::from_secs(DB_POOL_TIMEOUT_SECONDS)))
-   .build(manager);
+      .max_open(DB_POOL_MAX_OPEN)
+      .max_idle(DB_POOL_MAX_IDLE)
+      .get_timeout(Some(Duration::from_secs(DB_POOL_TIMEOUT_SECONDS)))
+      .build(manager);
    return Ok(result);
 }

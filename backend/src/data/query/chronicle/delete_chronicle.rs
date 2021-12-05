@@ -4,8 +4,6 @@ use mobc_postgres::PgConnectionManager;
 use tokio_postgres::NoTls;
 use uuid::Uuid;
 
-use crate::data::entity::chronicle::Chronicle;
-
 const DELETE_CHRONICLE_QUERY : &str = "
     DELETE FROM
         public.chronicle

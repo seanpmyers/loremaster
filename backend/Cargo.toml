@@ -7,21 +7,18 @@ edition = "2018"
 # See more keys and their definitions at https://doc.rust-lang.org/cargo/reference/manifest.html
 
 [dependencies]
-anyhow = "1.0.41"
-base64 = "0.13.0"
-cap = "0.1.0"
+anyhow = "1.0.51"
+argon2 = "0.3.1"
 chrono = "0.4.19"
-data-encoding = "2.3.2"
 env_logger = "0.8.4"
 log = "0.4.14"
-mobc = "0.7.2"
+mobc = "0.7.3"
 mobc-postgres = "0.7.0"
-ring = "0.16.20"
 rocket = { version = "0.5.0-rc.1", features = ["secrets"] }
-serde = { version = "1.0", features = ["derive"] }
-thiserror = "1.0.25"
-tokio = { version = "1.8.2", features = ["full"] }
-tokio-postgres = { version = "0.7.2", features = ["with-uuid-0_8", "with-chrono-0_4"]}
+serde = { version = "1.0.130", features = ["derive"] }
+thiserror = "1.0.30"
+tokio = { version = "1.14.0", features = ["full"] }
+tokio-postgres = { version = "0.7.5", features = ["with-uuid-0_8", "with-chrono-0_4"]}
 tokio-test = "0.4.2"
 toml = "0.5.8"
 uuid = { version = "0.8.2", features = ["v4", "serde"] }

@@ -1,5 +1,5 @@
 use anyhow::{Context, Result};
-use chrono::{Date, Local};
+use chrono::{offset, DateTime, Utc};
 use mobc::Connection;
 use mobc_postgres::PgConnectionManager;
 use tokio_postgres::NoTls;
@@ -16,17 +16,25 @@ const CREATE_PERSON_QUERY : &str = "
         id
     ;";
 
-pub async fn create_person_query(database_connection: &Connection<PgConnectionManager<NoTls>>, email_address: &String, hashed_password: &String, creation_date: &Date<Local>) -> Result<Person> {
+pub async fn create_person_query(
+    database_connection: &Connection<PgConnectionManager<NoTls>>, 
+    email_address: &String, 
+    hashed_password: &String, 
+    creation_date: &DateTime<Utc>
+) -> Result<Person> {
     
     let query_result = database_connection
-    .query_one(CREATE_PERSON_QUERY, &[&email_address, &hashed_password, &creation_date.to_string()])
-    .await
-    .context(format!("An error occurred while querying the database."))?;
+        .query_one(
+            CREATE_PERSON_QUERY, 
+            &[&email_address, &hashed_password, &creation_date.to_string()])
+        .await
+        .context(format!("An error occurred while querying the database."))?
+    ;
 
     let new_person: Person = Person {
         id: query_result.get::<_, Uuid>("id"),
         email_address: email_address.to_owned(),
-        creation_date: Local::today(),
+        creation_date: offset::Utc::now(),
         alias: None,
     };
 

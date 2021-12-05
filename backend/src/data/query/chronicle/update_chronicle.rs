@@ -1,5 +1,5 @@
 use anyhow::{Context, Result};
-use chrono::{NaiveDate, TimeZone, Local};
+use chrono::{NaiveDateTime, TimeZone, Utc};
 use mobc::Connection;
 use mobc_postgres::PgConnectionManager;
 use tokio_postgres::{NoTls, Row};
@@ -26,7 +26,9 @@ pub async fn update_chronicle_query(database_connection: &Connection<PgConnectio
 
     let updated_chronicle: Chronicle = Chronicle{
         id: query_result.get::<_, Uuid>("id"),
-        date_recorded: Local.from_local_date(&query_result.get::<_, NaiveDate>("date_recorded")).unwrap()
+        date_recorded: Utc
+          .from_local_datetime(&query_result.get::<_, NaiveDateTime>("date_recorded"))
+          .unwrap()
     };
 
     return Ok(updated_chronicle);

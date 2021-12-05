@@ -1,8 +1,8 @@
-use chrono::{Date, Utc};
-use uuid::Uuid;
+// use chrono::{Date, Utc};
+// use uuid::Uuid;
 
-pub struct Holiday {
-   pub id: Uuid,
-   pub occurence_date: Date<Utc>,
-   pub name: String,
-}
+// pub struct Holiday {
+//    pub id: Uuid,
+//    pub occurence_date: Date<Utc>,
+//    pub name: String,
+// }

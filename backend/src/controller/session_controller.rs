@@ -1,34 +1,30 @@
-use std::str::FromStr;
+// use std::str::FromStr;
 
-use rocket::{Request, form::{
-      FromForm
-   }, http::CookieJar, outcome::IntoOutcome, request::{
-      self,
-      FromRequest
-   }, routes};
-use uuid::Uuid;
-use crate::{
-   data::entity::person::Credentials, 
-};
+// use rocket::{Request, form::{
+//       FromForm
+//    }, get, http::CookieJar, outcome::IntoOutcome, request::{
+//       self,
+//       FromRequest
+//    }, response::content::Json, routes};
+// use uuid::Uuid;
+// use crate::{data::entity::person::{Credentials, SessionKey}};
 
-#[derive(FromForm)]
-struct Login<'r> {
-    email: &'r str,
-    password: &'r str
-}
+// use super::cookie_fields;
 
-#[derive(Debug)]
-struct UserId(Uuid);
+// #[get("/")]
+// async fn index(cookies: &CookieJar<'_>) {
+//     let session_id = cookies.get_private(cookie_fields::SESSION_ID);
+// } 
 
-#[rocket::async_trait]
-impl<'r> FromRequest<'r> for UserId {
-    type Error = std::convert::Infallible;
+// #[get("/registration")]
+// async fn get_registration() -> () {
+//     return ();
+// }
 
-    async fn from_request(request: &'r Request<'_>) -> request::Outcome<UserId, Self::Error> {
-        return request.cookies()
-            .get_private("user_id")
-            .and_then(|cookie| cookie.value().parse().ok())
-            .map(UserId)
-            .or_forward(())
-    }
-}
+
+// pub fn routes() -> Vec<rocket::Route> {
+//     routes![
+//         index
+//         , get_registration
+//         ]
+//  }
