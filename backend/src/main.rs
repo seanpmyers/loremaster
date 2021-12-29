@@ -7,6 +7,7 @@ use std::{io::Write};
 mod data;
 mod utility;
 pub mod controller;
+pub mod guards;
 
 use data::{postgres_handler::PostgresHandler};
 
@@ -32,7 +33,7 @@ async fn main() -> Result<()>{
     let postgres_service: PostgresHandler = PostgresHandler::new().await?;
     info!("LOREMASTER: Connection configured.");
 
-    info!("LOREMASTER: Launching http server...");
+    info!("LOREMASTER: Launching rocket http server...");
     rocket::build()
         .manage(postgres_service)
         // .mount("/", session_controller::routes())

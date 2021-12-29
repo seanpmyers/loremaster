@@ -7,7 +7,8 @@ use rocket::{State, get, routes, post, delete};
 use tokio_postgres::NoTls;
 use uuid::Uuid;
 
-use crate::data::{
+
+use crate::{data::{
    entity::chronicle::Chronicle,
    postgres_handler::PostgresHandler, 
    query::chronicle::{
@@ -17,16 +18,27 @@ use crate::data::{
       delete_chronicle::delete_chronicle_query, 
       update_chronicle::update_chronicle_query, chronicle_by_id::chronicle_by_id_query
    }, 
-};
+}, guards::user::User};
 
 #[get("/")]
-pub async fn current(postgres_service: &State<PostgresHandler>) -> Option<String> {
+pub async fn current(
+    postgres_service: &State<PostgresHandler>, 
+    user: User
+) -> Option<String> {
+
     info!("LOREMASTER: Connecting to database...");
-    let database_connection: Connection<PgConnectionManager<NoTls>> = postgres_service.database_pool.get().await.context(format!("Failed to get database connection!")).unwrap();
+    let database_connection: Connection<PgConnectionManager<NoTls>> = postgres_service.database_pool
+        .get()
+        .await
+        .context(format!("Failed to get database connection!"))
+        .unwrap();
     info!("LOREMASTER: Connected to database.");
     info!("LOREMASTER: Querying for today's chronicle.");
     let today: DateTime<Utc> = offset::Utc::now();
-    let query_result = get_current_chronicle_query(&database_connection).await.context(format!("Failed to execute query for current chronicle!")).unwrap();
+    let query_result = get_current_chronicle_query(&database_connection, &user.0)
+        .await
+        .context(format!("Failed to execute query for current chronicle!"))
+        .unwrap();
     
     match query_result {
         Some(chronicle_result) => {

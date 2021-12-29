@@ -29,6 +29,7 @@ impl PasswordEncryptionService {
 impl PasswordEncryption for PasswordEncryptionService {
 
     fn encrypt_password(credential: &str) -> Result<String> {
+
         let site_secret: String = get_secret( SITE_SECRET_FIELD)?;
         let iterations_setting: u32 = get_secret( ITERATIONS_FIELD)?.parse::<u32>()?;
 
@@ -40,7 +41,8 @@ impl PasswordEncryption for PasswordEncryptionService {
             , argon2::Algorithm::Argon2id
             , argon2::Version::V0x13
             , argon2_parameters.params().unwrap()
-        ).unwrap();
+        )
+        .unwrap();
 
         let salt: SaltString = SaltString::generate(&mut OsRng);
 
@@ -52,7 +54,8 @@ impl PasswordEncryption for PasswordEncryptionService {
         return Ok(result);
     }
 
-    fn verify_password(hash: &str, user_input: &str) -> Result<bool> {
+    fn verify_password(hash: &str, credential: &str) -> Result<bool> {
+        
         let site_secret: String = get_secret( SITE_SECRET_FIELD)?;
         let iterations_setting: u32 = get_secret( ITERATIONS_FIELD)?.parse::<u32>()?;
 
@@ -68,7 +71,7 @@ impl PasswordEncryption for PasswordEncryptionService {
         
         let parsed_hash = PasswordHash::new(&hash).unwrap();
 
-        return Ok(argon2.verify_password(&user_input.as_bytes(), &parsed_hash).is_ok());
+        return Ok(argon2.verify_password(&credential.as_bytes(), &parsed_hash).is_ok());
     }
 }
 
@@ -81,7 +84,6 @@ mod tests {
         let hashed_key: String = PasswordEncryptionService::encrypt_password("input").unwrap();
         let hashed_key2: String = PasswordEncryptionService::encrypt_password("input").unwrap();
         let verify_result = PasswordEncryptionService::verify_password(&hashed_key, "input").unwrap();
-        // println!("{}", check.1);
         assert_ne!(hashed_key, hashed_key2);
         assert_ne!("input", hashed_key);
         assert_eq!(verify_result, true);
@@ -96,7 +98,11 @@ mod tests {
     }
 
     #[test]
-    fn hash_same_input() {
-
+    fn unique_encryption_check() {
+        let output1 = PasswordEncryptionService::encrypt_password("input")
+            .unwrap();
+        let output2 = PasswordEncryptionService::encrypt_password("input")
+            .unwrap();
+        assert_ne!(output1, output2);
     }
 }
