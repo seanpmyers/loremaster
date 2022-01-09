@@ -21,7 +21,7 @@ impl PostgresHandler {
          .context(format!("Failed to get connection string from secret file!"))?;
       let database_pool = create_database_pool(&connection_string)
          .context(format!("Something went wrong while creating a database pool!"))?; 
-      let new_handler: PostgresHandler = PostgresHandler{connection_string: connection_string, database_pool};
+      let new_handler: PostgresHandler = PostgresHandler{connection_string, database_pool};
       return Ok(new_handler);
    }
 }

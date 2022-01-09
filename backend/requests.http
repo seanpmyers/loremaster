@@ -1,0 +1,30 @@
+
+
+GET http://localhost:8000/
+
+###
+GET http://localhost:8000/chronicle/today
+
+###
+GET http://localhost:8000/chronicle/today
+
+###
+GET http://localhost:8000/chronicle/by_date
+
+###
+GET http://localhost:8000/chronicle/by_id
+
+###
+GET http://localhost:8000/chronicle/
+
+###
+GET http://localhost:8000/chronicle/
+
+###
+GET http://localhost:8000/chronicle/
+
+###
+GET http://localhost:8000/chronicle/server_time
+
+###
+GET http://localhost:8000/chronicle/example

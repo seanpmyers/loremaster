@@ -9,13 +9,14 @@ edition = "2018"
 [dependencies]
 anyhow = "1.0.51"
 argon2 = "0.3.1"
-chrono = "0.4.19"
+chrono = { version = "0.4.19", features = ["serde"] }
 env_logger = "0.8.4"
 log = "0.4.14"
 mobc = "0.7.3"
 mobc-postgres = "0.7.0"
-rocket = { version = "0.5.0-rc.1", features = ["secrets"] }
+rocket = { version = "0.5.0-rc.1", features = ["secrets", "json", "tls", "uuid"] }
 serde = { version = "1.0.130", features = ["derive"] }
+serde_json = "1.0.74"
 thiserror = "1.0.30"
 tokio = { version = "1.14.0", features = ["full"] }
 tokio-postgres = { version = "0.7.5", features = ["with-uuid-0_8", "with-chrono-0_4"]}

@@ -4,6 +4,7 @@ use env_logger::{Builder, Target};
 use log::{LevelFilter, info};
 use std::{io::Write};
 
+mod api;
 mod data;
 mod utility;
 pub mod controller;
@@ -11,7 +12,7 @@ pub mod guards;
 
 use data::{postgres_handler::PostgresHandler};
 
-use crate::controller::{chronicle_controller};
+use crate::controller::{chronicle_controller, session_controller};
 
 #[rocket::main]
 async fn main() -> Result<()>{
@@ -36,7 +37,7 @@ async fn main() -> Result<()>{
     info!("LOREMASTER: Launching rocket http server...");
     rocket::build()
         .manage(postgres_service)
-        // .mount("/", session_controller::routes())
+        .mount("/", session_controller::routes())
         .mount("/chronicle", chronicle_controller::routes())
         .launch()
     .await?;

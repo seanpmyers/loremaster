@@ -28,9 +28,13 @@ mod tests {
 
     #[tokio::test]
     async fn test_get_current_chronicle() -> Result<()> {
-      let postgres_context: PostgresHandler = PostgresHandler::new().await?;
-      let database_connection = postgres_context.database_pool.get().await?;
-      get_current_chronicle_query(&database_connection).await?;
+      let postgres_context: PostgresHandler = PostgresHandler::new()
+        .await?;
+      let database_connection = postgres_context.database_pool
+        .get()
+        .await?;
+      get_current_chronicle_query(&database_connection, &Uuid::new_v4())
+        .await?;
       return Ok(());
     }
 
