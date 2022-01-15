@@ -10,9 +10,14 @@ mod utility;
 pub mod controller;
 pub mod guards;
 
-use data::{postgres_handler::PostgresHandler};
+use data::{
+    postgres_handler::PostgresHandler
+};
 
-use crate::controller::{chronicle_controller, session_controller};
+use crate::controller::{
+    chronicle_controller, 
+    session_controller
+};
 
 #[rocket::main]
 async fn main() -> Result<()>{

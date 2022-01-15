@@ -1,4 +1,6 @@
 pub mod create_person;
+pub mod by_email_address;
+pub mod credentials;
 
 #[cfg(test)]
 mod tests {
@@ -10,7 +12,7 @@ mod tests {
     use crate::{
       data::{
         postgres_handler::PostgresHandler, 
-        query::person::create_person::create_person_query
+        query::person_entity::create_person::create_person_query
       }, 
       utility::password_encryption::{
         PasswordEncryption, 
@@ -23,8 +25,12 @@ mod tests {
 
     #[tokio::test]
     async fn test_create_person() -> Result<()> {
-      let postgres_context: PostgresHandler = PostgresHandler::new().await?;
-      let database_connection: Connection<PgConnectionManager<tokio_postgres::NoTls>> = postgres_context.database_pool.get().await?;
+      let postgres_context: PostgresHandler = PostgresHandler::new()
+        .await?;
+      let database_connection: Connection<PgConnectionManager<tokio_postgres::NoTls>> = 
+        postgres_context.database_pool
+        .get()
+        .await?;
       let test_date: DateTime<Utc> = offset::Utc::now();
       
       let hashed_password: String = PasswordEncryptionService::encrypt_password(TEST_PASSWORD)?;

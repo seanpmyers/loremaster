@@ -1,13 +1,22 @@
-use anyhow::{Context, Result};
-use chrono::{offset, DateTime, Utc};
+use anyhow::{
+    Context, 
+    Result
+};
+use chrono::{
+    offset, 
+    DateTime, 
+    Utc
+};
 use mobc::Connection;
 use mobc_postgres::PgConnectionManager;
 use tokio_postgres::NoTls;
 use uuid::Uuid;
 
-use crate::data::entity::person::{Person};
+use crate::data::entity::person::{
+    Person
+};
 
-const CREATE_PERSON_QUERY : &str = "
+const QUERY : &str = "
     INSERT INTO
         public.person (email_address, hashed_password, creation_date, alias)
     VALUES 
@@ -25,8 +34,13 @@ pub async fn create_person_query(
     
     let query_result = database_connection
         .query_one(
-            CREATE_PERSON_QUERY, 
-            &[&email_address, &hashed_password, &creation_date.to_string()])
+            QUERY, 
+            &[
+                &email_address, 
+                &hashed_password, 
+                &creation_date.to_string()
+                ]
+            )
         .await
         .context(format!("An error occurred while querying the database."))?
     ;

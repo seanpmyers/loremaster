@@ -17,7 +17,7 @@ use rocket::{
 use tokio_postgres::{NoTls};
 
 use crate::data::{
-    query::person::create_person::create_person_query, 
+    query::person_entity::create_person::create_person_query, 
     postgres_handler::PostgresHandler
 };
 
