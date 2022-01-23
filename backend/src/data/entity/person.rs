@@ -8,6 +8,7 @@ use serde::{
 };
 use uuid::Uuid;
 
+
 #[derive(Deserialize, Serialize, Debug, Clone)]
 pub struct Person {
     pub id : Uuid,
@@ -17,7 +18,7 @@ pub struct Person {
 }
 
 #[derive(Deserialize, Serialize, Debug, Clone)]
-pub struct PersonCredentials {
+pub struct Credentials {
     pub id: Uuid,
     pub email_address: String,
     pub encrypted_password: String

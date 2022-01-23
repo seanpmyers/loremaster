@@ -17,7 +17,7 @@ use rocket::{
 use tokio_postgres::{NoTls};
 
 use crate::data::{
-    query::person_entity::create_person::create_person_query, 
+    query::person::create_person::create_person_query, 
     postgres_handler::PostgresHandler
 };
 
@@ -44,7 +44,12 @@ use crate::data::{
 #[post("/create")]
 pub async fn create_person (postgres_service: &State<PostgresHandler>) -> Option<String> {
     info!("LOREMASTER: Connecting to database...");
-    let database_connection: Connection<PgConnectionManager<NoTls>> = postgres_service.database_pool.get().await.context(format!("Failed to get database connection!")).unwrap();
+    let database_connection: Connection<PgConnectionManager<NoTls>> = postgres_service
+        .database_pool
+        .get()
+        .await
+        .context(format!("Failed to get database connection!"))
+        .unwrap();
 
     let email_address = "email";
     let hashed_password = "password";

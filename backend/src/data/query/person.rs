@@ -1,6 +1,6 @@
 pub mod create_person;
-pub mod by_email_address;
-pub mod credentials;
+pub mod person_by_email_address;
+pub mod credential_by_email_address;
 
 #[cfg(test)]
 mod tests {
@@ -12,7 +12,7 @@ mod tests {
     use crate::{
       data::{
         postgres_handler::PostgresHandler, 
-        query::person_entity::create_person::create_person_query
+        query::person::create_person::create_person_query
       }, 
       utility::password_encryption::{
         PasswordEncryption, 

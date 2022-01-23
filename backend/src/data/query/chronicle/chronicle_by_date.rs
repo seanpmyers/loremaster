@@ -19,9 +19,17 @@ const CHRONICLE_BY_DATE_QUERY : &str = "
     ;";
 
 
-pub async fn chronicle_by_date_query(database_connection: &Connection<PgConnectionManager<NoTls>>, chronicle_date: &DateTime<Utc>) -> Result<Option<Chronicle>> {
-   let query_result = database_connection.query_opt(CHRONICLE_BY_DATE_QUERY, &[&chronicle_date.to_string()])
-   .await.context(format!("An error occurred while querying the database."))?;
+pub async fn chronicle_by_date_query(
+   database_connection: &Connection<PgConnectionManager<NoTls>>, 
+   chronicle_date: &DateTime<Utc>
+) -> Result<Option<Chronicle>> {
+   let query_result = database_connection
+      .query_opt(
+         CHRONICLE_BY_DATE_QUERY, 
+         &[&chronicle_date.to_string()]
+      )
+      .await
+      .context(format!("An error occurred while querying the database."))?;
    match query_result {
        Some(row) => {
             let result = Chronicle {

@@ -33,7 +33,7 @@ use crate::{data::{
    }, 
 }, guards::user::User};
 
-#[get("/")]
+#[get("/today")]
 pub async fn today(
     postgres_service: &State<PostgresHandler>, 
     user: User

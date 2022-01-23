@@ -27,25 +27,30 @@ LIMIT
    1
 ;";
 
-pub async fn by_email_address(
+pub async fn person_by_email_address_query(
     database_connection: &Connection<PgConnectionManager<NoTls>>, 
     email_address: &String, 
-) -> Result<Person> {
+) -> Result<Option<Person>> {
     
     let query_result = database_connection
-        .query_one(
+        .query_opt(
          QUERY, 
             &[&email_address])
         .await
         .context(format!("An error occurred while querying the database."))?
     ;
+    
+    if let Some(person) = query_result {
+        let result: Person = Person {
+            id: person.get::<_, Uuid>("id"),
+            email_address: person.get::<_, String>("email_address"),
+            creation_date: person.get::<_, DateTime<Utc>>("creation_date"),
+            alias: None,
+        };
+    
+        return Ok(Some(result));
+    }
+    else { return Ok(None); }
 
-    let new_person: Person = Person {
-        id: query_result.get::<_, Uuid>("id"),
-        email_address: query_result.get::<_, String>("email_address"),
-        creation_date: query_result.get::<_, DateTime<Utc>>("creation_date"),
-        alias: None,
-    };
-
-    return Ok(new_person);
+    
 }

@@ -12,10 +12,12 @@ impl<'r> FromRequest<'r> for User {
         
         let user_id = request.cookies()
             .get_private("user_id")
-            .and_then(|cookie| Uuid::parse_str(
-                &cookie
-                .value()   
-                .to_owned())
+            .and_then(
+                |cookie| Uuid::parse_str(
+                    &cookie
+                    .value()   
+                    .to_owned()
+                )
                 .ok()
             );
 
