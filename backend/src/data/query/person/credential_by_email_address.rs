@@ -37,7 +37,7 @@ pub async fn credential_by_email_address_query(
                 ]
             )
         .await
-        .context(format!("An error occurred while querying the database."))?
+        .context("An error occurred while querying the database.".to_string())?
     ;
 
     if let Some(person) = query_result {

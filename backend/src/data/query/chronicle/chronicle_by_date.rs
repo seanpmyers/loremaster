@@ -29,7 +29,7 @@ pub async fn chronicle_by_date_query(
          &[&chronicle_date.to_string()]
       )
       .await
-      .context(format!("An error occurred while querying the database."))?;
+      .context("An error occurred while querying the database.".to_string())?;
    match query_result {
        Some(row) => {
             let result = Chronicle {

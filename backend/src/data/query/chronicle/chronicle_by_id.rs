@@ -21,7 +21,7 @@ const CHRONICLE_BY_ID_QUERY : &str = "
 
 pub async fn chronicle_by_id_query(database_connection: &Connection<PgConnectionManager<NoTls>>, chronicle_id: &Uuid) -> Result<Option<Chronicle>> {
    let query_result = database_connection.query(CHRONICLE_BY_ID_QUERY, &[&chronicle_id])
-   .await.context(format!("An error occurred while querying the database."))?;
+   .await.context("An error occurred while querying the database.".to_string())?;
    if query_result.len() == 0 { return Ok(None);}
    
    match query_result.get(0) {

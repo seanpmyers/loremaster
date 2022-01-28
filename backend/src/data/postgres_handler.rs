@@ -18,9 +18,9 @@ pub struct PostgresHandler {
 impl PostgresHandler {
    pub async fn new() -> Result<Self> {
       let connection_string : String = get_secret(POSTGRES_TOML_FIELD)
-         .context(format!("Failed to get connection string from secret file!"))?;
+         .context("Failed to get connection string from secret file!".to_string())?;
       let database_pool = create_database_pool(&connection_string)
-         .context(format!("Something went wrong while creating a database pool!"))?; 
+         .context("Something went wrong while creating a database pool!".to_string())?; 
       let new_handler: PostgresHandler = PostgresHandler{
          connection_string, 
          database_pool
@@ -33,7 +33,8 @@ impl PostgresHandler {
 pub fn create_database_pool(
    connection_string: &str
 ) -> Result<Pool<PgConnectionManager<NoTls>>> {
-   let config = Config::from_str(connection_string).context(format!("Failed to create database config from connection string!"))?;
+   let config = Config::from_str(connection_string)
+      .context("Failed to create database config from connection string!".to_string())?;
    let manager = PgConnectionManager::new(config, NoTls);
    let result = Pool::builder()
       .max_open(DB_POOL_MAX_OPEN)

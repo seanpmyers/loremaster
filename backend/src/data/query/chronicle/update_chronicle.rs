@@ -21,8 +21,13 @@ const UPDATE_CHRONICLE_QUERY : &str = "
 
 pub async fn update_chronicle_query(database_connection: &Connection<PgConnectionManager<NoTls>>, chronicle_to_update: &Chronicle) -> Result<Chronicle> {
     let query_result: Row = database_connection
-      .query_one(UPDATE_CHRONICLE_QUERY, &[&chronicle_to_update.date_recorded.to_string(), &chronicle_to_update.id])
-      .await.context(format!("An error occurred while querying the database."))?;
+      .query_one(
+        UPDATE_CHRONICLE_QUERY, 
+        &[&chronicle_to_update.date_recorded.to_string(), 
+        &chronicle_to_update.id]
+      )
+      .await
+      .context("An error occurred while querying the database.".to_string())?;
 
     let updated_chronicle: Chronicle = Chronicle{
         id: query_result.get::<_, Uuid>("id"),

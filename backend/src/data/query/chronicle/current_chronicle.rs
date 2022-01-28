@@ -33,7 +33,7 @@ pub async fn get_current_chronicle_query(
             CURRENT_CHRONICLE_QUERY, 
             &[&user_id])
         .await
-        .context(format!("An error occurred while querying the database."))?;
+        .context("An error occurred while querying the database.".to_string())?;
 
     if query_result.len() == 0 { return Ok(None);}
    

@@ -42,7 +42,7 @@ pub async fn today(
     let database_connection: Connection<PgConnectionManager<NoTls>> = postgres_service.database_pool
         .get()
         .await
-        .context(format!("Failed to get database connection!"))
+        .context("Failed to get database connection!".to_string())
         .unwrap();
 
     info!("LOREMASTER: Connected to database.");
@@ -51,7 +51,7 @@ pub async fn today(
 
     let query_result = get_current_chronicle_query(&database_connection, &user.0)
         .await
-        .context(format!("Failed to execute query for current chronicle!"))
+        .context("Failed to execute query for current chronicle!".to_string())
         .unwrap();
     
     match query_result {
@@ -63,7 +63,7 @@ pub async fn today(
             info!("LOREMASTER: No chronicle found for today. Generating new chronicle...");
             let result = create_chronicle_query(&database_connection, &today, &None)
                 .await
-                .context(format!("Failed to execute create new chronicle query!"))
+                .context("Failed to execute create new chronicle query!".to_string())
                 .unwrap();
             return Json(result);
         }
@@ -78,7 +78,7 @@ pub async fn by_date(
     let database_connection: Connection<PgConnectionManager<NoTls>> = postgres_service.database_pool
         .get()
         .await
-        .context(format!("Failed to get database connection!"))
+        .context("Failed to get database connection!".to_string())
         .unwrap();
 
     let chronicle_date = offset::Utc::now();
@@ -103,7 +103,7 @@ pub async fn by_id(
     let database_connection: Connection<PgConnectionManager<NoTls>> = postgres_service.database_pool
         .get()
         .await
-        .context(format!("Failed to get database connection!"))
+        .context("Failed to get database connection!".to_string())
         .unwrap();
     let chronicle_id = Uuid::new_v4();
     let query_result = chronicle_by_id_query(&database_connection, &chronicle_id)
@@ -124,7 +124,7 @@ pub async fn update(
         .database_pool
         .get()
         .await
-        .context(format!("Failed to get database connection!"))
+        .context("Failed to get database connection!".to_string())
         .unwrap();
 
     let chronicle = Chronicle{
@@ -147,7 +147,7 @@ pub async fn delete(
         .database_pool
         .get()
         .await
-        .context(format!("Failed to get database connection!"))
+        .context("Failed to get database connection!".to_string())
         .unwrap();
 
     let chronicle_id: Uuid = Uuid::new_v4();

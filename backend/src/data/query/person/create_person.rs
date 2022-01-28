@@ -9,7 +9,7 @@ use chrono::{
 };
 use mobc::Connection;
 use mobc_postgres::PgConnectionManager;
-use tokio_postgres::NoTls;
+use tokio_postgres::{NoTls, Row};
 use uuid::Uuid;
 
 use crate::data::entity::person::{
@@ -28,21 +28,20 @@ const QUERY : &str = "
 pub async fn create_person_query(
     database_connection: &Connection<PgConnectionManager<NoTls>>, 
     email_address: &String, 
-    hashed_password: &String, 
-    creation_date: &DateTime<Utc>
+    encrypted_password: &String, 
 ) -> Result<Person> {
-    
-    let query_result = database_connection
+    let creation_date: DateTime<Utc> = Utc::now();
+    let query_result: Row = database_connection
         .query_one(
             QUERY, 
             &[
                 &email_address, 
-                &hashed_password, 
+                &encrypted_password, 
                 &creation_date.to_string()
                 ]
             )
         .await
-        .context(format!("An error occurred while querying the database."))?
+        .context("An error occurred while querying the database.".to_string())?
     ;
 
     let new_person: Person = Person {

@@ -31,15 +31,16 @@ mod tests {
         postgres_context.database_pool
         .get()
         .await?;
-      let test_date: DateTime<Utc> = offset::Utc::now();
       
-      let hashed_password: String = PasswordEncryptionService::encrypt_password(TEST_PASSWORD)?;
+      let hashed_password: String = PasswordEncryptionService::encrypt_password(
+        TEST_PASSWORD
+      )?;
 
       let _new_person = create_person_query(
         &database_connection, 
         &TEST_EMAIL.to_string(), 
         &hashed_password,
-        &test_date).await?
+        ).await?
       ;
       
       return Ok(());

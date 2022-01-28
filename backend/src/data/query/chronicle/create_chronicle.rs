@@ -30,7 +30,7 @@ pub async fn create_chronicle_query(database_connection: &Connection<PgConnectio
         Some(id) => {
             let query_result = database_connection
             .query_one(CREATE_CHRONICLE_QUERY_WITH_ID, &[&id, &chronicle_date.to_string()])
-            .await.context(format!("An error occurred while querying the database."))?;
+            .await.context("An error occurred while querying the database.".to_string())?;
 
             let result_id: Uuid = query_result.get::<_, Uuid>("id");
 
@@ -44,7 +44,7 @@ pub async fn create_chronicle_query(database_connection: &Connection<PgConnectio
         None => {
             let query_result = database_connection
             .query_one(CREATE_CHRONICLE_QUERY, &[&chronicle_date.to_string()])
-            .await.context(format!("An error occurred while querying the database."))?;
+            .await.context("An error occurred while querying the database.".to_string())?;
     
             let result_id: Uuid = query_result.get::<_, Uuid>("id");
         

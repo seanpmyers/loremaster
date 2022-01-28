@@ -10,6 +10,6 @@ const SECRET_FILE_PATH : &str = "./../../../secrets/loremaster.toml";
 
 pub fn get_secret(secret_name: &str) -> Result<String> {
    let result = toml_reader::get_field_value(SECRET_FILE_PATH, secret_name)
-      .context(format!("Requested secret not available in secret file!"))?;
+      .context("Requested secret not available in secret file!".to_string())?;
    return Ok(result);
 }

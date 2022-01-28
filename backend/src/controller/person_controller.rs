@@ -41,25 +41,24 @@ use crate::data::{
 //     routes![]
 //  }
 
-#[post("/create")]
-pub async fn create_person (postgres_service: &State<PostgresHandler>) -> Option<String> {
-    info!("LOREMASTER: Connecting to database...");
-    let database_connection: Connection<PgConnectionManager<NoTls>> = postgres_service
-        .database_pool
-        .get()
-        .await
-        .context(format!("Failed to get database connection!"))
-        .unwrap();
+// #[post("/create")]
+// pub async fn create_person (postgres_service: &State<PostgresHandler>) -> Option<String> {
+//     info!("LOREMASTER: Connecting to database...");
+//     let database_connection: Connection<PgConnectionManager<NoTls>> = postgres_service
+//         .database_pool
+//         .get()
+//         .await
+//         .context("Failed to get database connection!".to_string())
+//         .unwrap();
 
-    let email_address = "email";
-    let hashed_password = "password";
-    let creation_date: DateTime<Utc> = offset::Utc::now();
-    let _person = create_person_query(
-        &database_connection, 
-        &email_address.to_string(), 
-        &hashed_password.to_string(), 
-        &creation_date)
-        .await;
-    unimplemented!();
-    // return None;
-}
+//     let email_address = "email";
+//     let hashed_password = "password";
+//     let creation_date: DateTime<Utc> = offset::Utc::now();
+//     let _person = create_person_query(
+//         &database_connection, 
+//         &email_address.to_string(), 
+//         &hashed_password.to_string(), 
+//         ).await;
+//     unimplemented!();
+//     // return None;
+// }
