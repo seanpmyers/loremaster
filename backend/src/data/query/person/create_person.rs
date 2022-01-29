@@ -18,7 +18,12 @@ use crate::data::entity::person::{
 
 const QUERY : &str = "
     INSERT INTO
-        public.person (email_address, hashed_password, creation_date, alias)
+        public.person (
+            email_address, 
+            encrypted_password,
+            creation_date, 
+            alias
+        )
     VALUES 
     ($1, $2,TO_DATE($3, 'YYYY-MM-DD'), null)
     RETURNING

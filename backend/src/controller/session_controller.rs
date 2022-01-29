@@ -1,6 +1,4 @@
-
 use anyhow::{Context, Error};
-use chrono::Utc;
 use log::info;
 use mobc::Connection;
 use mobc_postgres::PgConnectionManager;
@@ -13,12 +11,14 @@ use rocket::{
    post, 
    http::{
        CookieJar, 
-       Cookie
+       Cookie, 
+       SameSite
     }, 
    response::{
-      content::Json, 
-      Redirect
-   }, routes, State
+      content::Json
+   }, 
+   routes, 
+   State
 };
 use tokio_postgres::NoTls;
 
@@ -28,9 +28,14 @@ use crate::{
         postgres_handler::PostgresHandler, 
         query::{
             person::{
-                credential_by_email_address::credential_by_email_address_query, create_person::create_person_query
+                credential_by_email_address::credential_by_email_address_query, 
+                create_person::create_person_query
             }
-        }, entity::person::{Credentials, Person}
+        }, 
+        entity::person::{
+            Credentials, 
+            Person
+        }
     }, 
     utility::{
         password_encryption::{
@@ -40,12 +45,13 @@ use crate::{
         constants::{
             FAILED_LOGIN_MESSAGE,
             SUCCESSFUL_LOGIN_MESSAGE, 
-            REGISTRATION_SUCCESS_MESSAGE, REGISTRATION_FAILURE_MESSAGE
+            REGISTRATION_SUCCESS_MESSAGE, 
+            REGISTRATION_FAILURE_MESSAGE
         }   
     }
 };
 
-use super::cookie_fields;
+use super::cookie_fields::{self, USER_ID, SESSION_ID};
 
 #[derive(FromForm)]
 struct CredentialsForm<'r> {
@@ -77,21 +83,22 @@ async fn register(
         .await
         .context("Failed to get database connection!".to_string())
         .unwrap();
-
+    info!("LOREMASTER: Checking for existing users with provided email address...");
     let existing_credentials: Option<Credentials> = credential_by_email_address_query(
         &database_connection, 
         &registration_form.email_address.to_string()
     ).await.unwrap();
     
     if existing_credentials.is_some() {
+        info!("LOREMASTER: Existing user found!");
         //Send an email to the specified address and indicate someone tried to re-register using that email
         return Json(REGISTRATION_SUCCESS_MESSAGE.to_string());
     }
-
+    info!("LOREMASTER: Email can be registered.");
     let encrypted_password = PasswordEncryptionService::encrypt_password(
         &registration_form.password
     ).unwrap();
-
+    info!("LOREMASTER: Adding new user to database...");
     let query_result: Result<Person, Error> = create_person_query(
         &database_connection, 
         &registration_form.email_address.to_string(), 
@@ -137,10 +144,14 @@ async fn authenticate(
         if !valid_password { return Json(FAILED_LOGIN_MESSAGE.to_string()); }
     
         cookie_jar.add_private(
-            Cookie::new(
+            Cookie::build(
                 cookie_fields::USER_ID, 
                 person.id.to_string()
             )
+            .http_only(true)
+            .secure(true)
+            .same_site(SameSite::Strict)
+            .finish()
         );
         return Json(SUCCESSFUL_LOGIN_MESSAGE.to_string());
         //return Ok(Redirect::to(uri!(index)));
@@ -152,10 +163,12 @@ async fn authenticate(
 #[post("/logout")]
 async fn logout(
     cookie_jar: &CookieJar<'_>
-) -> Redirect {
-    unimplemented!();
-    // jar.remove_private(Cookie::named("user_id"));
-    // Flash::success(Redirect::to(uri!(get_registration)), "Successfully logged out.")
+) -> Json<String> {
+    cookie_jar
+        .remove_private(Cookie::named(USER_ID));
+    cookie_jar
+        .remove_private(Cookie::named(SESSION_ID));
+    return Json("Cookies cleared.".to_string());
 }
 
 

@@ -17,6 +17,9 @@ email_address=person@loremaster.xyz
 &password=Test123!
 
 ###
+POST http://localhost:8000/logout HTTP/1.1
+
+###
 GET http://localhost:8000/chronicle/today
 
 ###

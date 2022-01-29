@@ -13,16 +13,14 @@ use uuid::Uuid;
 
 use crate::data::entity::person::{Person};
 
-const QUERY
- : &str = "
+const QUERY: &str = "
 SELECT
    email_address
-   , hashed_password
    , creation_date
 FROM
-   public.loremaster.person
+   public.person
 WHERE
-   person.email_address = '$1'
+   person.email_address = $1
 LIMIT 
    1
 ;";

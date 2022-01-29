@@ -15,11 +15,11 @@ const QUERY: &str = "
    SELECT
       id
       , email_address
-      , hashed_password
+      , encrypted_password
    FROM
       public.person
    WHERE
-      person.email_address = '$1'
+      person.email_address = $1
    LIMIT 
       1
 ;";
@@ -33,7 +33,7 @@ pub async fn credential_by_email_address_query(
         .query_opt(
             QUERY, 
             &[
-                &email_address, 
+                &email_address
                 ]
             )
         .await

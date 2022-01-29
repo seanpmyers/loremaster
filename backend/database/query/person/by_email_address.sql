@@ -1,6 +1,6 @@
 SELECT
    email_address
-   , hashed_password
+   , encrypted_password
 FROM
    public.loremaster.person
 WHERE
