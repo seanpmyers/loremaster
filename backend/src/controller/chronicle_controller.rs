@@ -58,7 +58,7 @@ pub async fn today(
         }
         None => {
             info!("LOREMASTER: User is not associated with today's chronicle. Generating new a relation...");
-            let result = create_chronicle_query(&database_connection, &today, &None)
+            let result = create(&database_connection, &today, &None)
                 .await
                 .context("Failed to execute create new chronicle query!".to_string())?;
             return Ok(Json(result));
