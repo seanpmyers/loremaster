@@ -7,16 +7,16 @@ use uuid::Uuid;
 
 use crate::data::entity::chronicle::Chronicle;
 
-const CREATE_CHRONICLE_QUERY : &str = "
+const CREATE_CHRONICLE_QUERY: &str = "
     INSERT INTO
         public.chronicle (date_recorded)
     VALUES 
-    (TO_DATE($1, 'YYYY-MM-DD'))
+        (TO_DATE($1, 'YYYY-MM-DD'))
     RETURNING
         id
     ;";
 
-const CREATE_CHRONICLE_QUERY_WITH_ID : &str = "
+const CREATE_CHRONICLE_QUERY_WITH_ID: &str = "
     INSERT INTO
         public.chronicle (id, date_recorded)
     VALUES 
@@ -25,36 +25,44 @@ const CREATE_CHRONICLE_QUERY_WITH_ID : &str = "
         id
     ;";
 
-pub async fn create_chronicle_query(database_connection: &Connection<PgConnectionManager<NoTls>>, chronicle_date: &DateTime<Utc>, chronicle_id:  &Option<Uuid>) -> Result<Chronicle> {
+pub async fn create_chronicle_query(
+    database_connection: &Connection<PgConnectionManager<NoTls>>,
+    chronicle_date: &DateTime<Utc>,
+    chronicle_id: &Option<Uuid>,
+) -> Result<Chronicle> {
     match chronicle_id {
         Some(id) => {
             let query_result = database_connection
-            .query_one(CREATE_CHRONICLE_QUERY_WITH_ID, &[&id, &chronicle_date.to_string()])
-            .await.context("An error occurred while querying the database.".to_string())?;
+                .query_one(
+                    CREATE_CHRONICLE_QUERY_WITH_ID,
+                    &[&id, &chronicle_date.to_string()],
+                )
+                .await
+                .context("An error occurred while querying the database.".to_string())?;
 
             let result_id: Uuid = query_result.get::<_, Uuid>("id");
 
-            let new_chronicle: Chronicle = Chronicle{
+            let new_chronicle: Chronicle = Chronicle {
                 id: result_id,
-                date_recorded: chronicle_date.clone()
+                date_recorded: chronicle_date.clone(),
             };
 
             return Ok(new_chronicle);
-        },
+        }
         None => {
             let query_result = database_connection
-            .query_one(CREATE_CHRONICLE_QUERY, &[&chronicle_date.to_string()])
-            .await.context("An error occurred while querying the database.".to_string())?;
-    
+                .query_one(CREATE_CHRONICLE_QUERY, &[&chronicle_date.to_string()])
+                .await
+                .context("An error occurred while querying the database.".to_string())?;
+
             let result_id: Uuid = query_result.get::<_, Uuid>("id");
-        
-            let new_chronicle: Chronicle = Chronicle{
+
+            let new_chronicle: Chronicle = Chronicle {
                 id: result_id,
-                date_recorded: chronicle_date.clone()
+                date_recorded: chronicle_date.clone(),
             };
-        
+
             return Ok(new_chronicle);
         }
     }
-
 }

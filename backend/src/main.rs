@@ -36,7 +36,8 @@ async fn main() -> Result<()>{
     info!("LOREMASTER: Starting up...");
 
     info!("LOREMASTER: Configuring database connection...");
-    let postgres_service: PostgresHandler = PostgresHandler::new().await?;
+    let postgres_service: PostgresHandler = PostgresHandler::new()
+        .await?;
     info!("LOREMASTER: Connection configured.");
 
     info!("LOREMASTER: Launching rocket http server...");

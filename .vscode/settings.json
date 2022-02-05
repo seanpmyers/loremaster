@@ -1,5 +1,7 @@
 {
    "cSpell.words": [
       "chrono"
-   ]
+   ],
+   "editor.insertSpaces": false,
+   "editor.tabSize": 2
 }

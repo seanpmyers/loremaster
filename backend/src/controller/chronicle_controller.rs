@@ -1,185 +1,163 @@
-use anyhow::{
-    Context
-};
-use chrono::{
-    offset, 
-    Utc, 
-    DateTime
-};
+use anyhow::Context;
+use chrono::{offset, DateTime, SecondsFormat, Utc};
 use log::info;
 use mobc::Connection;
 use mobc_postgres::PgConnectionManager;
-use rocket::{
-    State,
-    serde::json::Json, 
-    get, 
-    routes, 
-    post, 
-    delete, http::Status, 
-};
+use rocket::{delete, get, post, routes, serde::json::Json, State};
 use tokio_postgres::NoTls;
 use uuid::Uuid;
 
-
-use crate::{data::{
-   entity::chronicle::Chronicle,
-   postgres_handler::PostgresHandler, 
-   query::chronicle::{
-      create_chronicle::create_chronicle_query, 
-      current_chronicle::get_current_chronicle_query, 
-      chronicle_by_date::{chronicle_by_date_query}, 
-      delete_chronicle::delete_chronicle_query, 
-      update_chronicle::update_chronicle_query, chronicle_by_id::chronicle_by_id_query
-   }, 
-}, guards::user::User};
+use crate::{
+    api::response::ApiError,
+    data::{
+        entity::chronicle::Chronicle,
+        postgres_handler::PostgresHandler,
+        query::chronicle::{
+            chronicle_by_date::chronicle_by_date_query, chronicle_by_id::chronicle_by_id_query,
+            create_chronicle::create_chronicle_query,
+            current_chronicle::get_current_chronicle_query,
+            current_chronicle_by_person::get_current_chronicle_by_person_query,
+            delete_chronicle::delete_chronicle_query, update_chronicle::update_chronicle_query,
+        },
+    },
+    guards::user::User,
+};
 
 #[get("/today")]
 pub async fn today(
-    postgres_service: &State<PostgresHandler>, 
-    user: User
-) -> Json<Chronicle> {
+    postgres_service: &State<PostgresHandler>,
+    user: User,
+) -> Result<Json<Chronicle>, ApiError> {
     info!("LOREMASTER: Connecting to database...");
-    let database_connection: Connection<PgConnectionManager<NoTls>> = postgres_service.database_pool
+    let database_connection: Connection<PgConnectionManager<NoTls>> = postgres_service
+        .database_pool
         .get()
         .await
-        .context("Failed to get database connection!".to_string())
-        .unwrap();
+        .context("Failed to get database connection!".to_string())?;
 
     info!("LOREMASTER: Connected to database.");
     info!("LOREMASTER: Querying for today's chronicle.");
     let today: DateTime<Utc> = offset::Utc::now();
 
-    let query_result = get_current_chronicle_query(&database_connection, &user.0)
+    let current_chronicle_query_result: Option<Chronicle> =
+        get_current_chronicle_query(&database_connection).await?;
+
+    if current_chronicle_query_result.is_none() {
+        info!("LOREMASTER: No chronicle exits for the current date. Creating one...");
+        create_chronicle_query(&database_connection, &today, &None).await?;
+    }
+
+    let query_result = get_current_chronicle_by_person_query(&database_connection, &user.0)
         .await
-        .context("Failed to execute query for current chronicle!".to_string())
-        .unwrap();
-    
+        .context("Failed to execute query for current chronicle!".to_string())?;
+
     match query_result {
         Some(result) => {
-            info!("LOREMASTER: Existing chronicle found!"); 
-            return Json(result);
+            info!("LOREMASTER: Existing chronicle found!");
+            return Ok(Json(result));
         }
         None => {
-            info!("LOREMASTER: No chronicle found for today. Generating new chronicle...");
+            info!("LOREMASTER: User is not associated with today's chronicle. Generating new a relation...");
             let result = create_chronicle_query(&database_connection, &today, &None)
                 .await
-                .context("Failed to execute create new chronicle query!".to_string())
-                .unwrap();
-            return Json(result);
+                .context("Failed to execute create new chronicle query!".to_string())?;
+            return Ok(Json(result));
         }
     }
 }
 
 #[get("/by_date")]
 pub async fn by_date(
-    postgres_service: &State<PostgresHandler>
-) -> Option<Json<Chronicle>> {
+    postgres_service: &State<PostgresHandler>,
+) -> Result<Option<Json<Chronicle>>, ApiError> {
     info!("LOREMASTER: Connecting to database...");
-    let database_connection: Connection<PgConnectionManager<NoTls>> = postgres_service.database_pool
+    let database_connection: Connection<PgConnectionManager<NoTls>> = postgres_service
+        .database_pool
         .get()
         .await
-        .context("Failed to get database connection!".to_string())
-        .unwrap();
+        .context("Failed to get database connection!".to_string())?;
 
-    let chronicle_date = offset::Utc::now();
+    let chronicle_date: DateTime<Utc> = offset::Utc::now();
 
-    let query_result = chronicle_by_date_query(&database_connection, &chronicle_date)
-        .await
-        .unwrap();
+    let query_result = chronicle_by_date_query(&database_connection, &chronicle_date).await?;
 
     if let Some(result) = query_result {
-        return Some(Json(result))
-    }
-    else {
-        return None;
+        return Ok(Some(Json(result)));
+    } else {
+        return Ok(None);
     }
 }
 
 #[get("/by_id")]
 pub async fn by_id(
-    postgres_service: &State<PostgresHandler>
-) -> Option<Json<Chronicle>> {
+    postgres_service: &State<PostgresHandler>,
+) -> Result<Option<Json<Chronicle>>, ApiError> {
     info!("LOREMASTER: Connecting to database...");
-    let database_connection: Connection<PgConnectionManager<NoTls>> = postgres_service.database_pool
+    let database_connection: Connection<PgConnectionManager<NoTls>> = postgres_service
+        .database_pool
         .get()
         .await
-        .context("Failed to get database connection!".to_string())
-        .unwrap();
+        .context("Failed to get database connection!".to_string())?;
+
     let chronicle_id = Uuid::new_v4();
-    let query_result = chronicle_by_id_query(&database_connection, &chronicle_id)
-        .await
-        .unwrap();
+
+    let query_result = chronicle_by_id_query(&database_connection, &chronicle_id).await?;
+
     match query_result {
-        Some(result) => return Some(Json(result)),
-        None => return None
+        Some(result) => return Ok(Some(Json(result))),
+        None => return Ok(None),
     }
 }
 
 #[post("/update")]
 pub async fn update(
-    postgres_service: &State<PostgresHandler>
-) -> Json<Chronicle> {
+    postgres_service: &State<PostgresHandler>,
+) -> Result<Json<Chronicle>, ApiError> {
     info!("LOREMASTER: Connecting to database...");
     let database_connection: Connection<PgConnectionManager<NoTls>> = postgres_service
         .database_pool
         .get()
         .await
-        .context("Failed to get database connection!".to_string())
-        .unwrap();
+        .context("Failed to get database connection!".to_string())?;
 
-    let chronicle = Chronicle{
+    let chronicle: Chronicle = Chronicle {
         id: Uuid::new_v4(),
         date_recorded: offset::Utc::now(),
     };
 
-    let query_result = update_chronicle_query(&database_connection, &chronicle)
-        .await
-        .unwrap();
-    return Json(query_result);
+    let query_result: Chronicle = update_chronicle_query(&database_connection, &chronicle).await?;
+    return Ok(Json(query_result));
 }
 
 #[delete("/delete")]
-pub async fn delete(
-    postgres_service: &State<PostgresHandler>
-) -> Status {
+pub async fn delete(postgres_service: &State<PostgresHandler>) -> Result<(), ApiError> {
     info!("LOREMASTER: Connecting to database...");
     let database_connection: Connection<PgConnectionManager<NoTls>> = postgres_service
         .database_pool
         .get()
         .await
-        .context("Failed to get database connection!".to_string())
-        .unwrap();
+        .context("Failed to get database connection!".to_string())?;
 
     let chronicle_id: Uuid = Uuid::new_v4();
 
-    delete_chronicle_query(&database_connection, &chronicle_id)
-        .await
-        .unwrap();
-    return Status::Ok;
+    delete_chronicle_query(&database_connection, &chronicle_id).await?;
+    return Ok(());
 }
 
 #[get("/server_time")]
-pub fn server_time() -> Json<DateTime<Utc>> {
-    return Json(Utc::now());
+pub fn server_time() -> Result<String, ApiError> {
+    return Ok(Utc::now().to_rfc3339_opts(SecondsFormat::Nanos, true));
 }
 
 #[get("/example")]
-pub fn example() -> Json<Chronicle> {
+pub fn example() -> Result<Json<Chronicle>, ApiError> {
     let result: Chronicle = Chronicle {
         id: Uuid::new_v4(),
         date_recorded: Utc::now(),
     };
-    return Json(result);
+    return Ok(Json(result));
 }
 
 pub fn routes() -> Vec<rocket::Route> {
-    routes![
-        by_date,
-        by_id,
-        today,
-        update,
-        delete,
-        server_time,
-        example
-    ]
- }
+    routes![by_date, by_id, today, update, delete, server_time, example]
+}
