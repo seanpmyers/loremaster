@@ -26,6 +26,9 @@ mod tests {
         },
     };
 
+    const TEST_PERSON_ID: &str = "";
+    const TEST_CHRONICLE_ID: &str = "98e94305-78c6-44f7-85fa-33f485647f7e";
+
     #[tokio::test]
     async fn test_get_current_chronicle() -> Result<()> {
         let postgres_context: PostgresHandler = PostgresHandler::new().await?;
@@ -36,24 +39,32 @@ mod tests {
 
     #[tokio::test]
     async fn test_create_chronicle() -> Result<()> {
+        let person_id: Uuid = Uuid::from_str(TEST_PERSON_ID)?;
         let postgres_context: PostgresHandler = PostgresHandler::new().await?;
         let database_connection = postgres_context.database_pool.get().await?;
         let test_date: DateTime<Utc> = offset::Utc::now() + Duration::days(7);
-        let query_result = create_chronicle_query(&database_connection, &test_date, &None).await?;
+        let query_result =
+            create_chronicle_query(&database_connection, &test_date, &person_id, &None).await?;
         assert_eq!(test_date, query_result.date_recorded);
         return Ok(());
     }
 
     #[tokio::test]
     async fn test_create_chronicle_with_id() -> Result<()> {
-        let id = Uuid::from_str("98e94305-78c6-44f7-85fa-33f485647f7e")?;
+        let chronicle_id: Uuid = Uuid::from_str(TEST_CHRONICLE_ID)?;
+        let person_id: Uuid = Uuid::from_str(TEST_PERSON_ID)?;
         let postgres_context: PostgresHandler = PostgresHandler::new().await?;
         let database_connection = postgres_context.database_pool.get().await?;
         let test_date: DateTime<Utc> = offset::Utc::now() + Duration::days(8);
-        let query_result: Chronicle =
-            create_chronicle_query(&database_connection, &test_date, &Some(id)).await?;
+        let query_result: Chronicle = create_chronicle_query(
+            &database_connection,
+            &test_date,
+            &person_id,
+            &Some(chronicle_id),
+        )
+        .await?;
         assert_eq!(test_date, query_result.date_recorded);
-        assert_eq!(id, query_result.id);
+        assert_eq!(chronicle_id, query_result.id);
         return Ok(());
     }
 
@@ -61,9 +72,9 @@ mod tests {
     async fn test_get_chronicle_by_id() -> Result<()> {
         let postgres_context: PostgresHandler = PostgresHandler::new().await?;
         let database_connection = postgres_context.database_pool.get().await?;
-        let test_id: Uuid = Uuid::from_str("98e94305-78c6-44f7-85fa-33f485647f7e")?;
+        let chronicle_id: Uuid = Uuid::from_str(TEST_CHRONICLE_ID)?;
         let query_result: Option<Chronicle> =
-            chronicle_by_id_query(&database_connection, &test_id).await?;
+            chronicle_by_id_query(&database_connection, &chronicle_id).await?;
         match query_result {
             Some(chronicle) => {
                 println!("{}, {}", chronicle.id, chronicle.date_recorded);
@@ -75,11 +86,12 @@ mod tests {
 
     #[tokio::test]
     async fn test_get_chronicle_by_date() -> Result<()> {
+        let person_id: Uuid = Uuid::from_str(TEST_PERSON_ID)?;
         let postgres_context: PostgresHandler = PostgresHandler::new().await?;
         let database_connection = postgres_context.database_pool.get().await?;
         let test_date: DateTime<Utc> = offset::Utc::now() + Duration::days(7);
         let query_result: Option<Chronicle> =
-            chronicle_by_date_query(&database_connection, &test_date).await?;
+            chronicle_by_date_query(&database_connection, &test_date, &person_id).await?;
         match query_result {
             Some(chronicle) => {
                 println!("{}", chronicle.date_recorded);
@@ -91,11 +103,12 @@ mod tests {
 
     #[tokio::test]
     async fn test_update_chronicle() -> Result<()> {
+        let person_id: Uuid = Uuid::from_str(TEST_PERSON_ID)?;
         let postgres_context: PostgresHandler = PostgresHandler::new().await?;
         let database_connection = postgres_context.database_pool.get().await?;
         let test_date: DateTime<Utc> = offset::Utc::now() + Duration::days(7);
         let query_result: Option<Chronicle> =
-            chronicle_by_date_query(&database_connection, &test_date).await?;
+            chronicle_by_date_query(&database_connection, &test_date, &person_id).await?;
         if let Some(mut chronicle) = query_result {
             println!("{}", chronicle.date_recorded);
             chronicle.date_recorded = chronicle.date_recorded + Duration::days(1);
@@ -110,10 +123,10 @@ mod tests {
 
     #[tokio::test]
     async fn test_delete_chronicle() -> Result<()> {
+        let chronicle_id: Uuid = Uuid::from_str(TEST_CHRONICLE_ID)?;
         let postgres_context: PostgresHandler = PostgresHandler::new().await?;
         let database_connection = postgres_context.database_pool.get().await?;
-        let test_id: Uuid = Uuid::from_str("98e94305-78c6-44f7-85fa-33f485647f7e")?;
-        delete_chronicle_query(&database_connection, &test_id).await?;
+        delete_chronicle_query(&database_connection, &chronicle_id).await?;
         return Ok(());
     }
 }

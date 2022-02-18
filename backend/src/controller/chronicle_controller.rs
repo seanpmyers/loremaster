@@ -44,7 +44,7 @@ pub async fn today(
 
     if current_chronicle_query_result.is_none() {
         info!("LOREMASTER: No chronicle exits for the current date. Creating one...");
-        create_chronicle_query(&database_connection, &today, &None).await?;
+        create_chronicle_query(&database_connection, &today, &user.0, &None).await?;
     }
 
     let query_result = get_current_chronicle_by_person_query(&database_connection, &user.0)
@@ -58,7 +58,7 @@ pub async fn today(
         }
         None => {
             info!("LOREMASTER: User is not associated with today's chronicle. Generating new a relation...");
-            let result = create_chronicle_query(&database_connection, &today, &None)
+            let result = create_chronicle_query(&database_connection, &today, &user.0, &None)
                 .await
                 .context("Failed to execute create new chronicle query!".to_string())?;
             return Ok(Json(result));
@@ -69,6 +69,7 @@ pub async fn today(
 #[get("/by_date")]
 pub async fn by_date(
     postgres_service: &State<PostgresHandler>,
+    user: User,
 ) -> Result<Option<Json<Chronicle>>, ApiError> {
     info!("LOREMASTER: Connecting to database...");
     let database_connection: Connection<PgConnectionManager<NoTls>> = postgres_service
@@ -79,7 +80,8 @@ pub async fn by_date(
 
     let chronicle_date: DateTime<Utc> = offset::Utc::now();
 
-    let query_result = chronicle_by_date_query(&database_connection, &chronicle_date).await?;
+    let query_result: Option<Chronicle> =
+        chronicle_by_date_query(&database_connection, &chronicle_date, &user.0).await?;
 
     if let Some(result) = query_result {
         return Ok(Some(Json(result)));

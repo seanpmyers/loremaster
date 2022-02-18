@@ -15,15 +15,20 @@ const CHRONICLE_BY_DATE_QUERY: &str = "
       public.chronicle
    WHERE
       chronicle.date_recorded = (TO_DATE($1, 'YYYY-MM-DD'))
+      AND chronicle.person_id = $2
    LIMIT 1
     ;";
 
 pub async fn chronicle_by_date_query(
     database_connection: &Connection<PgConnectionManager<NoTls>>,
     chronicle_date: &DateTime<Utc>,
+    person_id: &Uuid,
 ) -> Result<Option<Chronicle>> {
     let query_result = database_connection
-        .query_opt(CHRONICLE_BY_DATE_QUERY, &[&chronicle_date.to_string()])
+        .query_opt(
+            CHRONICLE_BY_DATE_QUERY,
+            &[&chronicle_date.to_string(), &person_id],
+        )
         .await
         .context("An error occurred while querying the database.".to_string())?;
     match query_result {

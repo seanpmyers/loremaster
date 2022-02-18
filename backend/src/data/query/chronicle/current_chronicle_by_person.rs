@@ -13,21 +13,18 @@ const CURRENT_CHRONICLE_QUERY: &str = "
         , chronicle.date_recorded
     FROM
         public.chronicle
-    INNER JOIN
-        public.person_chronicle
-        ON chronicle.id = person_chronicle.chronicle_id
     WHERE
         chronicle.date_recorded = CURRENT_DATE
-        AND person_chronicle.person_id = $1
+        AND chronicle.person_id = $1
     LIMIT 1
     ;";
 
 pub async fn get_current_chronicle_by_person_query(
     database_connection: &Connection<PgConnectionManager<NoTls>>,
-    user_id: &Uuid,
+    person_id: &Uuid,
 ) -> Result<Option<Chronicle>> {
     let query_result: Option<Row> = database_connection
-        .query_opt(CURRENT_CHRONICLE_QUERY, &[&user_id])
+        .query_opt(CURRENT_CHRONICLE_QUERY, &[&person_id])
         .await
         .context("An error occurred while querying the database.".to_string())?;
 
