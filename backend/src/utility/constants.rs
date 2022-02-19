@@ -1,4 +1,7 @@
-pub const FAILED_LOGIN_MESSAGE: &str ="Unable to verify your identity with the credentials you've provided.";
+pub mod database;
+
+pub const FAILED_LOGIN_MESSAGE: &str =
+    "Unable to verify your identity with the credentials you've provided.";
 pub const SUCCESSFUL_LOGIN_MESSAGE: &str = "User authenticated successfully!";
 
 pub const REGISTRATION_SUCCESS_MESSAGE: &str = "Account created successfully!";

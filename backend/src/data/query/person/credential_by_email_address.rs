@@ -1,14 +1,13 @@
-use anyhow::{
-   Context, 
-   Result
-};
+use anyhow::{anyhow, Result};
+use log::error;
 use mobc::Connection;
 use mobc_postgres::PgConnectionManager;
 use tokio_postgres::NoTls;
 use uuid::Uuid;
 
-use crate::data::entity::person::{
-   Credentials
+use crate::{
+    data::entity::person::Credentials,
+    utility::constants::database::{EMAIL_ADDRESS, ENCRYPTED_PASSWORD, ID},
 };
 
 const QUERY: &str = "
@@ -25,29 +24,31 @@ const QUERY: &str = "
 ;";
 
 pub async fn credential_by_email_address_query(
-    database_connection: &Connection<PgConnectionManager<NoTls>>, 
-    email_address: &String, 
+    database_connection: &Connection<PgConnectionManager<NoTls>>,
+    email_address: &String,
 ) -> Result<Option<Credentials>> {
-    
-    let query_result = database_connection
-        .query_opt(
-            QUERY, 
-            &[
-                &email_address
-                ]
-            )
-        .await
-        .context("An error occurred while querying the database.".to_string())?
-    ;
+    let query_result: Result<Option<tokio_postgres::Row>, tokio_postgres::Error> =
+        database_connection
+            .query_opt(QUERY, &[&email_address])
+            .await;
 
-    if let Some(person) = query_result {
-      let result: Credentials = Credentials {
-         id: person.get::<_, Uuid>("id"),
-         email_address: person.get::<_, String>("email_address"),
-         encrypted_password: person.get::<_, String>("encrypted_password")
-       };
-   
-       return Ok(Some(result));
+    match query_result {
+        Ok(row) => {
+            if let Some(person) = row {
+                let result: Credentials = Credentials {
+                    id: person.get::<_, Uuid>(ID),
+                    email_address: person.get::<_, String>(EMAIL_ADDRESS),
+                    encrypted_password: person.get::<_, String>(ENCRYPTED_PASSWORD),
+                };
+
+                return Ok(Some(result));
+            } else {
+                return Ok(None);
+            }
+        }
+        Err(error) => {
+            error!("{}", error);
+            return Err(anyhow!("Something went wrong creating the new person."));
+        }
     }
-    else { return Ok(None); }
 }

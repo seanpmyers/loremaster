@@ -58,6 +58,7 @@ async fn register(
         .get()
         .await
         .context("Failed to get database connection!".to_string())?;
+
     info!("LOREMASTER: Checking for existing users with provided email address...");
     let existing_credentials: Option<Credentials> = credential_by_email_address_query(
         &database_connection,

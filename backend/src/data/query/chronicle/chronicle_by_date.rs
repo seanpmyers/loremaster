@@ -1,11 +1,14 @@
 use anyhow::{Context, Result};
-use chrono::{DateTime, NaiveDateTime, TimeZone, Utc};
+use chrono::{DateTime, NaiveDate, TimeZone, Utc};
 use mobc::Connection;
 use mobc_postgres::PgConnectionManager;
 use tokio_postgres::NoTls;
 use uuid::Uuid;
 
-use crate::data::entity::chronicle::Chronicle;
+use crate::{
+    data::entity::chronicle::Chronicle,
+    utility::constants::database::{DATE_RECORDED, ID},
+};
 
 const CHRONICLE_BY_DATE_QUERY: &str = "
    SELECT
@@ -14,7 +17,7 @@ const CHRONICLE_BY_DATE_QUERY: &str = "
    FROM
       public.chronicle
    WHERE
-      chronicle.date_recorded = (TO_DATE($1, 'YYYY-MM-DD'))
+      chronicle.date_recorded = $1
       AND chronicle.person_id = $2
    LIMIT 1
     ;";
@@ -34,10 +37,9 @@ pub async fn chronicle_by_date_query(
     match query_result {
         Some(row) => {
             let result = Chronicle {
-                id: row.get::<_, Uuid>("id"),
+                id: row.get::<_, Uuid>(ID),
                 date_recorded: Utc
-                    .from_local_datetime(&row.get::<_, NaiveDateTime>("date_recorded"))
-                    .unwrap(),
+                    .from_utc_datetime(&row.get::<_, NaiveDate>(DATE_RECORDED).and_hms(0, 0, 0)),
             };
             return Ok(Some(result));
         }

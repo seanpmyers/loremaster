@@ -16,7 +16,7 @@ mod tests {
         utility::password_encryption::{PasswordEncryption, PasswordEncryptionService},
     };
 
-    use super::person_by_email_address::person_by_email_address_query;
+    use super::person_by_email_address::_person_by_email_address_query;
 
     const TEST_EMAIL: &str = "testemail@email.com";
     const TEST_PASSWORD: &str = "testPassword123!";
@@ -47,7 +47,7 @@ mod tests {
             postgres_context.database_pool.get().await?;
 
         let _query_result: Option<Person> =
-            person_by_email_address_query(&database_connection, &TEST_EMAIL.to_string()).await?;
+            _person_by_email_address_query(&database_connection, &TEST_EMAIL.to_string()).await?;
 
         return Ok(());
     }

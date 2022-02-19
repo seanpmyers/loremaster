@@ -44,7 +44,14 @@ pub async fn today(
 
     if current_chronicle_query_result.is_none() {
         info!("LOREMASTER: No chronicle exits for the current date. Creating one...");
-        create_chronicle_query(&database_connection, &today, &user.0, &None).await?;
+        let new_chronicle_id: Uuid = Uuid::new_v4();
+        create_chronicle_query(
+            &database_connection,
+            &today,
+            &user.0,
+            &Some(new_chronicle_id),
+        )
+        .await?;
     }
 
     let query_result = get_current_chronicle_by_person_query(&database_connection, &user.0)
