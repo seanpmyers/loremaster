@@ -1,30 +1,26 @@
-use anyhow::{Result};
-use chrono::{offset};
+use anyhow::Result;
+use chrono::offset;
 use env_logger::{Builder, Target};
-use log::{LevelFilter, info};
-use std::{io::Write};
+use log::{info, LevelFilter};
+use std::io::Write;
 
 mod api;
-mod data;
-mod utility;
 pub mod controller;
+mod data;
 pub mod guards;
+mod utility;
 
-use data::{
-    postgres_handler::PostgresHandler
-};
+use data::postgres_handler::PostgresHandler;
 
-use crate::controller::{
-    chronicle_controller, 
-    session_controller
-};
+use crate::controller::{chronicle_controller, session_controller};
 
 #[rocket::main]
-async fn main() -> Result<()>{
+async fn main() -> Result<()> {
     Builder::new()
         .target(Target::Stdout)
         .format(|buf, record| -> Result<(), std::io::Error> {
-            writeln!(buf,
+            writeln!(
+                buf,
                 "{} [{}] - {}",
                 offset::Utc::now().to_rfc3339(),
                 record.level(),
@@ -36,8 +32,7 @@ async fn main() -> Result<()>{
     info!("LOREMASTER: Starting up...");
 
     info!("LOREMASTER: Configuring database connection...");
-    let postgres_service: PostgresHandler = PostgresHandler::new()
-        .await?;
+    let postgres_service: PostgresHandler = PostgresHandler::new().await?;
     info!("LOREMASTER: Connection configured.");
 
     info!("LOREMASTER: Launching rocket http server...");
@@ -46,8 +41,8 @@ async fn main() -> Result<()>{
         .mount("/", session_controller::routes())
         .mount("/chronicle", chronicle_controller::routes())
         .launch()
-    .await?;
-    
+        .await?;
+
     info!("LOREMASTER: Shutting down...");
     return Ok(());
 }

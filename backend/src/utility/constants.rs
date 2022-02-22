@@ -1,4 +1,5 @@
 pub mod database;
+pub mod files;
 
 pub const FAILED_LOGIN_MESSAGE: &str =
     "Unable to verify your identity with the credentials you've provided.";

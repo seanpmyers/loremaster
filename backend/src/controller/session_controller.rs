@@ -6,8 +6,12 @@ use rocket::{
     form::{Form, FromForm},
     get,
     http::{Cookie, CookieJar},
-    post, routes, State,
+    post,
+    response::content::Html,
+    routes, State,
 };
+
+use tokio::fs;
 use tokio_postgres::NoTls;
 
 use crate::{
@@ -22,6 +26,7 @@ use crate::{
     },
     utility::{
         constants::{
+            files::{INDEX_PATH, REGISTRATION_PATH},
             FAILED_LOGIN_MESSAGE, REGISTRATION_FAILURE_MESSAGE, REGISTRATION_SUCCESS_MESSAGE,
             SUCCESSFUL_LOGIN_MESSAGE,
         },
@@ -45,7 +50,28 @@ macro_rules! session_uri {
 pub use session_uri as uri;
 
 #[get("/")]
-async fn index() {}
+async fn index() -> Result<Html<String>, ApiError> {
+    let index_html: String = String::from_utf8(
+        fs::read(INDEX_PATH)
+            .await
+            .context("Something went wrong reading the index file!")?,
+    )
+    .context("Failed to convert the html to a string.")?;
+
+    return Ok(Html(index_html));
+}
+
+#[get("/registration")]
+async fn registration() -> Result<Html<String>, ApiError> {
+    let registration_html: String = String::from_utf8(
+        fs::read(REGISTRATION_PATH)
+            .await
+            .context("Something went wrong reading the registration file!")?,
+    )
+    .context("Failed to convert the html to a string.")?;
+
+    return Ok(Html(registration_html));
+}
 
 #[post("/register", data = "<registration_form>")]
 async fn register(
@@ -141,5 +167,5 @@ async fn logout(cookie_jar: &CookieJar<'_>) -> Result<String, ApiError> {
 }
 
 pub fn routes() -> Vec<rocket::Route> {
-    routes![index, register, authenticate, logout]
+    routes![index, register, registration, authenticate, logout]
 }
