@@ -14,13 +14,22 @@ env_logger = "0.8.4"
 log = "0.4.14"
 mobc = "0.7.3"
 mobc-postgres = "0.7.0"
-rocket = { version = "0.5.0-rc.1", features = ["secrets", "json", "tls", "uuid"] }
+perseus = { version = "0.3.2", features = ["hydrate"] }
+rocket = { version = "0.5.0-rc.1", features = [
+	"secrets",
+	"json",
+	"tls",
+	"uuid",
+] }
 serde = { version = "1.0.130", features = ["derive"] }
 serde_json = "1.0.74"
 sycamore = "0.7.1"
 thiserror = "1.0.30"
 tokio = { version = "1.14.0", features = ["full"] }
-tokio-postgres = { version = "0.7.5", features = ["with-uuid-0_8", "with-chrono-0_4"]}
+tokio-postgres = { version = "0.7.5", features = [
+	"with-uuid-0_8",
+	"with-chrono-0_4",
+] }
 tokio-test = "0.4.2"
 toml = "0.5.8"
 uuid = { version = "0.8.2", features = ["v4", "serde"] }

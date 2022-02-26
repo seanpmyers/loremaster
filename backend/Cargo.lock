@@ -328,6 +328,41 @@ dependencies = [
 ]
 
 [[package]]
+name = "darling"
+version = "0.13.1"
+source = "registry+https://github.com/rust-lang/crates.io-index"
+checksum = "d0d720b8683f8dd83c65155f0530560cba68cd2bf395f6513a483caee57ff7f4"
+dependencies = [
+ "darling_core",
+ "darling_macro",
+]
+
+[[package]]
+name = "darling_core"
+version = "0.13.1"
+source = "registry+https://github.com/rust-lang/crates.io-index"
+checksum = "7a340f241d2ceed1deb47ae36c4144b2707ec7dd0b649f894cb39bb595986324"
+dependencies = [
+ "fnv",
+ "ident_case",
+ "proc-macro2",
+ "quote",
+ "strsim",
+ "syn",
+]
+
+[[package]]
+name = "darling_macro"
+version = "0.13.1"
+source = "registry+https://github.com/rust-lang/crates.io-index"
+checksum = "72c41b3b7352feb3211a0d743dc5700a4e3b60f51bd2b368892d1e0f9a95f44b"
+dependencies = [
+ "darling_core",
+ "quote",
+ "syn",
+]
+
+[[package]]
 name = "derive_more"
 version = "0.99.14"
 source = "registry+https://github.com/rust-lang/crates.io-index"
@@ -434,6 +469,12 @@ dependencies = [
  "uncased",
  "version_check",
 ]
+
+[[package]]
+name = "fmterr"
+version = "0.1.1"
+source = "registry+https://github.com/rust-lang/crates.io-index"
+checksum = "6a224f8df6326425eee955a654c558a6459ae6f2c9a5a715b42856790df24222"
 
 [[package]]
 name = "fnv"
@@ -646,6 +687,15 @@ dependencies = [
 ]
 
 [[package]]
+name = "html-escape"
+version = "0.2.9"
+source = "registry+https://github.com/rust-lang/crates.io-index"
+checksum = "816ea801a95538fc5f53c836697b3f8b64a9d664c4f0b91efe1fe7c92e4dbcb7"
+dependencies = [
+ "utf8-width",
+]
+
+[[package]]
 name = "http"
 version = "0.2.4"
 source = "registry+https://github.com/rust-lang/crates.io-index"
@@ -708,6 +758,12 @@ dependencies = [
  "tracing",
  "want",
 ]
+
+[[package]]
+name = "ident_case"
+version = "1.0.1"
+source = "registry+https://github.com/rust-lang/crates.io-index"
+checksum = "b9e0384b61958566e926dc50660321d12159025e767c18e043daf26b70104c39"
 
 [[package]]
 name = "indexmap"
@@ -883,6 +939,7 @@ dependencies = [
  "log",
  "mobc",
  "mobc-postgres",
+ "perseus",
  "rocket",
  "serde",
  "serde_json",
@@ -923,6 +980,12 @@ name = "mime"
 version = "0.3.16"
 source = "registry+https://github.com/rust-lang/crates.io-index"
 checksum = "2a60c7ce501c71e03a9c9c0d35b861413ae925bd979cc7a4e30d060069aaac8d"
+
+[[package]]
+name = "minimal-lexical"
+version = "0.2.1"
+source = "registry+https://github.com/rust-lang/crates.io-index"
+checksum = "68354c5c6bd36d73ff3feceb05efa59b6acb7626617f4962be322a825e61f79a"
 
 [[package]]
 name = "mio"
@@ -990,6 +1053,17 @@ dependencies = [
  "tokio",
  "tokio-util",
  "twoway",
+ "version_check",
+]
+
+[[package]]
+name = "nom"
+version = "7.1.0"
+source = "registry+https://github.com/rust-lang/crates.io-index"
+checksum = "1b1d11e1ef389c76fe5b81bcaf2ea32cf88b62bc494e19f493d0b30e7a930109"
+dependencies = [
+ "memchr",
+ "minimal-lexical",
  "version_check",
 ]
 
@@ -1113,6 +1187,44 @@ name = "percent-encoding"
 version = "2.1.0"
 source = "registry+https://github.com/rust-lang/crates.io-index"
 checksum = "d4fd5641d01c8f18a23da7b6fe29298ff4b55afcccdf78973b24cf3175fee32e"
+
+[[package]]
+name = "perseus"
+version = "0.3.3"
+source = "registry+https://github.com/rust-lang/crates.io-index"
+checksum = "eec1967ea4c10fbb33a262e97b90f85ed2ee11c6427bae957cee1c2e8bd76818"
+dependencies = [
+ "async-trait",
+ "cfg-if",
+ "chrono",
+ "fmterr",
+ "futures",
+ "http",
+ "perseus-macro",
+ "serde",
+ "serde_json",
+ "sycamore",
+ "sycamore-router",
+ "thiserror",
+ "tokio",
+ "urlencoding",
+ "wasm-bindgen",
+ "wasm-bindgen-futures",
+ "web-sys",
+]
+
+[[package]]
+name = "perseus-macro"
+version = "0.3.3"
+source = "registry+https://github.com/rust-lang/crates.io-index"
+checksum = "4752201104245b40f54fbb62dbd72f7a5dea6413a7db421f1f03037434e58714"
+dependencies = [
+ "darling",
+ "proc-macro2",
+ "quote",
+ "serde_json",
+ "syn",
+]
 
 [[package]]
 name = "phf"
@@ -1694,6 +1806,12 @@ dependencies = [
 ]
 
 [[package]]
+name = "strsim"
+version = "0.10.0"
+source = "registry+https://github.com/rust-lang/crates.io-index"
+checksum = "73473c0e59e6d5812c5dfe2a064a6444949f089e20eec9a2e5506596494e4623"
+
+[[package]]
 name = "subtle"
 version = "2.4.0"
 source = "registry+https://github.com/rust-lang/crates.io-index"
@@ -1706,9 +1824,11 @@ source = "registry+https://github.com/rust-lang/crates.io-index"
 checksum = "f5cea65876897bb946a623e16bf3df2de4997a6872d95b99dfaed5dd8e14e264"
 dependencies = [
  "ahash",
+ "html-escape",
  "indexmap",
  "js-sys",
  "lexical",
+ "once_cell",
  "paste",
  "smallvec",
  "sycamore-macro",
@@ -1740,6 +1860,31 @@ dependencies = [
  "smallvec",
  "wasm-bindgen",
  "web-sys",
+]
+
+[[package]]
+name = "sycamore-router"
+version = "0.7.1"
+source = "registry+https://github.com/rust-lang/crates.io-index"
+checksum = "cace57b69d923ef7ac5a1291bee73fa62e7d75b1f3a713db70d30ab0ee032185"
+dependencies = [
+ "sycamore",
+ "sycamore-router-macro",
+ "wasm-bindgen",
+ "web-sys",
+]
+
+[[package]]
+name = "sycamore-router-macro"
+version = "0.7.1"
+source = "registry+https://github.com/rust-lang/crates.io-index"
+checksum = "0a1f83a4862484dba897a6dc64c4a72b5c808c9af05573f7a55133b4f110ac66"
+dependencies = [
+ "nom",
+ "proc-macro2",
+ "quote",
+ "syn",
+ "unicode-xid",
 ]
 
 [[package]]
@@ -2086,6 +2231,18 @@ source = "registry+https://github.com/rust-lang/crates.io-index"
 checksum = "a156c684c91ea7d62626509bce3cb4e1d9ed5c4d978f7b4352658f96a4c26b4a"
 
 [[package]]
+name = "urlencoding"
+version = "2.1.0"
+source = "registry+https://github.com/rust-lang/crates.io-index"
+checksum = "68b90931029ab9b034b300b797048cf23723400aa757e8a2bfb9d748102f9821"
+
+[[package]]
+name = "utf8-width"
+version = "0.1.5"
+source = "registry+https://github.com/rust-lang/crates.io-index"
+checksum = "7cf7d77f457ef8dfa11e4cd5933c5ddb5dc52a94664071951219a97710f0a32b"
+
+[[package]]
 name = "uuid"
 version = "0.8.2"
 source = "registry+https://github.com/rust-lang/crates.io-index"
@@ -2124,6 +2281,8 @@ source = "registry+https://github.com/rust-lang/crates.io-index"
 checksum = "25f1af7423d8588a3d840681122e72e6a24ddbcb3f0ec385cac0d12d24256c06"
 dependencies = [
  "cfg-if",
+ "serde",
+ "serde_json",
  "wasm-bindgen-macro",
 ]
 
@@ -2140,6 +2299,18 @@ dependencies = [
  "quote",
  "syn",
  "wasm-bindgen-shared",
+]
+
+[[package]]
+name = "wasm-bindgen-futures"
+version = "0.4.29"
+source = "registry+https://github.com/rust-lang/crates.io-index"
+checksum = "2eb6ec270a31b1d3c7e266b999739109abce8b6c87e4b31fcfcd788b65267395"
+dependencies = [
+ "cfg-if",
+ "js-sys",
+ "wasm-bindgen",
+ "web-sys",
 ]
 
 [[package]]
