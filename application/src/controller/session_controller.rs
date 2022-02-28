@@ -10,7 +10,7 @@ use rocket::{
     response::content::Html,
     routes, State,
 };
-
+use sycamore::prelude::*;
 use tokio::fs;
 use tokio_postgres::NoTls;
 
@@ -57,6 +57,12 @@ async fn index() -> Result<Html<String>, ApiError> {
             .context("Something went wrong reading the index file!")?,
     )
     .context("Failed to convert the html to a string.")?;
+
+    // let rendered = sycamore::render_to_string(|| {
+    //     view! {
+    //         app::App()
+    //     }
+    // });
 
     return Ok(Html(index_html));
 }
