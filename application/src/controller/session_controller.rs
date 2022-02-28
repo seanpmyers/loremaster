@@ -10,7 +10,7 @@ use rocket::{
     response::content::Html,
     routes, State,
 };
-use sycamore::prelude::*;
+use sycamore::view;
 use tokio::fs;
 use tokio_postgres::NoTls;
 
@@ -28,7 +28,7 @@ use crate::{
         constants::{
             files::{INDEX_PATH, REGISTRATION_PATH},
             FAILED_LOGIN_MESSAGE, REGISTRATION_FAILURE_MESSAGE, REGISTRATION_SUCCESS_MESSAGE,
-            SUCCESSFUL_LOGIN_MESSAGE,
+            SUCCESSFUL_LOGIN_MESSAGE, SYCAMORE_BODY,
         },
         password_encryption::{PasswordEncryption, PasswordEncryptionService},
     },
@@ -58,11 +58,13 @@ async fn index() -> Result<Html<String>, ApiError> {
     )
     .context("Failed to convert the html to a string.")?;
 
-    // let rendered = sycamore::render_to_string(|| {
-    //     view! {
-    //         app::App()
-    //     }
-    // });
+    let rendered = sycamore::render_to_string(|| {
+        view! {
+            frontend::App()
+        }
+    });
+
+    let index_html: String = index_html.replace(SYCAMORE_BODY, &rendered);
 
     return Ok(Html(index_html));
 }
