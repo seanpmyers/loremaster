@@ -1,6 +1,6 @@
-use anyhow::Context;
+use anyhow::{anyhow, Context};
 use chrono::{offset, DateTime, SecondsFormat, Utc};
-use log::info;
+use log::{error, info};
 use mobc::Connection;
 use mobc_postgres::PgConnectionManager;
 use rocket::{delete, get, post, routes, serde::json::Json, State};
@@ -21,6 +21,7 @@ use crate::{
         },
     },
     guards::user::User,
+    utility::constants::SERVER_ERROR_MESSAGE,
 };
 
 #[get("/today")]
@@ -29,11 +30,16 @@ pub async fn today(
     user: User,
 ) -> Result<Json<Chronicle>, ApiError> {
     info!("LOREMASTER: Connecting to database...");
-    let database_connection: Connection<PgConnectionManager<NoTls>> = postgres_service
-        .database_pool
-        .get()
-        .await
-        .context("Failed to get database connection!".to_string())?;
+    let database_connection: Connection<PgConnectionManager<NoTls>> =
+        match postgres_service.database_pool.get().await {
+            Ok(connection) => connection,
+            Err(error) => {
+                error!("{}", error);
+                return Err(ApiError::Anyhow {
+                    source: anyhow!(SERVER_ERROR_MESSAGE),
+                });
+            }
+        };
 
     info!("LOREMASTER: Connected to database.");
     info!("LOREMASTER: Querying for today's chronicle.");
@@ -79,11 +85,16 @@ pub async fn by_date(
     user: User,
 ) -> Result<Option<Json<Chronicle>>, ApiError> {
     info!("LOREMASTER: Connecting to database...");
-    let database_connection: Connection<PgConnectionManager<NoTls>> = postgres_service
-        .database_pool
-        .get()
-        .await
-        .context("Failed to get database connection!".to_string())?;
+    let database_connection: Connection<PgConnectionManager<NoTls>> =
+        match postgres_service.database_pool.get().await {
+            Ok(connection) => connection,
+            Err(error) => {
+                error!("{}", error);
+                return Err(ApiError::Anyhow {
+                    source: anyhow!(SERVER_ERROR_MESSAGE),
+                });
+            }
+        };
 
     let chronicle_date: DateTime<Utc> = offset::Utc::now();
 
@@ -102,11 +113,16 @@ pub async fn by_id(
     postgres_service: &State<PostgresHandler>,
 ) -> Result<Option<Json<Chronicle>>, ApiError> {
     info!("LOREMASTER: Connecting to database...");
-    let database_connection: Connection<PgConnectionManager<NoTls>> = postgres_service
-        .database_pool
-        .get()
-        .await
-        .context("Failed to get database connection!".to_string())?;
+    let database_connection: Connection<PgConnectionManager<NoTls>> =
+        match postgres_service.database_pool.get().await {
+            Ok(connection) => connection,
+            Err(error) => {
+                error!("{}", error);
+                return Err(ApiError::Anyhow {
+                    source: anyhow!(SERVER_ERROR_MESSAGE),
+                });
+            }
+        };
 
     let chronicle_id = Uuid::new_v4();
 
@@ -123,11 +139,16 @@ pub async fn update(
     postgres_service: &State<PostgresHandler>,
 ) -> Result<Json<Chronicle>, ApiError> {
     info!("LOREMASTER: Connecting to database...");
-    let database_connection: Connection<PgConnectionManager<NoTls>> = postgres_service
-        .database_pool
-        .get()
-        .await
-        .context("Failed to get database connection!".to_string())?;
+    let database_connection: Connection<PgConnectionManager<NoTls>> =
+        match postgres_service.database_pool.get().await {
+            Ok(connection) => connection,
+            Err(error) => {
+                error!("{}", error);
+                return Err(ApiError::Anyhow {
+                    source: anyhow!(SERVER_ERROR_MESSAGE),
+                });
+            }
+        };
 
     let chronicle: Chronicle = Chronicle {
         id: Uuid::new_v4(),
@@ -141,11 +162,16 @@ pub async fn update(
 #[delete("/delete")]
 pub async fn delete(postgres_service: &State<PostgresHandler>) -> Result<(), ApiError> {
     info!("LOREMASTER: Connecting to database...");
-    let database_connection: Connection<PgConnectionManager<NoTls>> = postgres_service
-        .database_pool
-        .get()
-        .await
-        .context("Failed to get database connection!".to_string())?;
+    let database_connection: Connection<PgConnectionManager<NoTls>> =
+        match postgres_service.database_pool.get().await {
+            Ok(connection) => connection,
+            Err(error) => {
+                error!("{}", error);
+                return Err(ApiError::Anyhow {
+                    source: anyhow!(SERVER_ERROR_MESSAGE),
+                });
+            }
+        };
 
     let chronicle_id: Uuid = Uuid::new_v4();
 

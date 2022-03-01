@@ -1,5 +1,5 @@
 use anyhow::{anyhow, Context};
-use log::info;
+use log::{error, info};
 use mobc::Connection;
 use mobc_postgres::PgConnectionManager;
 use rocket::{
@@ -26,15 +26,14 @@ use crate::{
     },
     utility::{
         constants::{
+            cookie_fields,
             files::{INDEX_PATH, REGISTRATION_PATH},
             FAILED_LOGIN_MESSAGE, REGISTRATION_FAILURE_MESSAGE, REGISTRATION_SUCCESS_MESSAGE,
-            SUCCESSFUL_LOGIN_MESSAGE, SYCAMORE_BODY,
+            SERVER_ERROR_MESSAGE, SUCCESSFUL_LOGIN_MESSAGE, SYCAMORE_BODY,
         },
         password_encryption::{PasswordEncryption, PasswordEncryptionService},
     },
 };
-
-use super::cookie_fields::{self, SESSION_ID, USER_ID};
 
 #[derive(FromForm)]
 struct CredentialsForm<'r> {
@@ -48,6 +47,11 @@ macro_rules! session_uri {
 }
 
 pub use session_uri as uri;
+
+#[get("/favicon.ico")]
+fn favicon() -> Option<()> {
+    None
+}
 
 #[get("/")]
 async fn index() -> Result<Html<String>, ApiError> {
@@ -87,11 +91,16 @@ async fn register(
     registration_form: Form<CredentialsForm<'_>>,
 ) -> Result<String, ApiError> {
     info!("LOREMASTER: Connecting to database...");
-    let database_connection: Connection<PgConnectionManager<NoTls>> = postgres_service
-        .database_pool
-        .get()
-        .await
-        .context("Failed to get database connection!".to_string())?;
+    let database_connection: Connection<PgConnectionManager<NoTls>> =
+        match postgres_service.database_pool.get().await {
+            Ok(connection) => connection,
+            Err(error) => {
+                error!("{}", error);
+                return Err(ApiError::Anyhow {
+                    source: anyhow!(SERVER_ERROR_MESSAGE),
+                });
+            }
+        };
 
     info!("LOREMASTER: Checking for existing users with provided email address...");
     let existing_credentials: Option<Credentials> = credential_by_email_address_query(
@@ -127,11 +136,16 @@ async fn authenticate(
     authentication_form: Form<CredentialsForm<'_>>,
 ) -> Result<String, ApiError> {
     info!("LOREMASTER: Connecting to database...");
-    let database_connection: Connection<PgConnectionManager<NoTls>> = postgres_service
-        .database_pool
-        .get()
-        .await
-        .context("Failed to get database connection!".to_string())?;
+    let database_connection: Connection<PgConnectionManager<NoTls>> =
+        match postgres_service.database_pool.get().await {
+            Ok(connection) => connection,
+            Err(error) => {
+                error!("{}", error);
+                return Err(ApiError::Anyhow {
+                    source: anyhow!(SERVER_ERROR_MESSAGE),
+                });
+            }
+        };
 
     let query_result: Option<Credentials> = credential_by_email_address_query(
         &database_connection,
@@ -169,11 +183,11 @@ async fn authenticate(
 
 #[post("/logout")]
 async fn logout(cookie_jar: &CookieJar<'_>) -> Result<String, ApiError> {
-    cookie_jar.remove_private(Cookie::named(USER_ID));
-    cookie_jar.remove_private(Cookie::named(SESSION_ID));
+    cookie_jar.remove_private(Cookie::named(cookie_fields::USER_ID));
+    cookie_jar.remove_private(Cookie::named(cookie_fields::SESSION_ID));
     return Ok("Cookies cleared.".to_string());
 }
 
 pub fn routes() -> Vec<rocket::Route> {
-    routes![index, register, registration, authenticate, logout]
+    routes![authenticate, favicon, index, logout, registration, register,]
 }
