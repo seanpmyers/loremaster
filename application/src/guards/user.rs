@@ -16,7 +16,7 @@ impl<'r> FromRequest<'r> for User {
     type Error = std::convert::Infallible;
 
     async fn from_request(request: &'r Request<'_>) -> request::Outcome<User, Self::Error> {
-        info!("LOREMASTER: Checking for user_id cookie...");
+        info!("Checking for user_id cookie.");
         let user_id: Option<Uuid> = request
             .cookies()
             .get_private(USER_ID)

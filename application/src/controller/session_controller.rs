@@ -90,14 +90,14 @@ async fn register(
     postgres_service: &State<PostgresHandler>,
     registration_form: Form<CredentialsForm<'_>>,
 ) -> Result<String, ApiError> {
-    info!("LOREMASTER: Connecting to database...");
+    info!("Connecting to database.");
     let database_connection: Connection<PgConnectionManager<NoTls>> = postgres_service
         .database_pool
         .get()
         .await
         .map_err(|error| anyhow!("{}", error))?;
 
-    info!("LOREMASTER: Checking for existing users with provided email address...");
+    info!("Checking for existing users with provided email address.");
     let existing_credentials: Option<Credentials> = credential_by_email_address_query(
         &database_connection,
         &registration_form.email_address.to_string(),
@@ -106,17 +106,17 @@ async fn register(
     .map_err(|error| anyhow!("{}", error))?;
 
     if existing_credentials.is_some() {
-        info!("LOREMASTER: Existing user found!");
+        info!("Existing user found!");
         //TODO: Send an email to the specified address and indicate someone tried to re-register using that email
         return Ok(REGISTRATION_SUCCESS_MESSAGE.to_string());
     }
 
-    info!("LOREMASTER: Email can be registered.");
+    info!("Email can be registered.");
     let encrypted_password: String =
         PasswordEncryptionService::encrypt_password(&registration_form.password)
             .map_err(|error| anyhow!("{}", error))?;
 
-    info!("LOREMASTER: Adding new user to database...");
+    info!("Adding new user to database.");
     create_person_query(
         &database_connection,
         &registration_form.email_address.to_string(),
@@ -134,7 +134,7 @@ async fn authenticate(
     cookie_jar: &CookieJar<'_>,
     authentication_form: Form<CredentialsForm<'_>>,
 ) -> Result<String, ApiError> {
-    info!("LOREMASTER: Connecting to database...");
+    info!("Connecting to database.");
     let database_connection: Connection<PgConnectionManager<NoTls>> = postgres_service
         .database_pool
         .get()

@@ -28,15 +28,15 @@ pub async fn today(
     postgres_service: &State<PostgresHandler>,
     user: User,
 ) -> Result<Json<Chronicle>, ApiError> {
-    info!("LOREMASTER: Connecting to database...");
+    info!("Connecting to database.");
     let database_connection: Connection<PgConnectionManager<NoTls>> = postgres_service
         .database_pool
         .get()
         .await
         .map_err(|error| anyhow!("{}", error))?;
 
-    info!("LOREMASTER: Connected to database.");
-    info!("LOREMASTER: Querying for today's chronicle.");
+    info!("Connected to database.");
+    info!("Querying for today's chronicle.");
     let today: DateTime<Utc> = offset::Utc::now();
 
     let current_chronicle_query_result: Option<Chronicle> =
@@ -45,7 +45,7 @@ pub async fn today(
             .map_err(|error| anyhow!("{}", error))?;
 
     if current_chronicle_query_result.is_none() {
-        info!("LOREMASTER: No chronicle exits for the current date. Creating one...");
+        info!("No chronicle exits for the current date. Creating one.");
         let new_chronicle_id: Uuid = Uuid::new_v4();
         create_chronicle_query(
             &database_connection,
@@ -63,11 +63,11 @@ pub async fn today(
 
     match query_result {
         Some(result) => {
-            info!("LOREMASTER: Existing chronicle found!");
+            info!("Existing chronicle found!");
             return Ok(Json(result));
         }
         None => {
-            info!("LOREMASTER: User is not associated with today's chronicle. Generating new a relation...");
+            info!("User is not associated with today's chronicle. Generating new a relation.");
             let result = create_chronicle_query(&database_connection, &today, &user.0, &None)
                 .await
                 .map_err(|error| anyhow!("{}", error))?;
@@ -81,7 +81,7 @@ pub async fn by_date(
     postgres_service: &State<PostgresHandler>,
     user: User,
 ) -> Result<Option<Json<Chronicle>>, ApiError> {
-    info!("LOREMASTER: Connecting to database...");
+    info!("Connecting to database.");
     let database_connection: Connection<PgConnectionManager<NoTls>> = postgres_service
         .database_pool
         .get()
@@ -106,7 +106,7 @@ pub async fn by_date(
 pub async fn by_id(
     postgres_service: &State<PostgresHandler>,
 ) -> Result<Option<Json<Chronicle>>, ApiError> {
-    info!("LOREMASTER: Connecting to database...");
+    info!("Connecting to database.");
     let database_connection: Connection<PgConnectionManager<NoTls>> = postgres_service
         .database_pool
         .get()
@@ -130,7 +130,7 @@ pub async fn by_id(
 pub async fn update(
     postgres_service: &State<PostgresHandler>,
 ) -> Result<Json<Chronicle>, ApiError> {
-    info!("LOREMASTER: Connecting to database...");
+    info!("Connecting to database.");
     let database_connection: Connection<PgConnectionManager<NoTls>> = postgres_service
         .database_pool
         .get()
@@ -151,7 +151,7 @@ pub async fn update(
 
 #[delete("/delete")]
 pub async fn delete(postgres_service: &State<PostgresHandler>) -> Result<(), ApiError> {
-    info!("LOREMASTER: Connecting to database...");
+    info!("Connecting to database.");
     let database_connection: Connection<PgConnectionManager<NoTls>> = postgres_service
         .database_pool
         .get()
