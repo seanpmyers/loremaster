@@ -1,5 +1,5 @@
 use anyhow::{anyhow, Context};
-use log::{error, info};
+use log::info;
 use mobc::Connection;
 use mobc_postgres::PgConnectionManager;
 use rocket::{
@@ -28,8 +28,8 @@ use crate::{
         constants::{
             cookie_fields,
             files::{INDEX_PATH, REGISTRATION_PATH},
-            FAILED_LOGIN_MESSAGE, REGISTRATION_FAILURE_MESSAGE, REGISTRATION_SUCCESS_MESSAGE,
-            SERVER_ERROR_MESSAGE, SUCCESSFUL_LOGIN_MESSAGE, SYCAMORE_BODY,
+            FAILED_LOGIN_MESSAGE, REGISTRATION_SUCCESS_MESSAGE, SUCCESSFUL_LOGIN_MESSAGE,
+            SYCAMORE_BODY,
         },
         password_encryption::{PasswordEncryption, PasswordEncryptionService},
     },
@@ -78,9 +78,9 @@ async fn registration() -> Result<Html<String>, ApiError> {
     let registration_html: String = String::from_utf8(
         fs::read(REGISTRATION_PATH)
             .await
-            .context("Something went wrong reading the registration file!")?,
+            .map_err(|error| anyhow!("{}", error))?,
     )
-    .context("Failed to convert the html to a string.")?;
+    .map_err(|error| anyhow!("{}", error))?;
 
     return Ok(Html(registration_html));
 }
@@ -91,32 +91,31 @@ async fn register(
     registration_form: Form<CredentialsForm<'_>>,
 ) -> Result<String, ApiError> {
     info!("LOREMASTER: Connecting to database...");
-    let database_connection: Connection<PgConnectionManager<NoTls>> =
-        match postgres_service.database_pool.get().await {
-            Ok(connection) => connection,
-            Err(error) => {
-                error!("{}", error);
-                return Err(ApiError::Anyhow {
-                    source: anyhow!(SERVER_ERROR_MESSAGE),
-                });
-            }
-        };
+    let database_connection: Connection<PgConnectionManager<NoTls>> = postgres_service
+        .database_pool
+        .get()
+        .await
+        .map_err(|error| anyhow!("{}", error))?;
 
     info!("LOREMASTER: Checking for existing users with provided email address...");
     let existing_credentials: Option<Credentials> = credential_by_email_address_query(
         &database_connection,
         &registration_form.email_address.to_string(),
     )
-    .await?;
+    .await
+    .map_err(|error| anyhow!("{}", error))?;
 
     if existing_credentials.is_some() {
         info!("LOREMASTER: Existing user found!");
-        //Send an email to the specified address and indicate someone tried to re-register using that email
+        //TODO: Send an email to the specified address and indicate someone tried to re-register using that email
         return Ok(REGISTRATION_SUCCESS_MESSAGE.to_string());
     }
+
     info!("LOREMASTER: Email can be registered.");
-    let encrypted_password =
-        PasswordEncryptionService::encrypt_password(&registration_form.password)?;
+    let encrypted_password: String =
+        PasswordEncryptionService::encrypt_password(&registration_form.password)
+            .map_err(|error| anyhow!("{}", error))?;
+
     info!("LOREMASTER: Adding new user to database...");
     create_person_query(
         &database_connection,
@@ -124,7 +123,7 @@ async fn register(
         &encrypted_password,
     )
     .await
-    .context(REGISTRATION_FAILURE_MESSAGE)?;
+    .map_err(|error| anyhow!("{}", error))?;
 
     return Ok(REGISTRATION_SUCCESS_MESSAGE.to_string());
 }
@@ -136,28 +135,25 @@ async fn authenticate(
     authentication_form: Form<CredentialsForm<'_>>,
 ) -> Result<String, ApiError> {
     info!("LOREMASTER: Connecting to database...");
-    let database_connection: Connection<PgConnectionManager<NoTls>> =
-        match postgres_service.database_pool.get().await {
-            Ok(connection) => connection,
-            Err(error) => {
-                error!("{}", error);
-                return Err(ApiError::Anyhow {
-                    source: anyhow!(SERVER_ERROR_MESSAGE),
-                });
-            }
-        };
+    let database_connection: Connection<PgConnectionManager<NoTls>> = postgres_service
+        .database_pool
+        .get()
+        .await
+        .map_err(|error| anyhow!("{}", error))?;
 
     let query_result: Option<Credentials> = credential_by_email_address_query(
         &database_connection,
         &authentication_form.email_address.to_string(),
     )
-    .await?;
+    .await
+    .map_err(|error| anyhow!("{}", error))?;
 
     if let Some(person) = query_result {
         let valid_password: bool = PasswordEncryptionService::verify_password(
             &person.encrypted_password,
             &authentication_form.password,
-        )?;
+        )
+        .map_err(|error| anyhow!("{}", error))?;
 
         if !valid_password {
             return Err(ApiError::Anyhow {

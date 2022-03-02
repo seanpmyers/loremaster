@@ -7,8 +7,5 @@ pub const FAILED_LOGIN_MESSAGE: &str =
 pub const SUCCESSFUL_LOGIN_MESSAGE: &str = "User authenticated successfully!";
 
 pub const REGISTRATION_SUCCESS_MESSAGE: &str = "Account created successfully!";
-pub const REGISTRATION_FAILURE_MESSAGE: &str = "Failed to register with the given credentials.";
 
 pub const SYCAMORE_BODY: &str = "%sycamore.body";
-
-pub const SERVER_ERROR_MESSAGE: &str = "The server encountered an error. Please try again.";

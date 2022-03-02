@@ -1,11 +1,15 @@
 use log::info;
-use rocket::{request::{FromRequest, self}, Request, outcome::IntoOutcome};
+use rocket::{
+    outcome::IntoOutcome,
+    request::{self, FromRequest},
+    Request,
+};
 use uuid::Uuid;
 
-use crate::controller::cookie_fields::USER_ID;
+use crate::utility::constants::cookie_fields::USER_ID;
 
 #[derive(Debug)]
-pub struct User (pub Uuid);
+pub struct User(pub Uuid);
 
 #[rocket::async_trait]
 impl<'r> FromRequest<'r> for User {
@@ -16,17 +20,8 @@ impl<'r> FromRequest<'r> for User {
         let user_id: Option<Uuid> = request
             .cookies()
             .get_private(USER_ID)
-            .and_then(
-                |cookie| Uuid::parse_str(
-                    &cookie
-                    .value()   
-                    .to_owned()
-                )
-                .ok()
-            );
+            .and_then(|cookie| Uuid::parse_str(&cookie.value().to_owned()).ok());
 
-        return user_id
-            .map(User)
-            .or_forward(());
+        return user_id.map(User).or_forward(());
     }
 }
