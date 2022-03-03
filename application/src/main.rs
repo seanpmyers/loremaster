@@ -14,7 +14,7 @@ use data::postgres_handler::PostgresHandler;
 
 use crate::{
     controller::{chronicle_controller, session_controller},
-    utility::constants::{LOCAL_DEBUG, RUN_MODE},
+    utility::constants::{LOCAL_DEBUG, PROFILE},
 };
 
 #[rocket::main]
@@ -25,7 +25,7 @@ async fn main() -> Result<()> {
             writeln!(
                 buf,
                 "LOREMASTER_{}: {} [{}] - {}",
-                std::env::var(RUN_MODE).unwrap_or(LOCAL_DEBUG.to_string()),
+                std::env::var(PROFILE).unwrap_or(LOCAL_DEBUG.to_string()),
                 offset::Utc::now().to_rfc3339_opts(SecondsFormat::Millis, true),
                 record.level(),
                 record.args()
