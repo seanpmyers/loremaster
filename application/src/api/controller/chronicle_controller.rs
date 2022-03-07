@@ -8,7 +8,7 @@ use tokio_postgres::NoTls;
 use uuid::Uuid;
 
 use crate::{
-    api::response::ApiError,
+    api::{guards::user::User, response::ApiError},
     data::{
         entity::chronicle::Chronicle,
         postgres_handler::PostgresHandler,
@@ -20,7 +20,6 @@ use crate::{
             delete_chronicle::delete_chronicle_query, update_chronicle::update_chronicle_query,
         },
     },
-    guards::user::User,
 };
 
 #[get("/today")]

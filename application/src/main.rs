@@ -5,15 +5,13 @@ use log::{info, LevelFilter};
 use std::io::Write;
 
 mod api;
-pub mod controller;
 mod data;
-pub mod guards;
 mod utility;
 
 use data::postgres_handler::PostgresHandler;
 
 use crate::{
-    controller::{chronicle_controller, session_controller},
+    api::controller::{chronicle_controller, session_controller},
     utility::constants::{LOCAL_DEBUG, PROFILE},
 };
 
