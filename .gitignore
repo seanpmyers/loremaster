@@ -1,3 +1,6 @@
+/application/target
 application/frontend/styles/library/*
 Rocket.toml
 loremaster.toml
+/application/frontend/target
+/application/frontend/dist

@@ -1,9 +1,10 @@
-use anyhow::{anyhow, Context};
+use anyhow::anyhow;
 use log::info;
 use mobc::Connection;
 use mobc_postgres::PgConnectionManager;
 use rocket::{
     form::{Form, FromForm},
+    fs::NamedFile,
     get,
     http::{Cookie, CookieJar},
     post,
@@ -27,7 +28,7 @@ use crate::{
     utility::{
         constants::{
             cookie_fields,
-            files::{INDEX_PATH, REGISTRATION_PATH},
+            files::{FAVICON_PATH, INDEX_PATH, REGISTRATION_PATH},
             FAILED_LOGIN_MESSAGE, REGISTRATION_SUCCESS_MESSAGE, SUCCESSFUL_LOGIN_MESSAGE,
             SYCAMORE_BODY,
         },
@@ -49,8 +50,12 @@ macro_rules! session_uri {
 pub use session_uri as uri;
 
 #[get("/favicon.ico")]
-fn favicon() -> Option<()> {
-    None
+async fn favicon() -> Result<Option<NamedFile>, ApiError> {
+    let favicon_file: NamedFile = NamedFile::open(FAVICON_PATH)
+        .await
+        .map_err(|error| anyhow!("{}", error))?;
+
+    return Ok(Some(favicon_file));
 }
 
 #[get("/")]
@@ -58,9 +63,9 @@ async fn index() -> Result<Html<String>, ApiError> {
     let index_html: String = String::from_utf8(
         fs::read(INDEX_PATH)
             .await
-            .context("Something went wrong reading the index file!")?,
+            .map_err(|error| anyhow!("{}", error))?,
     )
-    .context("Failed to convert the html to a string.")?;
+    .map_err(|error| anyhow!("{}", error))?;
 
     let rendered = sycamore::render_to_string(|| {
         view! {

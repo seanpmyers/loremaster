@@ -3,8 +3,8 @@ use wasm_bindgen::JsCast;
 use web_sys::{Event, HtmlInputElement};
 
 #[component(App<G>)]
-pub fn app() -> View<G> {
-    let name = Signal::new(String::new());
+pub fn top_navigation() -> View<G> {
+    let name: Signal<String> = Signal::new(String::new());
 
     let displayed_name = cloned!((name) => move || {
         if name.get().is_empty() {
