@@ -1,15 +1,32 @@
-use anyhow::{Context, Result};
+use anyhow::{anyhow, Result};
 
 use super::toml_reader::{self};
 
-pub const ITERATIONS_FIELD : &str = "HASH_ITERATIONS";
-pub const POSTGRES_TOML_FIELD : &str = "POSTGRESQL";
-pub const SITE_SECRET_FIELD : &str = "SITE_SECRET";
+pub const ITERATIONS_FIELD: &str = "HASH_ITERATIONS";
+pub const POSTGRES_TOML_FIELD: &str = "POSTGRESQL";
+pub const SITE_SECRET_FIELD: &str = "SITE_SECRET";
 
-const SECRET_FILE_PATH : &str = "./../../../secrets/loremaster.toml";
+const LOREMASTER_FILE_PATH: &str = "./loremaster.toml";
 
 pub fn get_secret(secret_name: &str) -> Result<String> {
-   let result = toml_reader::get_field_value(SECRET_FILE_PATH, secret_name)
-      .context("Requested secret not available in secret file!".to_string())?;
-   return Ok(result);
+    let result = toml_reader::get_field_value(LOREMASTER_FILE_PATH, secret_name)
+        .map_err(|error| anyhow!("{}", error))?;
+    return Ok(result);
+}
+
+#[cfg(test)]
+mod tests {
+    use anyhow::Result;
+
+    use super::get_secret;
+
+    const TEST_SECRET_FIELD: &str = "TestField";
+    const TEST_SECRET_VALUE: &str = "TestValue";
+
+    #[test]
+    fn secret_exists() -> Result<()> {
+        let result: String = get_secret(TEST_SECRET_FIELD)?;
+        assert_eq!(result, TEST_SECRET_VALUE);
+        return Ok(());
+    }
 }
