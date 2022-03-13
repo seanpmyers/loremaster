@@ -1,58 +1,35 @@
-use anyhow::{
-    Result
-};
+use anyhow::Result;
 use argon2::{
-    Argon2,
-    ParamsBuilder, 
-    password_hash::{
-        rand_core::OsRng,
-        PasswordHash, 
-        PasswordHasher, 
-        PasswordVerifier, 
-        SaltString
-    }
+    password_hash::{rand_core::OsRng, PasswordHash, PasswordHasher, PasswordVerifier, SaltString},
+    Argon2, ParamsBuilder,
 };
 
-use crate::utility::secret_service::{ITERATIONS_FIELD, SITE_SECRET_FIELD, get_secret};
+use crate::utility::secret_service::{get_secret, ITERATIONS_FIELD, SITE_SECRET_FIELD};
 
 pub struct PasswordEncryptionService {}
 
 pub trait PasswordEncryption {
-    fn encrypt_password(
-        input: &str
-    ) -> Result<String>;
-    fn verify_password(
-        encrypted_password: &str, 
-        user_input: &str
-    ) -> Result<bool>;
+    fn encrypt_password(input: &str) -> Result<String>;
+    fn verify_password(encrypted_password: &str, user_input: &str) -> Result<bool>;
 }
 
-impl PasswordEncryptionService {
-
-}
+impl PasswordEncryptionService {}
 
 impl PasswordEncryption for PasswordEncryptionService {
-
-    fn encrypt_password(
-        credential: &str
-    ) -> Result<String> {
-
-        let site_secret: String = get_secret( SITE_SECRET_FIELD)?;
-        let iterations_setting: u32 = get_secret( ITERATIONS_FIELD)?
-            .parse::<u32>()?;
+    fn encrypt_password(credential: &str) -> Result<String> {
+        let site_secret: String = get_secret(SITE_SECRET_FIELD)?;
+        let iterations_setting: u32 = get_secret(ITERATIONS_FIELD)?.parse::<u32>()?;
 
         let mut argon2_parameters: ParamsBuilder = argon2::ParamsBuilder::new();
-        argon2_parameters
-            .t_cost(iterations_setting)
-            .unwrap();
+        argon2_parameters.t_cost(iterations_setting).unwrap();
 
         let argon2 = Argon2::new_with_secret(
-            site_secret.as_bytes()
-            , argon2::Algorithm::Argon2id
-            , argon2::Version::V0x13
-            , argon2_parameters.params().unwrap()
+            site_secret.as_bytes(),
+            argon2::Algorithm::Argon2id,
+            argon2::Version::V0x13,
+            argon2_parameters.params().unwrap(),
         )
-            .unwrap();
+        .unwrap();
 
         let salt: SaltString = SaltString::generate(&mut OsRng);
 
@@ -64,81 +41,60 @@ impl PasswordEncryption for PasswordEncryptionService {
         return Ok(result);
     }
 
-    fn verify_password(
-        encrypted_password: &str, 
-        credential: &str
-    ) -> Result<bool> {
-        
-        let site_secret: String = get_secret( SITE_SECRET_FIELD)?;
-        let iterations_setting: u32 = get_secret( ITERATIONS_FIELD)?
-            .parse::<u32>()?;
+    fn verify_password(encrypted_password: &str, credential: &str) -> Result<bool> {
+        let site_secret: String = get_secret(SITE_SECRET_FIELD)?;
+        let iterations_setting: u32 = get_secret(ITERATIONS_FIELD)?.parse::<u32>()?;
 
         let mut argon2_parameters: ParamsBuilder = argon2::ParamsBuilder::new();
-        argon2_parameters
-            .t_cost(iterations_setting)
-            .unwrap();
+        argon2_parameters.t_cost(iterations_setting).unwrap();
 
         let argon2 = Argon2::new_with_secret(
-            site_secret.as_bytes()
-            , argon2::Algorithm::Argon2id
-            , argon2::Version::V0x13
-            , argon2_parameters.params().unwrap()
-        ).unwrap();
-        
-        let parsed_hash = PasswordHash::new(&encrypted_password)
-            .unwrap();
+            site_secret.as_bytes(),
+            argon2::Algorithm::Argon2id,
+            argon2::Version::V0x13,
+            argon2_parameters.params().unwrap(),
+        )
+        .unwrap();
 
-        return Ok(
-            argon2
-            .verify_password(
-                &credential.as_bytes(), 
-                &parsed_hash
-            )
-            .is_ok()
-        );
+        let parsed_hash = PasswordHash::new(&encrypted_password).unwrap();
+
+        return Ok(argon2
+            .verify_password(&credential.as_bytes(), &parsed_hash)
+            .is_ok());
     }
 }
 
 #[cfg(test)]
 mod tests {
-    use crate::utility::password_encryption::{
-        PasswordEncryption, 
-        PasswordEncryptionService
-    };
+    use crate::utility::password_encryption::{PasswordEncryption, PasswordEncryptionService};
+    use anyhow::Result;
 
     #[test]
-    fn verify_same_key() {
-        let encrypted_key: String = PasswordEncryptionService::encrypt_password("input")
-            .unwrap();
-        let encrypted_key2: String = PasswordEncryptionService::encrypt_password("input")
-            .unwrap();
-        let verify_result = PasswordEncryptionService::verify_password(
-            &encrypted_key, 
-            "input"
-        ).unwrap();
+    fn verify_same_key() -> Result<()> {
+        let encrypted_key: String = PasswordEncryptionService::encrypt_password("input")?;
+        let encrypted_key2: String = PasswordEncryptionService::encrypt_password("input")?;
+        let verify_result = PasswordEncryptionService::verify_password(&encrypted_key, "input")?;
         assert_ne!(encrypted_key, encrypted_key2);
         assert_ne!("input", encrypted_key);
         assert_eq!(verify_result, true);
+        return Ok(());
     }
 
     #[test]
-    fn verify_different_keys() {
+    fn verify_different_keys() -> Result<()> {
         // The check function should return false if
-        let encrypted_key: String = PasswordEncryptionService::encrypt_password("pancakes123!")
-            .unwrap();
-        let verify_result: bool = PasswordEncryptionService::verify_password(
-            &encrypted_key, 
-            "blueberries325&"
-        ).unwrap();
+        let encrypted_key: String = PasswordEncryptionService::encrypt_password("pancakes123!")?;
+        let verify_result: bool =
+            PasswordEncryptionService::verify_password(&encrypted_key, "blueberries325&")?;
         assert_eq!(verify_result, false);
+        return Ok(());
     }
 
     #[test]
-    fn unique_encryption_check() {
-        let output1 = PasswordEncryptionService::encrypt_password("input")
-            .unwrap();
-        let output2 = PasswordEncryptionService::encrypt_password("input")
-            .unwrap();
+    fn unique_encryption_check() -> Result<()> {
+        let output1 = PasswordEncryptionService::encrypt_password("input")?;
+        let output2 = PasswordEncryptionService::encrypt_password("input")?;
         assert_ne!(output1, output2);
+        return Ok(());
     }
 }
