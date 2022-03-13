@@ -1,6 +1,10 @@
-# Setup
+# loremaster
 
-The frontend libraries have been excluded from version control.
+The appilcation is primarily written in Rust.
+
+## Setup
+
+The frontend style libraries have been excluded from version control.
 You must download them and place them in the styles/library folder.
 
 Current style libraries:
