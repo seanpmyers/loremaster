@@ -1,5 +1,5 @@
 /application/target
-application/frontend/styles/library/*
+application/frontend/resources/styles/library/*
 Rocket.toml
 loremaster.toml
 /application/frontend/target
