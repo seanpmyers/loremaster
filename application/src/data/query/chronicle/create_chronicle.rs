@@ -3,7 +3,7 @@ use chrono::{DateTime, Utc};
 use log::error;
 use mobc::Connection;
 use mobc_postgres::PgConnectionManager;
-use tokio_postgres::NoTls;
+use tokio_postgres::{NoTls, Statement};
 use uuid::Uuid;
 
 use crate::{data::entity::chronicle::Chronicle, utility::constants::database::ID};
@@ -34,9 +34,13 @@ pub async fn create_chronicle_query(
 ) -> Result<Chronicle> {
     match chronicle_id {
         Some(id) => {
+            let prepared_statement: Statement = database_connection
+                .prepare(CREATE_CHRONICLE_QUERY_WITH_ID)
+                .await?;
+
             let query_result = database_connection
                 .query_one(
-                    CREATE_CHRONICLE_QUERY_WITH_ID,
+                    &prepared_statement,
                     &[&id, &person_id, &chronicle_date.to_string()],
                 )
                 .await;
@@ -61,9 +65,12 @@ pub async fn create_chronicle_query(
             }
         }
         None => {
+            let prepared_statement: Statement =
+                database_connection.prepare(CREATE_CHRONICLE_QUERY).await?;
+
             let query_result = database_connection
                 .query_one(
-                    CREATE_CHRONICLE_QUERY,
+                    &prepared_statement,
                     &[&person_id, &chronicle_date.to_string()],
                 )
                 .await;

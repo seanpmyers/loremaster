@@ -2,7 +2,7 @@ use anyhow::{Context, Result};
 use chrono::{NaiveDateTime, TimeZone, Utc};
 use mobc::Connection;
 use mobc_postgres::PgConnectionManager;
-use tokio_postgres::{NoTls, Row};
+use tokio_postgres::{NoTls, Row, Statement};
 use uuid::Uuid;
 
 use crate::data::entity::chronicle::Chronicle;
@@ -23,9 +23,11 @@ pub async fn update_chronicle_query(
     database_connection: &Connection<PgConnectionManager<NoTls>>,
     chronicle_to_update: &Chronicle,
 ) -> Result<Chronicle> {
+    let prepared_statement: Statement = database_connection.prepare(UPDATE_CHRONICLE_QUERY).await?;
+
     let query_result: Row = database_connection
         .query_one(
-            UPDATE_CHRONICLE_QUERY,
+            &prepared_statement,
             &[
                 &chronicle_to_update.date_recorded.to_string(),
                 &chronicle_to_update.id,

@@ -2,7 +2,7 @@ use anyhow::{Context, Result};
 use chrono::{DateTime, NaiveDate, TimeZone, Utc};
 use mobc::Connection;
 use mobc_postgres::PgConnectionManager;
-use tokio_postgres::NoTls;
+use tokio_postgres::{NoTls, Statement};
 use uuid::Uuid;
 
 use crate::{
@@ -27,13 +27,17 @@ pub async fn chronicle_by_date_query(
     chronicle_date: &DateTime<Utc>,
     person_id: &Uuid,
 ) -> Result<Option<Chronicle>> {
+    let prepared_statement: Statement =
+        database_connection.prepare(CHRONICLE_BY_DATE_QUERY).await?;
+
     let query_result = database_connection
         .query_opt(
-            CHRONICLE_BY_DATE_QUERY,
+            &prepared_statement,
             &[&chronicle_date.to_string(), &person_id],
         )
         .await
         .context("An error occurred while querying the database.".to_string())?;
+
     match query_result {
         Some(row) => {
             let result = Chronicle {

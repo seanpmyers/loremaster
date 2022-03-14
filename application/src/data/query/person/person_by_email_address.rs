@@ -2,7 +2,7 @@ use anyhow::{Context, Result};
 use chrono::{DateTime, Utc};
 use mobc::Connection;
 use mobc_postgres::PgConnectionManager;
-use tokio_postgres::NoTls;
+use tokio_postgres::{NoTls, Statement};
 use uuid::Uuid;
 
 use crate::{
@@ -26,8 +26,10 @@ pub async fn _person_by_email_address_query(
     database_connection: &Connection<PgConnectionManager<NoTls>>,
     email_address: &String,
 ) -> Result<Option<Person>> {
+    let prepared_statement: Statement = database_connection.prepare(_QUERY).await?;
+
     let query_result = database_connection
-        .query_opt(_QUERY, &[&email_address])
+        .query_opt(&prepared_statement, &[&email_address])
         .await
         .context("An error occurred while querying the database.".to_string())?;
 

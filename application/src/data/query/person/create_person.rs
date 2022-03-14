@@ -3,7 +3,7 @@ use chrono::{offset, DateTime, Utc};
 use log::error;
 use mobc::Connection;
 use mobc_postgres::PgConnectionManager;
-use tokio_postgres::{NoTls, Row};
+use tokio_postgres::{NoTls, Row, Statement};
 use uuid::Uuid;
 
 use crate::data::entity::person::Person;
@@ -31,9 +31,12 @@ pub async fn create_person_query(
 ) -> Result<Person> {
     let new_person_id: Uuid = Uuid::new_v4();
     let creation_date: DateTime<Utc> = Utc::now();
+
+    let prepared_statement: Statement = database_connection.prepare(QUERY).await?;
+
     let query_result: Result<Row, tokio_postgres::Error> = database_connection
         .query_one(
-            QUERY,
+            &prepared_statement,
             &[
                 &new_person_id,
                 &email_address,

@@ -2,7 +2,7 @@ use anyhow::{anyhow, Result};
 use log::error;
 use mobc::Connection;
 use mobc_postgres::PgConnectionManager;
-use tokio_postgres::NoTls;
+use tokio_postgres::{NoTls, Statement};
 use uuid::Uuid;
 
 use crate::{
@@ -27,9 +27,11 @@ pub async fn credential_by_email_address_query(
     database_connection: &Connection<PgConnectionManager<NoTls>>,
     email_address: &String,
 ) -> Result<Option<Credentials>> {
+    let prepared_statement: Statement = database_connection.prepare(QUERY).await?;
+
     let query_result: Result<Option<tokio_postgres::Row>, tokio_postgres::Error> =
         database_connection
-            .query_opt(QUERY, &[&email_address])
+            .query_opt(&prepared_statement, &[&email_address])
             .await;
 
     match query_result {
