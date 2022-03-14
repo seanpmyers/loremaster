@@ -2,6 +2,7 @@ use anyhow::Result;
 use chrono::{offset, SecondsFormat};
 use env_logger::{Builder, Target};
 use log::{info, LevelFilter};
+use rocket::fs::FileServer;
 use std::io::Write;
 
 mod api;
@@ -12,7 +13,7 @@ use data::postgres_handler::PostgresHandler;
 
 use crate::{
     api::controller::{chronicle_controller, session_controller},
-    utility::constants::{LOCAL_DEBUG, PROFILE},
+    utility::constants::{files::FRONTEND_DIST_PATH, LOCAL_DEBUG, PROFILE},
 };
 
 #[rocket::main]
@@ -41,6 +42,7 @@ async fn main() -> Result<()> {
     rocket::build()
         .manage(postgres_service)
         .mount("/", session_controller::routes())
+        .mount("/", FileServer::from(FRONTEND_DIST_PATH))
         .mount("/chronicle", chronicle_controller::routes())
         .launch()
         .await?;

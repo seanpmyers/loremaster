@@ -1,3 +1,4 @@
+use log::info;
 use sycamore::prelude::*;
 use wasm_bindgen::JsCast;
 use web_sys::{Event, HtmlInputElement};
@@ -15,6 +16,7 @@ pub fn app() -> View<G> {
     });
 
     let handle_change = move |event: Event| {
+        info!("Here!");
         name.set(
             event
                 .target()
