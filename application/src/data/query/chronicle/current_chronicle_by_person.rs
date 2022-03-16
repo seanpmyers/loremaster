@@ -1,4 +1,4 @@
-use anyhow::{Context, Result};
+use anyhow::{anyhow, Result};
 use chrono::{NaiveDate, TimeZone, Utc};
 use mobc::Connection;
 use mobc_postgres::PgConnectionManager;
@@ -7,7 +7,7 @@ use uuid::Uuid;
 
 use crate::data::entity::chronicle::Chronicle;
 
-const CURRENT_CHRONICLE_QUERY: &str = "
+const QUERY: &str = "
     SELECT DISTINCT
         chronicle.id
         , chronicle.date_recorded
@@ -23,13 +23,12 @@ pub async fn get_current_chronicle_by_person_query(
     database_connection: &Connection<PgConnectionManager<NoTls>>,
     person_id: &Uuid,
 ) -> Result<Option<Chronicle>> {
-    let prepared_statement: Statement =
-        database_connection.prepare(CURRENT_CHRONICLE_QUERY).await?;
+    let prepared_statement: Statement = database_connection.prepare(QUERY).await?;
 
     let query_result: Option<Row> = database_connection
         .query_opt(&prepared_statement, &[&person_id])
         .await
-        .context("An error occurred while querying the database.".to_string())?;
+        .map_err(|error| anyhow!("{}", error))?;
 
     if let Some(chronicle) = query_result {
         let result = Chronicle {
@@ -40,8 +39,8 @@ pub async fn get_current_chronicle_by_person_query(
                     .and_hms(0, 0, 0),
             ),
         };
-        return Ok(Some(result));
+        Ok(Some(result))
     } else {
-        return Ok(None);
+        Ok(None)
     }
 }

@@ -63,14 +63,14 @@ pub async fn today(
     match query_result {
         Some(result) => {
             info!("Existing chronicle found!");
-            return Ok(Json(result));
+            Ok(Json(result))
         }
         None => {
             info!("User is not associated with today's chronicle. Generating new a relation.");
             let result = create_chronicle_query(&database_connection, &today, &user.0, &None)
                 .await
                 .map_err(|error| anyhow!("{}", error))?;
-            return Ok(Json(result));
+            Ok(Json(result))
         }
     }
 }
@@ -95,9 +95,9 @@ pub async fn by_date(
             .map_err(|error| anyhow!("{}", error))?;
 
     if let Some(result) = query_result {
-        return Ok(Some(Json(result)));
+        Ok(Some(Json(result)))
     } else {
-        return Ok(None);
+        Ok(None)
     }
 }
 
@@ -120,8 +120,8 @@ pub async fn by_id(
             .map_err(|error| anyhow!("{}", error))?;
 
     match query_result {
-        Some(result) => return Ok(Some(Json(result))),
-        None => return Ok(None),
+        Some(result) => Ok(Some(Json(result))),
+        None => Ok(None),
     }
 }
 
@@ -145,7 +145,7 @@ pub async fn update(
         .await
         .map_err(|error| anyhow!("{}", error))?;
 
-    return Ok(Json(query_result));
+    Ok(Json(query_result))
 }
 
 #[delete("/delete")]
@@ -163,12 +163,12 @@ pub async fn delete(postgres_service: &State<PostgresHandler>) -> Result<(), Api
         .await
         .map_err(|error| anyhow!("{}", error))?;
 
-    return Ok(());
+    Ok(())
 }
 
 #[get("/server_time")]
 pub fn server_time() -> Result<String, ApiError> {
-    return Ok(Utc::now().to_rfc3339_opts(SecondsFormat::Nanos, true));
+    Ok(Utc::now().to_rfc3339_opts(SecondsFormat::Nanos, true))
 }
 
 #[get("/example")]
@@ -177,7 +177,7 @@ pub fn example() -> Result<Json<Chronicle>, ApiError> {
         id: Uuid::new_v4(),
         date_recorded: Utc::now(),
     };
-    return Ok(Json(result));
+    Ok(Json(result))
 }
 
 pub fn routes() -> Vec<rocket::Route> {

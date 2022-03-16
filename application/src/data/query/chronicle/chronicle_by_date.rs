@@ -1,4 +1,4 @@
-use anyhow::{Context, Result};
+use anyhow::{anyhow, Result};
 use chrono::{DateTime, NaiveDate, TimeZone, Utc};
 use mobc::Connection;
 use mobc_postgres::PgConnectionManager;
@@ -10,7 +10,7 @@ use crate::{
     utility::constants::database::{DATE_RECORDED, ID},
 };
 
-const CHRONICLE_BY_DATE_QUERY: &str = "
+const QUERY: &str = "
    SELECT
       chronicle.id
       , chronicle.date_recorded
@@ -27,8 +27,7 @@ pub async fn chronicle_by_date_query(
     chronicle_date: &DateTime<Utc>,
     person_id: &Uuid,
 ) -> Result<Option<Chronicle>> {
-    let prepared_statement: Statement =
-        database_connection.prepare(CHRONICLE_BY_DATE_QUERY).await?;
+    let prepared_statement: Statement = database_connection.prepare(QUERY).await?;
 
     let query_result = database_connection
         .query_opt(
@@ -36,7 +35,7 @@ pub async fn chronicle_by_date_query(
             &[&chronicle_date.to_string(), &person_id],
         )
         .await
-        .context("An error occurred while querying the database.".to_string())?;
+        .map_err(|error| anyhow!("{}", error))?;
 
     match query_result {
         Some(row) => {
@@ -45,10 +44,8 @@ pub async fn chronicle_by_date_query(
                 date_recorded: Utc
                     .from_utc_datetime(&row.get::<_, NaiveDate>(DATE_RECORDED).and_hms(0, 0, 0)),
             };
-            return Ok(Some(result));
+            Ok(Some(result))
         }
-        None => {
-            return Ok(None);
-        }
+        None => Ok(None),
     }
 }

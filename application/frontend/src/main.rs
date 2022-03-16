@@ -1,7 +1,7 @@
 use frontend::App;
 use sycamore::prelude::*;
 
-pub mod register;
+pub mod components;
 
 fn main() {
     console_error_panic_hook::set_once();

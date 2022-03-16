@@ -9,9 +9,9 @@ pub const SITE_SECRET_FIELD: &str = "SITE_SECRET";
 const LOREMASTER_FILE_PATH: &str = "./loremaster.toml";
 
 pub fn get_secret(secret_name: &str) -> Result<String> {
-    let result = toml_reader::get_field_value(LOREMASTER_FILE_PATH, secret_name)
+    let result: String = toml_reader::get_field_value(LOREMASTER_FILE_PATH, secret_name)
         .map_err(|error| anyhow!("{}", error))?;
-    return Ok(result);
+    Ok(result)
 }
 
 #[cfg(test)]
@@ -27,6 +27,6 @@ mod tests {
     fn secret_exists() -> Result<()> {
         let result: String = get_secret(TEST_SECRET_FIELD)?;
         assert_eq!(result, TEST_SECRET_VALUE);
-        return Ok(());
+        Ok(())
     }
 }

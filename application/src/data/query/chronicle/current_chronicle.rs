@@ -1,4 +1,4 @@
-use anyhow::{Context, Result};
+use anyhow::{anyhow, Result};
 use chrono::{NaiveDate, TimeZone, Utc};
 use mobc::Connection;
 use mobc_postgres::PgConnectionManager;
@@ -7,7 +7,7 @@ use uuid::Uuid;
 
 use crate::data::entity::chronicle::Chronicle;
 
-const CURRENT_CHRONICLE_QUERY: &str = "
+const QUERY: &str = "
     SELECT DISTINCT
         chronicle.id
         , chronicle.date_recorded
@@ -21,24 +21,23 @@ const CURRENT_CHRONICLE_QUERY: &str = "
 pub async fn get_current_chronicle_query(
     database_connection: &Connection<PgConnectionManager<NoTls>>,
 ) -> Result<Option<Chronicle>> {
-    let prepared_statement: Statement =
-        database_connection.prepare(CURRENT_CHRONICLE_QUERY).await?;
+    let prepared_statement: Statement = database_connection.prepare(QUERY).await?;
 
     let query_result = database_connection
         .query_opt(&prepared_statement, &[])
         .await
-        .context("An error occurred while querying the database.".to_string())?;
+        .map_err(|error| anyhow!("{}", error))?;
 
     if let Some(chronicle) = query_result {
-        return Ok(Some(Chronicle {
+        Ok(Some(Chronicle {
             id: chronicle.get::<_, Uuid>("id"),
             date_recorded: Utc.from_utc_datetime(
                 &chronicle
                     .get::<_, NaiveDate>("date_recorded")
                     .and_hms(0, 0, 0),
             ),
-        }));
+        }))
     } else {
-        return Ok(None);
+        Ok(None)
     }
 }

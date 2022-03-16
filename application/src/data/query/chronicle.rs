@@ -34,7 +34,7 @@ mod tests {
         let postgres_context: PostgresHandler = PostgresHandler::new().await?;
         let database_connection = postgres_context.database_pool.get().await?;
         get_current_chronicle_by_person_query(&database_connection, &Uuid::new_v4()).await?;
-        return Ok(());
+        Ok(())
     }
 
     #[tokio::test]
@@ -46,7 +46,7 @@ mod tests {
         let query_result =
             create_chronicle_query(&database_connection, &test_date, &person_id, &None).await?;
         assert_eq!(test_date, query_result.date_recorded);
-        return Ok(());
+        Ok(())
     }
 
     #[tokio::test]
@@ -65,7 +65,7 @@ mod tests {
         .await?;
         assert_eq!(test_date, query_result.date_recorded);
         assert_eq!(chronicle_id, query_result.id);
-        return Ok(());
+        Ok(())
     }
 
     #[tokio::test]
@@ -81,7 +81,7 @@ mod tests {
             }
             _ => panic!("Did not find chronicle for test date!"),
         };
-        return Ok(());
+        Ok(())
     }
 
     #[tokio::test]
@@ -98,7 +98,7 @@ mod tests {
             }
             None => panic!("Did not find chronicle for test date!"),
         };
-        return Ok(());
+        Ok(())
     }
 
     #[tokio::test]
@@ -118,7 +118,7 @@ mod tests {
         } else {
             panic!("Did not find chronicle for test date!")
         };
-        return Ok(());
+        Ok(())
     }
 
     #[tokio::test]
@@ -127,6 +127,6 @@ mod tests {
         let postgres_context: PostgresHandler = PostgresHandler::new().await?;
         let database_connection = postgres_context.database_pool.get().await?;
         delete_chronicle_query(&database_connection, &chronicle_id).await?;
-        return Ok(());
+        Ok(())
     }
 }

@@ -26,8 +26,8 @@ const QUERY: &str = "
 
 pub async fn create_person_query(
     database_connection: &Connection<PgConnectionManager<NoTls>>,
-    email_address: &String,
-    encrypted_password: &String,
+    email_address: &str,
+    encrypted_password: &str,
 ) -> Result<Person> {
     let new_person_id: Uuid = Uuid::new_v4();
     let creation_date: DateTime<Utc> = Utc::now();
@@ -55,11 +55,11 @@ pub async fn create_person_query(
                 alias: None,
             };
 
-            return Ok(new_person);
+            Ok(new_person)
         }
         Err(error) => {
             error!("{}", error);
-            return Err(anyhow!("Something went wrong creating the new person."));
+            Err(anyhow!("Something went wrong creating the new person."))
         }
     }
 }

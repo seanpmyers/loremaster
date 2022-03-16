@@ -20,7 +20,7 @@ impl<'r> FromRequest<'r> for User {
         let user_id: Option<Uuid> = request
             .cookies()
             .get_private(USER_ID)
-            .and_then(|cookie| Uuid::parse_str(&cookie.value().to_owned()).ok());
+            .and_then(|cookie| Uuid::parse_str(cookie.value()).ok());
 
         return user_id.map(User).or_forward(());
     }

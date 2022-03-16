@@ -8,8 +8,8 @@ pub fn get_field_value(file_path: &str, field_name: &str) -> Result<String> {
     let value_map: Value = string_file_content.parse::<Value>()?;
 
     if let Some(value) = value_map[field_name].as_str() {
-        return Ok(value.to_string());
+        Ok(value.to_string())
     } else {
-        return Err(anyhow!("No value found for field name: {}", field_name));
-    };
+        Err(anyhow!("No value found for field name: {}", field_name))
+    }
 }

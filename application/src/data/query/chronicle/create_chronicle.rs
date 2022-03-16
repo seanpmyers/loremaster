@@ -51,10 +51,10 @@ pub async fn create_chronicle_query(
 
                     let new_chronicle: Chronicle = Chronicle {
                         id: result_id,
-                        date_recorded: chronicle_date.clone(),
+                        date_recorded: *chronicle_date,
                     };
 
-                    return Ok(new_chronicle);
+                    Ok(new_chronicle)
                 }
                 Err(error) => {
                     error!("{}", error);
@@ -81,10 +81,10 @@ pub async fn create_chronicle_query(
 
                     let new_chronicle: Chronicle = Chronicle {
                         id: result_id,
-                        date_recorded: chronicle_date.clone(),
+                        date_recorded: *chronicle_date,
                     };
 
-                    return Ok(new_chronicle);
+                    Ok(new_chronicle)
                 }
                 Err(error) => {
                     error!("{}", error);

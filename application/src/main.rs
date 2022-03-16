@@ -24,7 +24,7 @@ async fn main() -> Result<()> {
             writeln!(
                 buf,
                 "LOREMASTER_{}: {} [{}] - {}",
-                std::env::var(PROFILE).unwrap_or(LOCAL_DEBUG.to_string()),
+                std::env::var(PROFILE).unwrap_or_else(|_| LOCAL_DEBUG.to_string()),
                 offset::Utc::now().to_rfc3339_opts(SecondsFormat::Millis, true),
                 record.level(),
                 record.args()
@@ -48,5 +48,6 @@ async fn main() -> Result<()> {
         .await?;
 
     info!("Shutting down.");
-    return Ok(());
+
+    Ok(())
 }

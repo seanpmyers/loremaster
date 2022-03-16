@@ -1,4 +1,4 @@
-use anyhow::{Context, Result};
+use anyhow::{anyhow, Result};
 use chrono::{DateTime, Utc};
 use mobc::Connection;
 use mobc_postgres::PgConnectionManager;
@@ -24,14 +24,14 @@ LIMIT
 
 pub async fn _person_by_email_address_query(
     database_connection: &Connection<PgConnectionManager<NoTls>>,
-    email_address: &String,
+    email_address: &str,
 ) -> Result<Option<Person>> {
     let prepared_statement: Statement = database_connection.prepare(_QUERY).await?;
 
-    let query_result = database_connection
+    let query_result: Option<tokio_postgres::Row> = database_connection
         .query_opt(&prepared_statement, &[&email_address])
         .await
-        .context("An error occurred while querying the database.".to_string())?;
+        .map_err(|error| anyhow!("{}", error))?;
 
     if let Some(person) = query_result {
         let result: Person = Person {
@@ -41,8 +41,8 @@ pub async fn _person_by_email_address_query(
             alias: None,
         };
 
-        return Ok(Some(result));
+        Ok(Some(result))
     } else {
-        return Ok(None);
+        Ok(None)
     }
 }

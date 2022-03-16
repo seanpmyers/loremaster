@@ -1,4 +1,4 @@
-use anyhow::{Context, Result};
+use anyhow::{anyhow, Result};
 use chrono::{NaiveDateTime, TimeZone, Utc};
 use mobc::Connection;
 use mobc_postgres::PgConnectionManager;
@@ -7,7 +7,7 @@ use uuid::Uuid;
 
 use crate::data::entity::chronicle::Chronicle;
 
-const UPDATE_CHRONICLE_QUERY: &str = "
+const QUERY: &str = "
     UPDATE
         public.chronicle
     SET 
@@ -23,7 +23,7 @@ pub async fn update_chronicle_query(
     database_connection: &Connection<PgConnectionManager<NoTls>>,
     chronicle_to_update: &Chronicle,
 ) -> Result<Chronicle> {
-    let prepared_statement: Statement = database_connection.prepare(UPDATE_CHRONICLE_QUERY).await?;
+    let prepared_statement: Statement = database_connection.prepare(QUERY).await?;
 
     let query_result: Row = database_connection
         .query_one(
@@ -34,7 +34,7 @@ pub async fn update_chronicle_query(
             ],
         )
         .await
-        .context("An error occurred while querying the database.".to_string())?;
+        .map_err(|error| anyhow!("{}", error))?;
 
     let updated_chronicle: Chronicle = Chronicle {
         id: query_result.get::<_, Uuid>("id"),
@@ -43,5 +43,5 @@ pub async fn update_chronicle_query(
             .unwrap(),
     };
 
-    return Ok(updated_chronicle);
+    Ok(updated_chronicle)
 }

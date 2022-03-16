@@ -4,7 +4,7 @@ use mobc_postgres::PgConnectionManager;
 use tokio_postgres::{NoTls, Statement};
 use uuid::Uuid;
 
-const DELETE_CHRONICLE_QUERY: &str = "
+const QUERY: &str = "
     DELETE FROM
         public.chronicle
     WHERE
@@ -15,11 +15,11 @@ pub async fn delete_chronicle_query(
     database_connection: &Connection<PgConnectionManager<NoTls>>,
     chronicle_id: &Uuid,
 ) -> Result<()> {
-    let prepared_statement: Statement = database_connection.prepare(DELETE_CHRONICLE_QUERY).await?;
+    let prepared_statement: Statement = database_connection.prepare(QUERY).await?;
 
     database_connection
         .query(&prepared_statement, &[&chronicle_id])
         .await?;
 
-    return Ok(());
+    Ok(())
 }

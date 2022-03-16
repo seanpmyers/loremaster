@@ -25,7 +25,7 @@ const QUERY: &str = "
 
 pub async fn credential_by_email_address_query(
     database_connection: &Connection<PgConnectionManager<NoTls>>,
-    email_address: &String,
+    email_address: &str,
 ) -> Result<Option<Credentials>> {
     let prepared_statement: Statement = database_connection.prepare(QUERY).await?;
 
@@ -43,14 +43,14 @@ pub async fn credential_by_email_address_query(
                     encrypted_password: person.get::<_, String>(ENCRYPTED_PASSWORD),
                 };
 
-                return Ok(Some(result));
+                Ok(Some(result))
             } else {
-                return Ok(None);
+                Ok(None)
             }
         }
         Err(error) => {
             error!("{}", error);
-            return Err(anyhow!("Something went wrong creating the new person."));
+            Err(anyhow!("Something went wrong creating the new person."))
         }
     }
 }
