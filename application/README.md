@@ -1,15 +1,22 @@
-# loremaster
+# loremaster - Backend
 
 The appilcation is primarily written in Rust.
 
-## Setup
+## Tech Stack
 
-The frontend style libraries have been excluded from version control.
-You must download them and place them in the styles/library folder.
-
-Current style libraries:
-
-- [Bootstrap 5.1](https://getbootstrap.com/docs/5.1/getting-started/download/)
+- Programming Languages and Frameworks
+  - [Rust](https://www.rust-lang.org/)
+    - [Rocket](https://rocket.rs/)
+  - [SQL](https://en.wikipedia.org/wiki/SQL)
+- Databases / Datastores
+  - [PostgreSQL](https://www.postgresql.org/)
+- Development Operations
+  - Cloud Service Provider
+    - [AWS](https://aws.amazon.com/)
+  - Version Control
+    - [Git](https://git-scm.com/)
+    - [GitHub](https://github.com/)
+    - [Docker](https://www.docker.com/)
 
 ### Database
 
