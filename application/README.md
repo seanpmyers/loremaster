@@ -1,6 +1,6 @@
 # loremaster - Backend
 
-[![dependency status](https://deps.rs/repo/github/seanpmyers/loremaster/status.svg)](https://deps.rs/repo/github/deps-rs/deps.rs)
+[![dependency status](https://deps.rs/repo/github/seanpmyers/loremaster/status.svg)](https://deps.rs/repo/github/seanpmyers/loremaster/deps.rs)
 
 The appilcation is primarily written in Rust.
 
