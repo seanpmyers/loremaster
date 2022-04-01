@@ -1,6 +1,6 @@
 # loremaster
 
-[![Build Status](https://github.com/seanpmyers/loremaster/workflows/CI/badge.svg)](https://github.com/seanpmyers/loremaster/actions)
+[![Build Status](https://github.com/seanpmyers/loremaster/workflows/Rust/badge.svg)](https://github.com/seanpmyers/loremaster/actions)
 [![dependency status](https://deps.rs/repo/github/seanpmyers/loremaster/status.svg)](https://deps.rs/repo/github/seanpmyers/loremaster/deps.rs)
 
 Streamlined planning and tracking of life goals, actions, and outcomes.
