@@ -1,5 +1,7 @@
 # loremaster
 
+[![dependency status](https://deps.rs/repo/github/seanpmyers/loremaster/status.svg)](https://deps.rs/repo/github/deps-rs/deps.rs)
+
 Streamlined planning and tracking of life goals, actions, and outcomes.
 
 ## Intentions

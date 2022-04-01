@@ -1,5 +1,7 @@
 # loremaster - Backend
 
+[![dependency status](https://deps.rs/repo/github/seanpmyers/loremaster/status.svg)](https://deps.rs/repo/github/deps-rs/deps.rs)
+
 The appilcation is primarily written in Rust.
 
 ## Tech Stack
@@ -17,6 +19,7 @@ The appilcation is primarily written in Rust.
     - [Git](https://git-scm.com/)
     - [GitHub](https://github.com/)
     - [Docker](https://www.docker.com/)
+  - Observability/Logging
 
 ### Database
 
