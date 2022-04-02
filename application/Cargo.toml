@@ -16,7 +16,7 @@ log = "0.4.14"
 mobc = "0.7.3"
 mobc-postgres = "0.7.0"
 # perseus = { version = "0.3.2", features = ["hydrate"] }
-reqwasm = "0.4.1"
+reqwasm = "0.5.0"
 rocket = { version = "0.5.0-rc.1", features = [
 	"secrets",
 	"json",
