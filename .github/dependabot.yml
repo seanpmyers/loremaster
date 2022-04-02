@@ -1,0 +1,8 @@
+version: 2
+updates:
+- package-ecosystem: cargo
+  directory: "/application/"
+  schedule:
+    interval: daily
+    time: "05:30"
+  open-pull-requests-limit: 10
