@@ -12,7 +12,7 @@ argon2 = "0.4.0"
 chrono = { version = "0.4.19", features = ["serde"] }
 env_logger = "0.8.4"
 frontend = { path = "./frontend" }
-log = "0.4.14"
+log = "0.4.16"
 mobc = "0.7.3"
 mobc-postgres = "0.7.0"
 # perseus = { version = "0.3.2", features = ["hydrate"] }
