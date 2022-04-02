@@ -7,7 +7,7 @@ edition = "2021"
 # See more keys and their definitions at https://doc.rust-lang.org/cargo/reference/manifest.html
 
 [dependencies]
-anyhow = "1.0.51"
+anyhow = "1.0.56"
 argon2 = "0.4.0"
 chrono = { version = "0.4.19", features = ["serde"] }
 env_logger = "0.8.4"
@@ -16,18 +16,18 @@ log = "0.4.14"
 mobc = "0.7.3"
 mobc-postgres = "0.7.0"
 # perseus = { version = "0.3.2", features = ["hydrate"] }
-reqwasm = "0.4.1"
+reqwasm = "0.5.0"
 rocket = { version = "0.5.0-rc.1", features = [
 	"secrets",
 	"json",
 	"tls",
 	"uuid",
 ] }
-serde = { version = "1.0.130", features = ["derive"] }
+serde = { version = "1.0.136", features = ["derive"] }
 serde_json = "1.0.74"
 sycamore = { version = "0.7.1", features = ["ssr"] }
 thiserror = "1.0.30"
-tokio = { version = "1.14.0", features = ["full"] }
+tokio = { version = "1.16.1", features = ["full"] }
 tokio-postgres = { version = "0.7.5", features = [
 	"with-uuid-0_8",
 	"with-chrono-0_4",
