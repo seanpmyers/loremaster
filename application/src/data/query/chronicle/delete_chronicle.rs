@@ -1,7 +1,5 @@
 use anyhow::Result;
-use mobc::Connection;
-use mobc_postgres::PgConnectionManager;
-use tokio_postgres::{NoTls, Statement};
+use sqlx::{query, PgPool};
 use uuid::Uuid;
 
 const QUERY: &str = "
@@ -12,13 +10,12 @@ const QUERY: &str = "
     ;";
 
 pub async fn delete_chronicle_query(
-    database_connection: &Connection<PgConnectionManager<NoTls>>,
+    database_connection: &PgPool,
     chronicle_id: &Uuid,
 ) -> Result<()> {
-    let prepared_statement: Statement = database_connection.prepare(QUERY).await?;
-
-    database_connection
-        .query(&prepared_statement, &[&chronicle_id])
+    query(QUERY)
+        .bind(&chronicle_id)
+        .execute(database_connection)
         .await?;
 
     Ok(())

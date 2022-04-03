@@ -3,17 +3,17 @@ use sycamore::prelude::*;
 use wasm_bindgen::JsCast;
 use web_sys::{Event, HtmlInputElement};
 
-#[component(App<G>)]
-pub fn app() -> View<G> {
-    let name = Signal::new(String::new());
+#[component]
+pub fn App<G: Html>(context: ScopeRef) -> View<G> {
+    let name: &Signal<String> = context.create_signal(String::new());
 
-    let displayed_name = cloned!((name) => move || {
+    let displayed_name = || {
         if name.get().is_empty() {
             "World".to_string()
         } else {
             name.get().as_ref().clone()
         }
-    });
+    };
 
     let handle_change = move |event: Event| {
         info!("Here!");
@@ -27,7 +27,7 @@ pub fn app() -> View<G> {
         );
     };
 
-    view! {
+    view! { context,
         div {
             h1 {
                 "Hello "

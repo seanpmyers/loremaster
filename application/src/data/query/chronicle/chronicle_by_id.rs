@@ -1,46 +1,32 @@
-use anyhow::{anyhow, Result};
-use chrono::{NaiveDate, TimeZone, Utc};
-use mobc::Connection;
-use mobc_postgres::PgConnectionManager;
-use tokio_postgres::{NoTls, Statement};
+use anyhow::Result;
+use sqlx::{query_as, PgPool};
 use uuid::Uuid;
 
-use crate::{
-    data::entity::chronicle::Chronicle,
-    utility::constants::database::{DATE_RECORDED, ID},
-};
+use crate::data::entity::chronicle::Chronicle;
 
 const QUERY: &str = "
    SELECT
-      chronicle.id
-      , chronicle.date_recorded
+        chronicle.id
+        , chronicle.person_id
+        , chronicle.date_recorded
+        , chronicle.notes
+        , chronicle.creation_time
    FROM
-      public.chronicle
+        public.chronicle
    WHERE
-      chronicle.id = $1
-   LIMIT 1
-    ;";
+        chronicle.id = $1
+   LIMIT 
+        1
+;";
 
 pub async fn chronicle_by_id_query(
-    database_connection: &Connection<PgConnectionManager<NoTls>>,
+    database_connection: &PgPool,
     chronicle_id: &Uuid,
 ) -> Result<Option<Chronicle>> {
-    let prepared_statement: Statement = database_connection.prepare(QUERY).await?;
+    let query_result: Option<Chronicle> = query_as::<_, Chronicle>(QUERY)
+        .bind(&chronicle_id)
+        .fetch_optional(database_connection)
+        .await?;
 
-    let query_result = database_connection
-        .query_opt(&prepared_statement, &[&chronicle_id])
-        .await
-        .map_err(|error| anyhow!("{}", error))?;
-
-    match query_result {
-        Some(row) => {
-            let result = Chronicle {
-                id: row.get::<_, Uuid>(ID),
-                date_recorded: Utc
-                    .from_utc_datetime(&row.get::<_, NaiveDate>(DATE_RECORDED).and_hms(0, 0, 0)),
-            };
-            Ok(Some(result))
-        }
-        None => Ok(None),
-    }
+    Ok(query_result)
 }

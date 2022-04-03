@@ -1,6 +1,7 @@
 version: '3.8'
 services:
   db:
+    container_name: loremaster_database
     image: postgres:14.2-alpine
     restart: always
     environment:
@@ -9,7 +10,7 @@ services:
     ports:
       - '5432:5432'
     volumes:
-      - db:/var/lib/postgresql/data
+      # - db:/var/lib/postgresql/data
       - ../database/initalization/:/docker-entrypoint-initdb.d
 volumes:
   db:

@@ -4,3 +4,4 @@ Rocket.toml
 loremaster.toml
 /application/frontend/target
 /application/frontend/dist
+.env
