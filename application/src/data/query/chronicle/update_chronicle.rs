@@ -1,9 +1,5 @@
-use anyhow::{anyhow, Result};
-use chrono::{NaiveDateTime, TimeZone, Utc};
-use mobc::Connection;
-use mobc_postgres::PgConnectionManager;
-use tokio_postgres::{NoTls, Row, Statement};
-use uuid::Uuid;
+use anyhow::Result;
+use sqlx::{query_as, PgPool};
 
 use crate::data::entity::chronicle::Chronicle;
 
@@ -20,28 +16,13 @@ const QUERY: &str = "
     ;";
 
 pub async fn update_chronicle_query(
-    database_connection: &Connection<PgConnectionManager<NoTls>>,
+    database_connection: &PgPool,
     chronicle_to_update: &Chronicle,
 ) -> Result<Chronicle> {
-    let prepared_statement: Statement = database_connection.prepare(QUERY).await?;
-
-    let query_result: Row = database_connection
-        .query_one(
-            &prepared_statement,
-            &[
-                &chronicle_to_update.date_recorded.to_string(),
-                &chronicle_to_update.id,
-            ],
-        )
-        .await
-        .map_err(|error| anyhow!("{}", error))?;
-
-    let updated_chronicle: Chronicle = Chronicle {
-        id: query_result.get::<_, Uuid>("id"),
-        date_recorded: Utc
-            .from_local_datetime(&query_result.get::<_, NaiveDateTime>("date_recorded"))
-            .unwrap(),
-    };
-
-    Ok(updated_chronicle)
+    let query_result = query_as::<_, Chronicle>(QUERY)
+        .bind(&chronicle_to_update.date_recorded)
+        .bind(&chronicle_to_update.id)
+        .fetch_one(database_connection)
+        .await?;
+    Ok(query_result)
 }

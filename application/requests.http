@@ -35,12 +35,6 @@ GET http://localhost:8000/chronicle/by_id
 GET http://localhost:8000/chronicle/
 
 ###
-GET http://localhost:8000/chronicle/
-
-###
-GET http://localhost:8000/chronicle/
-
-###
 GET http://localhost:8000/chronicle/server_time
 
 ###
