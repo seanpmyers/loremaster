@@ -10,4 +10,4 @@ pub const REGISTRATION_SUCCESS_MESSAGE: &str = "Account created successfully!";
 
 pub const SYCAMORE_BODY: &str = "%sycamore.body";
 pub const PROFILE: &str = "LOREMASTER_PROFILE";
-pub const LOCAL_DEBUG: &str = "LOCAL_DEBUG";
+pub const LOCAL_DEBUG: &str = "LOCAL";

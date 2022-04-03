@@ -2,6 +2,8 @@ use frontend::App;
 use sycamore::prelude::*;
 
 pub mod components;
+pub mod lib;
+pub mod utility;
 
 fn main() {
     console_error_panic_hook::set_once();
@@ -15,5 +17,5 @@ fn main() {
         .unwrap()
         .unwrap();
 
-    sycamore::hydrate_to(|| view! { App() }, &root);
+    sycamore::hydrate_to(|context| view! { context, App() }, &root);
 }

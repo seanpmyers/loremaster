@@ -1,8 +1,8 @@
 use anyhow::Result;
-use chrono::{offset, SecondsFormat};
 use env_logger::{Builder, Target};
 use log::{info, LevelFilter};
 use rocket::fs::FileServer;
+use sqlx::types::time::OffsetDateTime;
 use std::io::Write;
 
 mod api;
@@ -25,7 +25,7 @@ async fn main() -> Result<()> {
                 buf,
                 "LOREMASTER_{}: {} [{}] - {}",
                 std::env::var(PROFILE).unwrap_or_else(|_| LOCAL_DEBUG.to_string()),
-                offset::Utc::now().to_rfc3339_opts(SecondsFormat::Millis, true),
+                OffsetDateTime::now_utc().format("%FT%T"),
                 record.level(),
                 record.args()
             )

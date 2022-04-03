@@ -1,7 +1,5 @@
 use anyhow::anyhow;
 use log::info;
-use mobc::Connection;
-use mobc_postgres::PgConnectionManager;
 use rocket::{
     form::{Form, FromForm},
     fs::NamedFile,
@@ -13,7 +11,6 @@ use rocket::{
 };
 use sycamore::view;
 use tokio::fs;
-use tokio_postgres::NoTls;
 
 use crate::{
     api::response::ApiError,
@@ -67,13 +64,13 @@ async fn index() -> Result<Html<String>, ApiError> {
     )
     .map_err(|error| anyhow!("{}", error))?;
 
-    let rendered = sycamore::render_to_string(|| {
-        view! {
-            frontend::App()
-        }
-    });
+    // let rendered = sycamore::render_to_string(|| {
+    //     view! {
+    //         frontend::App()
+    //     }
+    // });
 
-    let index_html: String = index_html.replace(SYCAMORE_BODY, &rendered);
+    // let index_html: String = index_html.replace(SYCAMORE_BODY, &rendered);
 
     Ok(Html(index_html))
 }
@@ -87,13 +84,13 @@ async fn registration() -> Result<Html<String>, ApiError> {
     )
     .map_err(|error| anyhow!("{}", error))?;
 
-    let rendered = sycamore::render_to_string(|| {
-        view! {
-            frontend::App()
-        }
-    });
+    // let rendered = sycamore::render_to_string(|context| {
+    //     view! { context,
+    //         frontend::App()
+    //     }
+    // });
 
-    let index_html: String = index_html.replace(SYCAMORE_BODY, &rendered);
+    // let index_html: String = index_html.replace(SYCAMORE_BODY, &rendered);
 
     Ok(Html(index_html))
 }
@@ -103,18 +100,14 @@ async fn register(
     postgres_service: &State<PostgresHandler>,
     registration_form: Form<CredentialsForm<'_>>,
 ) -> Result<String, ApiError> {
-    info!("Connecting to database.");
-    let database_connection: Connection<PgConnectionManager<NoTls>> = postgres_service
-        .database_pool
-        .get()
-        .await
-        .map_err(|error| anyhow!("{}", error))?;
-
+    info!("API CALL: /session/register");
     info!("Checking for existing users with provided email address.");
-    let existing_credentials: Option<Credentials> =
-        credential_by_email_address_query(&database_connection, registration_form.email_address)
-            .await
-            .map_err(|error| anyhow!("{}", error))?;
+    let existing_credentials: Option<Credentials> = credential_by_email_address_query(
+        &postgres_service.database_pool,
+        registration_form.email_address,
+    )
+    .await
+    .map_err(|error| anyhow!("{}", error))?;
 
     if existing_credentials.is_some() {
         info!("Existing user found!");
@@ -129,9 +122,11 @@ async fn register(
 
     info!("Adding new user to database.");
     create_person_query(
-        &database_connection,
+        &postgres_service.database_pool,
         registration_form.email_address,
         &encrypted_password,
+        None,
+        None,
     )
     .await
     .map_err(|error| anyhow!("{}", error))?;
@@ -145,17 +140,13 @@ async fn authenticate(
     cookie_jar: &CookieJar<'_>,
     authentication_form: Form<CredentialsForm<'_>>,
 ) -> Result<String, ApiError> {
-    info!("Connecting to database.");
-    let database_connection: Connection<PgConnectionManager<NoTls>> = postgres_service
-        .database_pool
-        .get()
-        .await
-        .map_err(|error| anyhow!("{}", error))?;
-
-    let query_result: Option<Credentials> =
-        credential_by_email_address_query(&database_connection, authentication_form.email_address)
-            .await
-            .map_err(|error| anyhow!("{}", error))?;
+    info!("API CALL: /session/authenticate");
+    let query_result: Option<Credentials> = credential_by_email_address_query(
+        &postgres_service.database_pool,
+        authentication_form.email_address,
+    )
+    .await
+    .map_err(|error| anyhow!("{}", error))?;
 
     if let Some(person) = query_result {
         let valid_password: bool = PasswordEncryptionService::verify_password(
@@ -188,6 +179,7 @@ async fn authenticate(
 
 #[post("/logout")]
 async fn logout(cookie_jar: &CookieJar<'_>) -> Result<String, ApiError> {
+    info!("API CALL: /session/logout");
     cookie_jar.remove_private(Cookie::named(cookie_fields::USER_ID));
     cookie_jar.remove_private(Cookie::named(cookie_fields::SESSION_ID));
     Ok("Cookies cleared.".to_string())
