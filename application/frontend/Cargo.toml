@@ -18,4 +18,4 @@ wasm-bindgen = "0.2.80"
 
 [dependencies.web-sys]
 features = ["HtmlInputElement", "InputEvent"]
-version = "0.3.56"
+version = "0.3.57"
