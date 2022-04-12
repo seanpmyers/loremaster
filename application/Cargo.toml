@@ -7,23 +7,33 @@ edition = "2021"
 # See more keys and their definitions at https://doc.rust-lang.org/cargo/reference/manifest.html
 
 [dependencies]
+# Error handling
 anyhow = "1.0.56"
+# Password Encryption
 argon2 = "0.4.0"
+# Logging
 env_logger = "0.9.0"
+# Frontend project
 frontend = { path = "./frontend" }
+# Provides async programming foundational functionality
 futures = "0.3.21"
+# Logging
 log = "0.4.16"
-# perseus = { version = "0.3.2", features = ["hydrate"] }
+# Random nubmer generation
 rand = "0.8.5"
+# Http requests library for WebAssembly
 reqwasm = "0.5.0"
+# Backend web framework
 rocket = { version = "0.5.0-rc.1", features = [
 	"secrets",
 	"json",
 	"tls",
 	"uuid",
 ] }
+# Serialization
 serde = { version = "1.0.136", features = ["derive"] }
 serde_json = "1.0.79"
+# Database client/pool/toolkit
 sqlx = { version = "0.5.11", features = [
 	"json",
 	"macros",
@@ -35,14 +45,19 @@ sqlx = { version = "0.5.11", features = [
 	"tls",
 	"uuid",
 ] }
-sycamore = { version = "0.7.1", features = ["ssr"] }
+# Frontend WebAssembly library
+sycamore = { version = "0.8.0-beta.4", features = ["ssr", "suspense"] }
+# Error/exception handling
 thiserror = "1.0.30"
+# Time
 time = { version = "0.2.7", features = ["serde", "std"] }
+# Backend async I/O functionality
 tokio = { version = "1.16.1", features = ["full"] }
 tokio-stream = "0.1.8"
 tokio-test = "0.4.2"
+# Encode/decode TOML content/files
 toml = "0.5.8"
-ureq = "2.4.0"
+# Implementation of Universally Unique Identifiers (Uuid)
 uuid = { version = "0.8.2", features = ["v4", "serde"] }
 
 

@@ -64,13 +64,13 @@ async fn index() -> Result<Html<String>, ApiError> {
     )
     .map_err(|error| anyhow!("{}", error))?;
 
-    // let rendered = sycamore::render_to_string(|| {
-    //     view! {
-    //         frontend::App()
-    //     }
-    // });
+    let rendered = sycamore::render_to_string(|context| {
+        view! { context,
+            frontend::App()
+        }
+    });
 
-    // let index_html: String = index_html.replace(SYCAMORE_BODY, &rendered);
+    let index_html: String = index_html.replace(SYCAMORE_BODY, &rendered);
 
     Ok(Html(index_html))
 }
@@ -84,13 +84,13 @@ async fn registration() -> Result<Html<String>, ApiError> {
     )
     .map_err(|error| anyhow!("{}", error))?;
 
-    // let rendered = sycamore::render_to_string(|context| {
-    //     view! { context,
-    //         frontend::App()
-    //     }
-    // });
+    let rendered = sycamore::render_to_string(|context| {
+        view! { context,
+            frontend::App()
+        }
+    });
 
-    // let index_html: String = index_html.replace(SYCAMORE_BODY, &rendered);
+    let index_html: String = index_html.replace(SYCAMORE_BODY, &rendered);
 
     Ok(Html(index_html))
 }

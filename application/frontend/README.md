@@ -8,3 +8,17 @@ You must download them and place them in the styles/library folder.
 Current style libraries:
 
 - [Bootstrap 5.1](https://getbootstrap.com/docs/5.1/getting-started/download/)
+
+## Local Debugging
+
+```
+trunk build
+```
+
+```
+trunk watch
+```
+
+```
+trunk run
+```

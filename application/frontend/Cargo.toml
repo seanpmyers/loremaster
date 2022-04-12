@@ -7,15 +7,19 @@ authors = ["Sean Myers <spmyers@protonmail.com>"]
 # See more keys and their definitions at https://doc.rust-lang.org/cargo/reference/manifest.html
 
 [dependencies]
+# Logging
 console_error_panic_hook = "0.1.7"
 console_log = "0.2.0"
-log = "0.4.14"
-reqwasm = "0.4.1"
-serde = { version = "1.0.130", features = ["derive"] }
+log = "0.4.16"
+# Http requests library for WebAssembly
+reqwasm = "0.5.0"
+# Serialization/deserialization
+serde = { version = "1.0.136", features = ["derive"] }
 serde_json = "1.0.74"
-sycamore = { version = "0.8.0-beta.3", features = ["ssr", "suspense"] }
-wasm-bindgen = "0.2.79"
+# Frontend WebAssembly library
+sycamore = { version = "0.8.0-beta.4", features = ["ssr", "suspense"] }
+wasm-bindgen = "0.2.80"
 
 [dependencies.web-sys]
 features = ["HtmlInputElement", "InputEvent"]
-version = "0.3.56"
+version = "0.3.57"
