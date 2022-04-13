@@ -1,25 +1,17 @@
+use log::info;
 use reqwasm::http::Request;
-use serde::{Deserialize, Serialize};
 use sycamore::{futures::spawn_local_scoped, prelude::*, suspense::Suspense};
 
 use crate::utility::constants::API_REGISTER_URL;
 
-#[derive(Serialize, Deserialize, Default, Debug)]
-struct RegisterResponse {
-    value: String,
-}
-
-async fn register_user(
-    email_address: String,
-    password: String,
-) -> Result<RegisterResponse, reqwasm::Error> {
+async fn register_user(email_address: String, password: String) -> Result<String, reqwasm::Error> {
     let response: reqwasm::http::Response = Request::post(&format!(
         "{API_REGISTER_URL}/?email_address={email_address}&password={password}"
     ))
     .send()
     .await?;
 
-    let body: RegisterResponse = response.json::<RegisterResponse>().await?;
+    let body: String = response.json::<String>().await?;
 
     Ok(body)
 }
@@ -40,6 +32,7 @@ pub async fn RegistrationForm<G: Html>(context: Scope<'_>) -> View<G> {
             )
             .await
             .unwrap_or_default();
+            info!("{response}");
         })
     };
 

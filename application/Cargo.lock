@@ -591,6 +591,7 @@ dependencies = [
  "serde",
  "serde_json",
  "sycamore",
+ "sycamore-router",
  "wasm-bindgen",
  "web-sys",
 ]
@@ -2147,6 +2148,31 @@ dependencies = [
  "indexmap",
  "slotmap",
  "smallvec",
+]
+
+[[package]]
+name = "sycamore-router"
+version = "0.8.0-beta.4"
+source = "registry+https://github.com/rust-lang/crates.io-index"
+checksum = "5a3a61f9b557304dbe8d64f7d186a720ab204815068a39d4eefbf53eb20ee4c1"
+dependencies = [
+ "sycamore",
+ "sycamore-router-macro",
+ "wasm-bindgen",
+ "web-sys",
+]
+
+[[package]]
+name = "sycamore-router-macro"
+version = "0.8.0-beta.4"
+source = "registry+https://github.com/rust-lang/crates.io-index"
+checksum = "d8f8a924e1cf8bfccecb1d697ea10398572f673300c174299b3ff77b86e10eca"
+dependencies = [
+ "nom",
+ "proc-macro2",
+ "quote",
+ "syn",
+ "unicode-xid",
 ]
 
 [[package]]
