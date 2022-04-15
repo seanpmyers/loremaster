@@ -41,7 +41,7 @@ time = { version = "0.2.7", features = ["serde", "std"] }
 tokio = { version = "1.16.1", features = ["full"] }
 tokio-stream = "0.1.8"
 tokio-test = "0.4.2"
-toml = "0.5.8"
+toml = "0.5.9"
 ureq = "2.4.0"
 uuid = { version = "0.8.2", features = ["v4", "serde"] }
 
