@@ -16,7 +16,7 @@ log = "0.4.17"
 # perseus = { version = "0.3.2", features = ["hydrate"] }
 rand = "0.8.5"
 reqwasm = "0.5.0"
-rocket = { version = "0.5.0-rc.1", features = [
+rocket = { version = "0.5.0-rc.2", features = [
 	"secrets",
 	"json",
 	"tls",
