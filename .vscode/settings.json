@@ -1,6 +1,7 @@
 {
    "cSpell.words": [
-      "chrono"
+      "chrono",
+      "reqwasm"
    ],
    "editor.insertSpaces": false,
    "editor.tabSize": 2,
