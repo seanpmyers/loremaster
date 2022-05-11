@@ -1,7 +1,7 @@
 use anyhow::Result;
 use env_logger::{Builder, Target};
 use log::{info, LevelFilter};
-use rocket::fs::FileServer;
+use rocket::{fs::FileServer, Ignite, Rocket};
 use sqlx::types::time::OffsetDateTime;
 use std::io::Write;
 
@@ -39,11 +39,13 @@ async fn main() -> Result<()> {
     info!("Connection configured.");
 
     info!("Launching rocket HTTP server.");
-    rocket::build()
+    let _rocket_server: Rocket<Ignite> = rocket::build()
         .manage(postgres_service)
         .mount("/", session_controller::routes())
         .mount("/", FileServer::from(FRONTEND_DIST_PATH))
         .mount("/chronicle", chronicle_controller::routes())
+        .ignite()
+        .await?
         .launch()
         .await?;
 

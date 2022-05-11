@@ -4,8 +4,8 @@ use wasm_bindgen::JsCast;
 use web_sys::{Event, HtmlInputElement};
 
 #[component]
-pub fn App<G: Html>(context: ScopeRef) -> View<G> {
-    let name: &Signal<String> = context.create_signal(String::new());
+pub fn App<G: Html>(context: Scope) -> View<G> {
+    let name: &Signal<String> = create_signal(context, String::new());
 
     let displayed_name = || {
         if name.get().is_empty() {
