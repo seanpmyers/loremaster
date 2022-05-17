@@ -35,7 +35,7 @@ sqlx = { version = "0.5.13", features = [
 	"tls",
 	"uuid",
 ] }
-sycamore = { version = "0.8.0-beta.5", features = ["ssr", "suspense"] }
+sycamore = { version = "0.8.0-beta.6", features = ["ssr", "suspense"] }
 thiserror = "1.0.31"
 time = { version = "0.2.7", features = ["serde", "std"] }
 tokio = { version = "1.18.2", features = ["full"] }
