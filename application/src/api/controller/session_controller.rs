@@ -6,7 +6,7 @@ use rocket::{
     get,
     http::{Cookie, CookieJar},
     post,
-    response::content::Html,
+    response::content::RawHtml,
     routes, State,
 };
 use sycamore::view;
@@ -56,7 +56,7 @@ async fn favicon() -> Result<Option<NamedFile>, ApiError> {
 }
 
 #[get("/")]
-async fn index() -> Result<Html<String>, ApiError> {
+async fn index() -> Result<RawHtml<String>, ApiError> {
     let index_html: String = String::from_utf8(
         fs::read(INDEX_PATH)
             .await
@@ -72,11 +72,11 @@ async fn index() -> Result<Html<String>, ApiError> {
 
     let index_html: String = index_html.replace(SYCAMORE_BODY, &rendered);
 
-    Ok(Html(index_html))
+    Ok(RawHtml(index_html))
 }
 
 #[get("/registration")]
-async fn registration() -> Result<Html<String>, ApiError> {
+async fn registration() -> Result<RawHtml<String>, ApiError> {
     let index_html: String = String::from_utf8(
         fs::read(INDEX_PATH)
             .await
@@ -92,7 +92,7 @@ async fn registration() -> Result<Html<String>, ApiError> {
 
     let index_html: String = index_html.replace(SYCAMORE_BODY, &rendered);
 
-    Ok(Html(index_html))
+    Ok(RawHtml(index_html))
 }
 
 #[post("/register", data = "<registration_form>")]

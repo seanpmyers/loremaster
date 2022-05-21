@@ -8,7 +8,7 @@ edition = "2021"
 
 [dependencies]
 # Error handling
-anyhow = "1.0.56"
+anyhow = "1.0.57"
 # Password Encryption
 argon2 = "0.4.0"
 # Logging
@@ -18,23 +18,23 @@ frontend = { path = "./frontend" }
 # Provides async programming foundational functionality
 futures = "0.3.21"
 # Logging
-log = "0.4.16"
+log = "0.4.17"
 # Random nubmer generation
 rand = "0.8.5"
 # Http requests library for WebAssembly
 reqwasm = "0.5.0"
 # Backend web framework
-rocket = { version = "0.5.0-rc.1", features = [
+rocket = { version = "0.5.0-rc.2", features = [
 	"secrets",
 	"json",
 	"tls",
 	"uuid",
 ] }
 # Serialization
-serde = { version = "1.0.136", features = ["derive"] }
-serde_json = "1.0.79"
+serde = { version = "1.0.137", features = ["derive"] }
+serde_json = "1.0.81"
 # Database client/pool/toolkit
-sqlx = { version = "0.5.11", features = [
+sqlx = { version = "0.5.13", features = [
 	"json",
 	"macros",
 	"migrate",
@@ -46,17 +46,17 @@ sqlx = { version = "0.5.11", features = [
 	"uuid",
 ] }
 # Frontend WebAssembly library
-sycamore = { version = "0.8.0-beta.4", features = ["ssr", "suspense"] }
+sycamore = { version = "0.8.0-beta.6", features = ["ssr", "suspense"] }
 # Error/exception handling
-thiserror = "1.0.30"
+thiserror = "1.0.31"
 # Time
 time = { version = "0.2.7", features = ["serde", "std"] }
 # Backend async I/O functionality
-tokio = { version = "1.16.1", features = ["full"] }
+tokio = { version = "1.18.2", features = ["full"] }
 tokio-stream = "0.1.8"
 tokio-test = "0.4.2"
 # Encode/decode TOML content/files
-toml = "0.5.8"
+toml = "0.5.9"
 # Implementation of Universally Unique Identifiers (Uuid)
 uuid = { version = "0.8.2", features = ["v4", "serde"] }
 

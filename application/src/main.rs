@@ -39,11 +39,13 @@ async fn main() -> Result<()> {
     info!("Connection configured.");
 
     info!("Launching rocket HTTP server.");
-    rocket::build()
+    let _rocket = rocket::build()
         .manage(postgres_service)
         .mount("/", session_controller::routes())
         .mount("/", FileServer::from(FRONTEND_DIST_PATH))
         .mount("/chronicle", chronicle_controller::routes())
+        .ignite()
+        .await?
         .launch()
         .await?;
 
