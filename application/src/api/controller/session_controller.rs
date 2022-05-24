@@ -9,7 +9,6 @@ use rocket::{
     response::content::RawHtml,
     routes, State,
 };
-use sycamore::view;
 use tokio::fs;
 
 use crate::{
@@ -22,12 +21,12 @@ use crate::{
             credential_by_email_address::credential_by_email_address_query,
         },
     },
+    frontend,
     utility::{
         constants::{
             cookie_fields,
             files::{FAVICON_PATH, INDEX_PATH},
             FAILED_LOGIN_MESSAGE, REGISTRATION_SUCCESS_MESSAGE, SUCCESSFUL_LOGIN_MESSAGE,
-            SYCAMORE_BODY,
         },
         password_encryption::{PasswordEncryption, PasswordEncryptionService},
     },
@@ -57,22 +56,7 @@ async fn favicon() -> Result<Option<NamedFile>, ApiError> {
 
 #[get("/")]
 async fn index() -> Result<RawHtml<String>, ApiError> {
-    let index_html: String = String::from_utf8(
-        fs::read(INDEX_PATH)
-            .await
-            .map_err(|error| anyhow!("{}", error))?,
-    )
-    .map_err(|error| anyhow!("{}", error))?;
-
-    let rendered = sycamore::render_to_string(|context| {
-        view! { context,
-            frontend::App()
-        }
-    });
-
-    let index_html: String = index_html.replace(SYCAMORE_BODY, &rendered);
-
-    Ok(RawHtml(index_html))
+    Ok(RawHtml(frontend::index::index().await))
 }
 
 #[get("/registration")]
@@ -83,14 +67,6 @@ async fn registration() -> Result<RawHtml<String>, ApiError> {
             .map_err(|error| anyhow!("{}", error))?,
     )
     .map_err(|error| anyhow!("{}", error))?;
-
-    let rendered = sycamore::render_to_string(|context| {
-        view! { context,
-            frontend::App()
-        }
-    });
-
-    let index_html: String = index_html.replace(SYCAMORE_BODY, &rendered);
 
     Ok(RawHtml(index_html))
 }

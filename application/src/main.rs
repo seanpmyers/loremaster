@@ -7,6 +7,7 @@ use std::io::Write;
 
 mod api;
 mod data;
+mod frontend;
 mod utility;
 
 use data::postgres_handler::PostgresHandler;
