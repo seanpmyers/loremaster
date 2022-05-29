@@ -11,7 +11,7 @@ authors = ["Sean Myers <spmyers@protonmail.com>"]
 console_error_panic_hook = "0.1.7"
 console_log = "0.2.0"
 # A concurrent renderer-agnostic Virtual DOM for interactive user experiences
-dioxus = { version = "0.2.4", features = ["web", "ssr"] }
+dioxus = { version = "0.2.4", features = ["router", "web", "ssr"] }
 # Logging
 log = "0.4.17"
 # Http requests library for WebAssembly

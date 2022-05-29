@@ -1,37 +1,12 @@
+use crate::components::navigation::Navigation;
+use dioxus::router::{Link, Route, Router};
 use dioxus::{events::FormEvent, prelude::*};
 use std::time::Duration;
 
+mod components;
 mod utility;
 
-use crate::utility::constants::API_REGISTER_URL;
-
 fn dioxus_application(context: Scope) -> Element {
-    let onsubmit = move |event: FormEvent| {
-        context.spawn(async move {
-            let response: Result<reqwest::Response, reqwest::Error> = reqwest::Client::new()
-                .crossorigin
-                .post(API_REGISTER_URL)
-                .form(&[
-                    ("email_address", &event.values["username"]),
-                    ("password", &event.values["password"]),
-                ])
-                .send()
-                .await;
-
-            match response {
-                // Parse data from here, such as storing a response token
-                Ok(_data) => println!("Registration successful!"),
-
-                //Handle any errors from the fetch here
-                Err(_err) => {
-                    println!(
-                        "Registration failed - you need a login server running on localhost:8000."
-                    )
-                }
-            }
-        });
-    };
-
     context.render(rsx! {
       head { class: "m-4",
         link {
@@ -43,38 +18,7 @@ fn dioxus_application(context: Scope) -> Element {
       }
       body {
         class: "d-flex justify-content-center h-100 w-100",
-        div { class: "d-flex flex-column",
-          h1 { class: "font-bold text-decoration-underline text-center", "loremaster" }
-            div {
-              form {
-                onsubmit: onsubmit,
-                prevent_default: "onsubmit",
-                div {
-                  label {"Email Address"}
-                  input {
-                    r#type:"text",
-                    placeholder:"email@example.com",
-                    id: "username",
-                    name: "username"
-                  }
-                }
-                div {
-                  label {"Password"}
-                  input {
-                    placeholder:"",
-                    r#type:"password",
-                    id: "password",
-                    name: "password"
-                  }
-                }
-                div {
-                  button {
-                    "Submit"
-                  }
-                }
-              }
-            }
-        }
+        div {class: "container-fluid", Navigation {} }
       }
     })
 }

@@ -21,7 +21,6 @@ use crate::{
             credential_by_email_address::credential_by_email_address_query,
         },
     },
-    frontend,
     utility::{
         constants::{
             cookie_fields,
@@ -56,11 +55,6 @@ async fn favicon() -> Result<Option<NamedFile>, ApiError> {
 
 #[get("/")]
 async fn index() -> Result<RawHtml<String>, ApiError> {
-    Ok(RawHtml(frontend::index::index().await))
-}
-
-#[get("/registration")]
-async fn registration() -> Result<RawHtml<String>, ApiError> {
     let index_html: String = String::from_utf8(
         fs::read(INDEX_PATH)
             .await
@@ -162,5 +156,5 @@ async fn logout(cookie_jar: &CookieJar<'_>) -> Result<String, ApiError> {
 }
 
 pub fn routes() -> Vec<rocket::Route> {
-    routes![authenticate, favicon, index, logout, registration, register,]
+    routes![authenticate, favicon, index, logout, register,]
 }
