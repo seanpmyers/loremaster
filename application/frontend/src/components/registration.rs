@@ -29,11 +29,11 @@ pub fn Registration(context: Scope) -> Element {
 };
 
 context.render(rsx! {
-  div { class: "d-flex flex-column",
-    h2 { "Registration" },
+  div { class: "d-flex justify-content-center p-4",
     form {
       onsubmit: onsubmit,
       prevent_default: "onsubmit",
+      h2 { "Registration" },
       div { class: "mb-3",
         label { class: "form-label", "Email Address"}
         input { class: "form-control",
@@ -53,7 +53,7 @@ context.render(rsx! {
           name: "password"
         }
       }
-      button { class: "btn btn-primary", "Submit" }
+      button { class: "btn text-white acrylic-button-primary", "Submit" }
     }
   }
   

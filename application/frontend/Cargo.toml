@@ -19,8 +19,12 @@ log = "0.4.17"
 # Http requests library for WebAssembly
 reqwasm = "0.5.0"
 # Higher level HTTP client library 
-reqwest = "0.11.10"
+reqwest = { version = "0.11.10", features = ["json"] }
 # Serialization/deserialization
 serde = { version = "1.0.137", features = ["derive"] }
 serde_json = "1.0.81"
+# Time
+time = { version = "0.2.7", features = ["serde", "std"] }
 wasm-bindgen = "0.2.80"
+# Implementation of Universally Unique Identifiers (Uuid) - DOES NOT COMPILE CURRENTLY
+# uuid = { version = "1.1.0", features = ["v4", "serde"] }

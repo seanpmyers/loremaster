@@ -29,11 +29,11 @@ pub fn Login(context: Scope) -> Element {
 };
 
 context.render(rsx! {
-  div { class: "d-flex flex-column",
-    h2 { "Login" },
+  div { class: "d-flex justify-content-center p-4",
     form {
       onsubmit: onsubmit,
       prevent_default: "onsubmit",
+      h2 { "Login" },
       div { class: "mb-3",
         label { class: "form-label", "Email Address"}
         input { class: "form-control",
@@ -42,7 +42,7 @@ context.render(rsx! {
           id: "email_address",
           name: "email_address"
         }
-        div { class: "form-text", "Emails are encrypted before being stored in the database." }
+        div { class: "form-text", "You must register before you can login." }
       }
       div { class: "mb-3",
         label { class: "form-label", "Password"}
@@ -53,7 +53,7 @@ context.render(rsx! {
           name: "password"
         }
       }
-      button { class: "btn btn-primary", "Submit" }
+      button { class: "btn text-white acrylic-button-primary", "Submit" }
     }
   }
   

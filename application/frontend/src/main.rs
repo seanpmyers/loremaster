@@ -2,22 +2,12 @@ use crate::components::navigation::Navigation;
 use dioxus::prelude::*;
 
 mod components;
+mod data;
 mod utility;
 
 fn dioxus_application(context: Scope) -> Element {
     context.render(rsx! {
-      head { class: "m-4",
-        link {
-          href: "https://cdn.jsdelivr.net/npm/bootstrap@5.1.3/dist/css/bootstrap.min.css",
-          rel: "stylesheet",
-          integrity: "sha384-1BmE4kWBq78iYhFldvKuhfTAU6auU8tT94WrHftjDbrCEXSU1oBoqyl2QvZ6jIW3",
-          crossorigin: "anonymous"
-        }
-      }
-      body {
-        class: "d-flex justify-content-center h-100 w-100",
-        div {class: "container-fluid", Navigation {} }
-      }
+      div {class: "d-flex flex-column h-100 w-100", Navigation {} }
     })
 }
 
