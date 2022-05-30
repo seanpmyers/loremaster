@@ -1,7 +1,5 @@
 use crate::components::navigation::Navigation;
-use dioxus::router::{Link, Route, Router};
-use dioxus::{events::FormEvent, prelude::*};
-use std::time::Duration;
+use dioxus::prelude::*;
 
 mod components;
 mod utility;

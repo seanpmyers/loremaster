@@ -4,9 +4,9 @@ use rocket::{
     form::{Form, FromForm},
     fs::NamedFile,
     get,
-    http::{Cookie, CookieJar},
+    http::{Cookie, CookieJar, SameSite},
     post,
-    response::content::RawHtml,
+    response::content::{RawHtml, RawJson},
     routes, State,
 };
 use tokio::fs;
@@ -69,7 +69,7 @@ async fn index() -> Result<RawHtml<String>, ApiError> {
 async fn register(
     postgres_service: &State<PostgresHandler>,
     registration_form: Form<CredentialsForm<'_>>,
-) -> Result<String, ApiError> {
+) -> Result<RawJson<String>, ApiError> {
     info!("API CALL: /session/register");
     info!("Checking for existing users with provided email address.");
     let existing_credentials: Option<Credentials> = credential_by_email_address_query(
@@ -82,7 +82,7 @@ async fn register(
     if existing_credentials.is_some() {
         info!("Existing user found!");
         //TODO: Send an email to the specified address and indicate someone tried to re-register using that email
-        return Ok(REGISTRATION_SUCCESS_MESSAGE.to_string());
+        return Ok(RawJson(REGISTRATION_SUCCESS_MESSAGE.to_string()));
     }
 
     info!("Email can be registered.");
@@ -101,7 +101,7 @@ async fn register(
     .await
     .map_err(|error| anyhow!("{}", error))?;
 
-    Ok(REGISTRATION_SUCCESS_MESSAGE.to_string())
+    Ok(RawJson(REGISTRATION_SUCCESS_MESSAGE.to_string()))
 }
 
 #[post("/authenticate", data = "<authentication_form>")]
@@ -109,7 +109,7 @@ async fn authenticate(
     postgres_service: &State<PostgresHandler>,
     cookie_jar: &CookieJar<'_>,
     authentication_form: Form<CredentialsForm<'_>>,
-) -> Result<String, ApiError> {
+) -> Result<RawJson<String>, ApiError> {
     info!("API CALL: /session/authenticate");
     let query_result: Option<Credentials> = credential_by_email_address_query(
         &postgres_service.database_pool,
@@ -133,12 +133,12 @@ async fn authenticate(
 
         cookie_jar.add_private(
             Cookie::build(cookie_fields::USER_ID, person.id.to_string())
-                // .http_only(true)
-                // .secure(true)
-                // .same_site(SameSite::Strict)
+                .http_only(true)
+                .secure(true)
+                .same_site(SameSite::Strict)
                 .finish(),
         );
-        Ok(SUCCESSFUL_LOGIN_MESSAGE.to_string())
+        Ok(RawJson(SUCCESSFUL_LOGIN_MESSAGE.to_string()))
         //return Ok(Redirect::to(uri!(index)));
     } else {
         Err(ApiError::Anyhow {

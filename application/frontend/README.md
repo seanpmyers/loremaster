@@ -11,14 +11,20 @@ Current style libraries:
 
 ## Local Debugging
 
-```
+This command will compile the source code and create a ```dist/``` folder with the compiled contents to be served.
+
+```bash
 trunk build
 ```
 
-```
+This command also compiles the source code, but will continue to monitor changes in the code and auto-rebuild when a file is changed.
+
+```bash
 trunk watch
 ```
 
-```
-trunk run
+Trunk can also serve the content with the following command, but I don't see a use for this at the moment besides if the backend isn't avaialble for some reason.
+
+```bash
+trunk serve
 ```

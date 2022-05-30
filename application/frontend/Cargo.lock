@@ -314,6 +314,7 @@ dependencies = [
  "console_error_panic_hook",
  "console_log",
  "dioxus",
+ "js-sys",
  "log",
  "reqwasm",
  "reqwest",
