@@ -1,7 +1,7 @@
 use anyhow::Result;
 use env_logger::{Builder, Target};
 use log::{info, LevelFilter};
-use rocket::fs::FileServer;
+use rocket::{fs::FileServer, Ignite, Rocket};
 use sqlx::types::time::OffsetDateTime;
 use std::io::Write;
 

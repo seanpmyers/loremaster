@@ -2,6 +2,7 @@
 application/frontend/resources/styles/library/*
 Rocket.toml
 loremaster.toml
+Loremaster.toml
 /application/frontend/target
 /application/frontend/dist
 .env
