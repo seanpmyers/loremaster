@@ -1,12 +1,12 @@
 use dioxus::{events::FormEvent, prelude::*};
 use dioxus::router::{Link, Route, Router};
-use crate::utility::constants::API_REGISTER_URL;
+use crate::utility::constants::API_AUTHENTICATE_URL;
 
-pub fn Registration(context: Scope) -> Element { 
+pub fn Login(context: Scope) -> Element { 
   let onsubmit = move |event: FormEvent| {
     context.spawn(async move {
         let response: Result<reqwest::Response, reqwest::Error> = reqwest::Client::new()
-            .post(API_REGISTER_URL)
+            .post(API_AUTHENTICATE_URL)
             .form(&[
                 ("email_address", &event.values["email_address"]),
                 ("password", &event.values["password"]),
@@ -33,7 +33,7 @@ context.render(rsx! {
     form {
       onsubmit: onsubmit,
       prevent_default: "onsubmit",
-      h2 { "Registration" },
+      h2 { "Login" },
       div { class: "mb-3",
         label { class: "form-label", "Email Address"}
         input { class: "form-control",
@@ -42,7 +42,7 @@ context.render(rsx! {
           id: "email_address",
           name: "email_address"
         }
-        div { class: "form-text", "Emails are encrypted before being stored in the database." }
+        div { class: "form-text", "You must register before you can login." }
       }
       div { class: "mb-3",
         label { class: "form-label", "Password"}

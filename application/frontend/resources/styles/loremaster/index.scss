@@ -3,12 +3,72 @@ html {
    padding: 0;
    height: 100%;
    width: 100%;
-   font-family: 'Barlow', sans-serif;
-   background: white;
+   font-family: 'Fira Sans', sans-serif;
+   background: black;
 }
 
 body {
    width: 100%;
    height: 100%;
-   font-family: 'Barlow', sans-serif;
+   font-family: 'Fira Sans', sans-serif;
+   color: white;
+}
+
+#main {
+   background-color: #1d1d1d;
+}
+
+.background-main {
+   background-color: #1d1d1d;
+}
+
+.background-secondary {
+   background-color: #24282b;
+}
+
+.acrylic {
+   position: relative;
+   background: rgba(55, 54, 54, 0.8);
+   -webkit-backdrop-filter: blur(10px);
+   backdrop-filter: blur(10px);
+}
+
+.acrylic-link {
+   background: transparent;
+   -webkit-backdrop-filter: blur(10px);
+   backdrop-filter: blur(10px);
+}
+
+.acrylic-link:hover {
+   background: rgba(77, 77, 77, 0.8);
+   -webkit-backdrop-filter: blur(10px);
+   backdrop-filter: blur(10px);
+}
+
+.acrylic-button {
+   background: rgba(89, 88, 88, 0.8);
+   -webkit-backdrop-filter: blur(10px);
+   backdrop-filter: blur(10px);
+}
+
+.acrylic-button:hover {
+   background: rgba(113, 108, 108, 0.8);
+   -webkit-backdrop-filter: blur(10px);
+   backdrop-filter: blur(10px);
+}
+
+.acrylic-button-primary {
+   background: rgba(4, 90, 183, 0.8);
+   -webkit-backdrop-filter: blur(10px);
+   backdrop-filter: blur(10px);
+}
+
+.acrylic-button-primary:hover {
+   background: rgba(66, 137, 213, 0.8);
+   -webkit-backdrop-filter: blur(10px);
+   backdrop-filter: blur(10px);
+}
+
+.vw-20 {
+   width: 20vw;
 }

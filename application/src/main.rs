@@ -39,7 +39,7 @@ async fn main() -> Result<()> {
     info!("Connection configured.");
 
     info!("Launching rocket HTTP server.");
-    let _rocket_server: Rocket<Ignite> = rocket::build()
+    let _rocket = rocket::build()
         .manage(postgres_service)
         .mount("/", session_controller::routes())
         .mount("/", FileServer::from(FRONTEND_DIST_PATH))
