@@ -60,7 +60,7 @@ tokio-test = "0.4.2"
 # Encode/decode TOML content/files
 toml = "0.5.9"
 # Implementation of Universally Unique Identifiers (Uuid)
-uuid = { version = "0.8.2", features = ["v4", "serde"] }
+uuid = { version = "1.0.0", features = ["v4", "serde"] }
 
 
 # [workspace]
