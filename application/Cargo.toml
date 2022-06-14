@@ -24,7 +24,7 @@ rand = "0.8.5"
 # Http requests library for WebAssembly
 reqwasm = "0.5.0"
 # Higher level HTTP client library 
-reqwest = "0.11.10"
+reqwest = "0.11.11"
 # Backend web framework
 rocket = { version = "0.5.0-rc.2", features = [
 	"secrets",
