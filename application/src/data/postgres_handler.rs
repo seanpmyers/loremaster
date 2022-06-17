@@ -35,7 +35,7 @@ pub async fn create_database_pool(connection_string: &str) -> Result<PgPool> {
     let options: PoolOptions<sqlx::Postgres> = PgPoolOptions::new()
         .idle_timeout(Duration::from_secs(DB_POOL_MAX_IDLE))
         .max_connections(DB_POOL_MAX_OPEN)
-        .connect_timeout(Duration::from_secs(DB_POOL_TIMEOUT_SECONDS));
+        .acquire_timeout(Duration::from_secs(DB_POOL_TIMEOUT_SECONDS));
 
     let result: PgPool = options
         .connect(&connection_string)
