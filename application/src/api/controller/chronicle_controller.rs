@@ -1,7 +1,7 @@
 use anyhow::anyhow;
 use log::info;
 use rocket::{delete, get, post, routes, serde::json::Json, State};
-use time::{Format, OffsetDateTime};
+use time::{format_description::well_known::Rfc3339, OffsetDateTime};
 use uuid::Uuid;
 
 use crate::{
@@ -120,7 +120,9 @@ pub async fn delete(postgres_service: &State<PostgresHandler>) -> Result<(), Api
 
 #[get("/server_time")]
 pub fn server_time() -> Result<String, ApiError> {
-    Ok(OffsetDateTime::now_utc().format(Format::Rfc3339))
+    Ok(OffsetDateTime::now_utc()
+        .format(&Rfc3339)
+        .map_err(|error| anyhow!("{}", error))?)
 }
 
 #[get("/example")]

@@ -4,6 +4,7 @@ use log::{info, LevelFilter};
 use rocket::fs::FileServer;
 use sqlx::types::time::OffsetDateTime;
 use std::io::Write;
+use time::format_description::well_known::Rfc3339;
 
 mod api;
 mod data;
@@ -25,13 +26,14 @@ async fn main() -> Result<()> {
                 buf,
                 "LOREMASTER_{}: {} [{}] - {}",
                 std::env::var(PROFILE).unwrap_or_else(|_| LOCAL_DEBUG.to_string()),
-                OffsetDateTime::now_utc().format("%FT%T"),
+                OffsetDateTime::now_utc().format(&Rfc3339).unwrap(),
                 record.level(),
                 record.args()
             )
         })
         .filter(None, LevelFilter::Info)
         .init();
+
     info!("Starting up.");
 
     info!("Configuring database connection.");
