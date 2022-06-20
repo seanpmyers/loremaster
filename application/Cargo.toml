@@ -8,7 +8,7 @@ edition = "2021"
 
 [dependencies]
 # Error handling
-anyhow = "1.0.57"
+anyhow = "1.0.58"
 # Password Encryption
 argon2 = "0.4.0"
 # A concurrent renderer-agnostic Virtual DOM for interactive user experiences
