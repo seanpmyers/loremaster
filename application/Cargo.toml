@@ -10,7 +10,7 @@ edition = "2021"
 # Error handling
 anyhow = "1.0.58"
 # Password Encryption
-argon2 = "0.4.0"
+argon2 = "0.4.1"
 # A concurrent renderer-agnostic Virtual DOM for interactive user experiences
 dioxus = { version = "0.2.4", features = ["web", "ssr"] }
 # Logging
@@ -52,7 +52,7 @@ sycamore = { version = "0.8.0-beta.6", features = ["ssr", "suspense"] }
 # Error/exception handling
 thiserror = "1.0.31"
 # Time
-time = { version = "0.3.10", features = ["serde", "std"] }
+time = { version = "0.3.11", features = ["serde", "std"] }
 # Backend async I/O functionality
 tokio = { version = "1.19.2", features = ["full"] }
 tokio-stream = "0.1.9"
