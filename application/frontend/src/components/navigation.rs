@@ -2,6 +2,7 @@ use crate::components::home::Home;
 use crate::components::registration::Registration;
 use crate::components::login::Login;
 use crate::components::chronicle::Chronicle;
+use crate::components::demo::Demo;
 
 use dioxus::router::{Link, Route, Router};
 use dioxus::{events::FormEvent, prelude::*};
@@ -18,6 +19,7 @@ pub fn Navigation(context: Scope) -> Element {
                         li { class: "nav-item", Link { class: "nav-link btn acrylic-link text-white", to: "/chronicle",  "Chronicle" } }
                         li { class: "nav-item", Link { class: "nav-link btn acrylic-link text-white", to: "/registration", li { "Registration" } } } 
                         li { class: "nav-item", Link { class: "nav-link btn acrylic-link text-white", to: "/login", li { "Login" } } } 
+                        li { class: "nav-item", Link { class: "nav-link btn acrylic-link text-white", to: "/demo", li { "Demo" } } } 
                         }
                     }
                     
@@ -28,6 +30,7 @@ pub fn Navigation(context: Scope) -> Element {
                 Route { to: "/chronicle", Chronicle {} }
                 Route { to: "/registration", Registration {} }
                 Route { to: "/login", Login {} }
+                Route { to: "/demo", Demo {} }
                 Route { to: "", "Err 404 Route Not Found" }
             }
             

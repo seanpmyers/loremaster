@@ -966,15 +966,6 @@ dependencies = [
 ]
 
 [[package]]
-name = "html-escape"
-version = "0.2.11"
-source = "registry+https://github.com/rust-lang/crates.io-index"
-checksum = "b8e7479fa1ef38eb49fb6a42c426be515df2d063f06cb8efd3e50af073dbc26c"
-dependencies = [
- "utf8-width",
-]
-
-[[package]]
 name = "http"
 version = "0.2.7"
 source = "registry+https://github.com/rust-lang/crates.io-index"
@@ -1187,7 +1178,6 @@ dependencies = [
  "serde",
  "serde_json",
  "sqlx",
- "sycamore",
  "thiserror",
  "time",
  "tokio",
@@ -2055,15 +2045,6 @@ source = "registry+https://github.com/rust-lang/crates.io-index"
 checksum = "eb703cfe953bccee95685111adeedb76fabe4e97549a58d16f03ea7b9367bb32"
 
 [[package]]
-name = "slotmap"
-version = "1.0.6"
-source = "registry+https://github.com/rust-lang/crates.io-index"
-checksum = "e1e08e261d0e8f5c43123b7adf3e4ca1690d655377ac93a03b2c9d3e98de1342"
-dependencies = [
- "version_check",
-]
-
-[[package]]
 name = "smallstr"
 version = "0.2.0"
 source = "registry+https://github.com/rust-lang/crates.io-index"
@@ -2237,91 +2218,6 @@ name = "subtle"
 version = "2.4.1"
 source = "registry+https://github.com/rust-lang/crates.io-index"
 checksum = "6bdef32e8150c2a081110b42772ffe7d7c9032b606bc226c8260fd97e0976601"
-
-[[package]]
-name = "sycamore"
-version = "0.8.0-beta.6"
-source = "registry+https://github.com/rust-lang/crates.io-index"
-checksum = "28742333c3596d915883adbf5fd7546860e46fc9e7563e17da07fb6950151992"
-dependencies = [
- "ahash",
- "futures",
- "html-escape",
- "indexmap",
- "js-sys",
- "once_cell",
- "paste",
- "sycamore-core",
- "sycamore-futures",
- "sycamore-macro",
- "sycamore-reactive",
- "sycamore-web",
- "wasm-bindgen",
- "wasm-bindgen-futures",
- "web-sys",
-]
-
-[[package]]
-name = "sycamore-core"
-version = "0.8.0-beta.6"
-source = "registry+https://github.com/rust-lang/crates.io-index"
-checksum = "afe27c8724090ddb343ad134a1ba87c58bc3962060d50422cd5514246dd3ea8f"
-dependencies = [
- "ahash",
- "sycamore-reactive",
-]
-
-[[package]]
-name = "sycamore-futures"
-version = "0.8.0-beta.6"
-source = "registry+https://github.com/rust-lang/crates.io-index"
-checksum = "565c3d3e4b1ed51f7e10c059d9c1d6791c98b5189b5ed768baa33d0f69994f96"
-dependencies = [
- "futures",
- "sycamore-reactive",
- "tokio",
- "wasm-bindgen-futures",
-]
-
-[[package]]
-name = "sycamore-macro"
-version = "0.8.0-beta.6"
-source = "registry+https://github.com/rust-lang/crates.io-index"
-checksum = "789fd337951cb59e322fc620683fec6a552494f58e7ac486797959edc3c9aed4"
-dependencies = [
- "once_cell",
- "proc-macro2",
- "quote",
- "syn",
-]
-
-[[package]]
-name = "sycamore-reactive"
-version = "0.8.0-beta.6"
-source = "registry+https://github.com/rust-lang/crates.io-index"
-checksum = "79cee4913578c538f5a7c96771ed402198555307c4854bf65c350603059fdf5f"
-dependencies = [
- "bumpalo",
- "indexmap",
- "slotmap",
- "smallvec",
-]
-
-[[package]]
-name = "sycamore-web"
-version = "0.8.0-beta.6"
-source = "registry+https://github.com/rust-lang/crates.io-index"
-checksum = "42d7ec1b21434e694254f4a3dce23ce5b1388376c584ea44329ed8855b0d2be2"
-dependencies = [
- "html-escape",
- "indexmap",
- "js-sys",
- "once_cell",
- "sycamore-core",
- "sycamore-reactive",
- "wasm-bindgen",
- "web-sys",
-]
 
 [[package]]
 name = "syn"
@@ -2692,12 +2588,6 @@ dependencies = [
  "matches",
  "percent-encoding",
 ]
-
-[[package]]
-name = "utf8-width"
-version = "0.1.6"
-source = "registry+https://github.com/rust-lang/crates.io-index"
-checksum = "5190c9442dcdaf0ddd50f37420417d219ae5261bbf5db120d0f9bab996c9cba1"
 
 [[package]]
 name = "uuid"

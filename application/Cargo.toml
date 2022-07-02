@@ -24,7 +24,7 @@ rand = "0.8.5"
 # Http requests library for WebAssembly
 reqwasm = "0.5.0"
 # Higher level HTTP client library 
-reqwest = "0.11.11"
+reqwest = { version = "0.11.11", features = ["blocking"] }
 # Backend web framework
 rocket = { version = "0.5.0-rc.2", features = [
 	"secrets",
@@ -48,7 +48,7 @@ sqlx = { version = "0.6.0", features = [
 	"uuid",
 ] }
 # Frontend WebAssembly library
-sycamore = { version = "0.8.0-beta.6", features = ["ssr", "suspense"] }
+# sycamore = { version = "0.8.0-beta.6", features = ["ssr", "suspense"] }
 # Error/exception handling
 thiserror = "1.0.31"
 # Time

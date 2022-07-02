@@ -1,5 +1,7 @@
 use anyhow::anyhow;
+use dioxus::{events::FormEvent, prelude::*};
 use log::info;
+use reqwest::blocking;
 use rocket::{
     form::{Form, FromForm},
     fs::NamedFile,
@@ -155,6 +157,92 @@ async fn logout(cookie_jar: &CookieJar<'_>) -> Result<String, ApiError> {
     Ok("Cookies cleared.".to_string())
 }
 
+#[get("/ssr")]
+async fn server_side() -> Result<RawHtml<String>, ApiError> {
+    let html: String = ssr_register();
+
+    Ok(RawHtml(html))
+}
+
+fn ssr_register() -> String {
+    let mut virtual_dom = VirtualDom::new(app);
+    let _ = virtual_dom.rebuild();
+
+    dioxus::ssr::render_vdom(&virtual_dom)
+}
+
+fn app(context: Scope) -> Element {
+    let onsubmit = move |event: FormEvent| {
+        let response: Result<reqwest::blocking::Response, reqwest::Error> = blocking::Client::new()
+            .post("http://localhost:8000/register")
+            .form(&[
+                ("email_address", &event.values["email_address"]),
+                ("password", &event.values["password"]),
+            ])
+            .send();
+
+        match response {
+            // Parse data from here, such as storing a response token
+            Ok(_data) => println!("Registration successful!"),
+
+            //Handle any errors from the fetch here
+            Err(_err) => {
+                println!("Registration failed - you need a login server running on localhost:8000.")
+            }
+        }
+    };
+    context.render(rsx! {
+      head { class: "m-4",
+        link {
+          href: "https://cdn.jsdelivr.net/npm/bootstrap@5.1.3/dist/css/bootstrap.min.css",
+          rel: "stylesheet",
+          integrity: "sha384-1BmE4kWBq78iYhFldvKuhfTAU6auU8tT94WrHftjDbrCEXSU1oBoqyl2QvZ6jIW3",
+          crossorigin: "anonymous"
+        }
+        link {
+            href: "./resources/styles/loremaster/index.scss",
+            rel: "scss",
+
+        }
+      }
+      body {
+        class: "d-flex justify-content-center h-100 w-100",
+        div { class: "d-flex flex-column",
+          h1 { class: "font-bold text-decoration-underline text-center", a { href: "/ssr","loremaster" } }
+          div{
+            div { class: "d-flex justify-content-center p-4",
+                form {
+                onsubmit: onsubmit,
+                prevent_default: "onsubmit",
+                h2 { "Registration" },
+                div { class: "mb-3",
+                    label { class: "form-label", "Email Address"}
+                    input { class: "form-control",
+                    r#type:"text",
+                    placeholder:"email@example.com",
+                    id: "email_address",
+                    name: "email_address"
+                    }
+                    div { class: "form-text", "Emails are encrypted before being stored in the database." }
+                }
+                div { class: "mb-3",
+                    label { class: "form-label", "Password"}
+                    input { class: "form-control",
+                    placeholder:"",
+                    r#type:"password",
+                    id: "password",
+                    name: "password"
+                    }
+                }
+                button { class: "btn acrylic-button-primary", "Submit" }
+                }
+            }
+          }
+        }
+      }
+    })
+}
+
 pub fn routes() -> Vec<rocket::Route> {
-    routes![authenticate, favicon, index, logout, register,]
+    routes![authenticate, favicon, index, logout, register, server_side]
 }
