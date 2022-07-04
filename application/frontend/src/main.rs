@@ -1,19 +1,19 @@
-use crate::components::navigation::Navigation;
-use dioxus::prelude::*;
+use frontend::App;
+use sycamore::prelude::*;
 
-mod components;
-mod data;
-mod utility;
-
-fn dioxus_application(context: Scope) -> Element {
-    context.render(rsx! {
-      div {class: "d-flex flex-column h-100 w-100", Navigation {} }
-    })
-}
+pub mod data;
 
 fn main() {
     console_error_panic_hook::set_once();
     console_log::init_with_level(log::Level::Debug).unwrap();
 
-    dioxus::web::launch(dioxus_application);
+    let root = web_sys::window()
+        .unwrap()
+        .document()
+        .unwrap()
+        .query_selector("#sycamore")
+        .unwrap()
+        .unwrap();
+
+    sycamore::hydrate_to(|context| view! { context, App() }, &root);
 }

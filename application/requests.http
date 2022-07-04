@@ -1,17 +1,32 @@
+@localhost = http://localhost:8000
+@json_content_type = application/json
+@form_content_type = application/x-www-form-urlencoded
+@multi_part_form_content_type = multipart/form-data
 
+@test_email = "person@loremaster.xyz"
+@test_password ="Test123!"
 
-GET http://localhost:8000/
+GET {{localhost}}
 
 ### REGISTER
-POST http://localhost:8000/register HTTP/1.1
-Content-Type: application/x-www-form-urlencoded
+POST {{localhost}}/register HTTP/1.1
+Content-Type: {{form_content_type}}
 
-email_address=person@loremaster.xyz
-&password=Test123!
+email_address={{test_email}}
+&password={{test_password}}
+
+### REGISTER - JSON
+POST {{localhost}}/register HTTP/1.1
+Content-Type: {{json_content_type}}
+
+{
+	"email_address": "person@loremaster.xyz",
+	"password": "Test123!"
+}
 
 ### LOGIN
 POST http://localhost:8000/authenticate HTTP/1.1
-Content-Type: application/x-www-form-urlencoded
+Content-Type: {{form_content_type}}
 
 email_address=person@loremaster.xyz
 &password=Test123!

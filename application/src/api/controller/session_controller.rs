@@ -9,6 +9,7 @@ use rocket::{
     response::content::{RawHtml, RawJson},
     routes, State,
 };
+use sycamore::view;
 use tokio::fs;
 
 use crate::{
@@ -155,6 +156,26 @@ async fn logout(cookie_jar: &CookieJar<'_>) -> Result<String, ApiError> {
     Ok("Cookies cleared.".to_string())
 }
 
+#[get("/ssr")]
+async fn test() -> Result<RawHtml<String>, ApiError> {
+    let index_html: String = String::from_utf8(
+        fs::read(INDEX_PATH)
+            .await
+            .map_err(|error| anyhow!("{}", error))?,
+    )
+    .map_err(|error| anyhow!("{}", error))?;
+
+    let rendered = sycamore::render_to_string(|context| {
+        view! { context,
+            frontend::App()
+        }
+    });
+
+    let index_html = index_html.replace("%sycamore.body", &rendered);
+
+    Ok(RawHtml(index_html))
+}
+
 pub fn routes() -> Vec<rocket::Route> {
-    routes![authenticate, favicon, index, logout, register,]
+    routes![authenticate, favicon, index, logout, register, test]
 }

@@ -11,20 +11,17 @@ edition = "2021"
 anyhow = "1.0.58"
 # Password Encryption
 argon2 = "0.4.1"
-# A concurrent renderer-agnostic Virtual DOM for interactive user experiences
-dioxus = { version = "0.2.4", features = ["web", "ssr"] }
+# Minimal HTTP client for both native and WASM
+ehttp = "0.2.0"
 # Logging
 env_logger = "0.9.0"
+frontend = { path = "./frontend" }
 # Provides async programming foundational functionality
 futures = "0.3.21"
 # Logging
 log = "0.4.17"
 # Random nubmer generation
 rand = "0.8.5"
-# Http requests library for WebAssembly
-reqwasm = "0.5.0"
-# Higher level HTTP client library 
-reqwest = "0.11.11"
 # Backend web framework
 rocket = { version = "0.5.0-rc.2", features = [
 	"secrets",
@@ -48,7 +45,7 @@ sqlx = { version = "0.6.0", features = [
 	"uuid",
 ] }
 # Frontend WebAssembly library
-sycamore = { version = "0.8.0-beta.6", features = ["ssr", "suspense"] }
+sycamore = { version = "0.8.0-beta.7", features = ["ssr", "suspense"] }
 # Error/exception handling
 thiserror = "1.0.31"
 # Time
@@ -62,6 +59,7 @@ toml = "0.5.9"
 # Implementation of Universally Unique Identifiers (Uuid)
 uuid = { version = "1.1.2", features = ["v4", "serde"] }
 
+web-sys = { version = "0.3.58" }
 
-# [workspace]
-# members = ["frontend"]
+[workspace]
+members = ["frontend"]
