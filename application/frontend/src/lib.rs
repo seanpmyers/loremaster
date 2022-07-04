@@ -1,28 +1,20 @@
-use data::credentials::Credentials;
 use sycamore::prelude::*;
+use utility::constants::API_REGISTER_URL;
+use utility::http_service::post_html_form;
 use wasm_bindgen::JsCast;
 use web_sys::{Event, HtmlInputElement};
 
 pub mod data;
+pub mod utility;
 
-fn submit_registration(credentials: &Credentials) -> bool {
-    let request_body: Vec<u8> = format!(
-        "email_address={}\n&password={}",
-        &credentials.email_address, &credentials.password
+fn submit_registration(email_address: String, password: String) -> bool {
+    post_html_form(
+        &API_REGISTER_URL.to_string(),
+        &vec![
+            (String::from("email_address"), email_address),
+            (String::from("password"), password),
+        ],
     )
-    .into_bytes();
-    let mut request: ehttp::Request =
-        ehttp::Request::post(&format!("http://localhost:8000/register"), request_body);
-    request.headers.insert(
-        String::from("Content-Type"),
-        String::from("application/x-www-form-urlencoded"),
-    );
-    let mut result: bool = false;
-    ehttp::fetch(request, move |fetch_result| match fetch_result {
-        Ok(_response) => result = true,
-        Err(_error) => result = false,
-    });
-    result
 }
 
 #[component]
@@ -35,11 +27,11 @@ fn RegistrationForm<G: Html>(context: Scope<'_>) -> View<G> {
         if email_address.get().is_empty() || password.get().is_empty() {
             return;
         }
-        let credentials = Credentials {
-            email_address: email_address.get().as_ref().to_string(),
-            password: password.get().as_ref().to_string(),
-        };
-        let response: bool = submit_registration(&credentials);
+
+        let response: bool = submit_registration(
+            email_address.get().as_ref().to_string(),
+            password.get().as_ref().to_string(),
+        );
 
         match response {
             // Parse data from here, such as storing a response token
