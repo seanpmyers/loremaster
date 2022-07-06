@@ -1,5 +1,3 @@
-pub mod chronicle;
-pub mod home;
-pub mod login;
-pub mod navigation;
+pub mod hello_world;
+pub mod navigation_bar;
 pub mod registration;

@@ -1,3 +1,5 @@
+use log::{error, info};
+
 use super::constants::{FORM_CONTENT_TYPE, HTTP_HEADER_CONTENT_TYPE};
 
 pub fn post_html_form(endpoint_url: &String, fields: &Vec<(String, String)>) -> bool {
@@ -24,8 +26,17 @@ pub fn post_html_form(endpoint_url: &String, fields: &Vec<(String, String)>) -> 
     ehttp::fetch(
         http_request,
         move |fetch_result: Result<ehttp::Response, String>| match fetch_result {
-            Ok(_response) => result = true,
-            Err(_error) => result = false,
+            Ok(response) => {
+                result = true;
+                info!(
+                    "Registration request response: {} - {}",
+                    response.status, response.status_text
+                );
+            }
+            Err(error) => {
+                result = false;
+                error!("Registration request failed with the following error: {error}");
+            }
         },
     );
 

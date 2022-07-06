@@ -1,6 +1,6 @@
 use anyhow::anyhow;
 use log::info;
-use rocket::{delete, get, post, routes, serde::json::Json, State};
+use rocket::{delete, get, post, response::Redirect, routes, serde::json::Json, State};
 use time::{format_description::well_known::Rfc3339, OffsetDateTime};
 use uuid::Uuid;
 
@@ -48,6 +48,11 @@ pub async fn today(
             Ok(Json(result))
         }
     }
+}
+
+#[get("/today", rank = 2)]
+pub async fn today_redirect() -> Redirect {
+    Redirect::to("http://localhost:8000/ssr")
 }
 
 #[get("/by_date")]
@@ -138,5 +143,14 @@ pub fn example() -> Result<Json<Chronicle>, ApiError> {
 }
 
 pub fn routes() -> Vec<rocket::Route> {
-    routes![by_date, by_id, today, update, delete, server_time, example]
+    routes![
+        by_date,
+        by_id,
+        today,
+        today_redirect,
+        update,
+        delete,
+        server_time,
+        example
+    ]
 }
