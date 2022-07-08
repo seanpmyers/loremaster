@@ -1,4 +1,5 @@
 use anyhow::Result;
+use api::controller;
 use env_logger::{Builder, Target};
 use log::{info, LevelFilter};
 use rocket::fs::FileServer;
@@ -12,10 +13,7 @@ mod utility;
 
 use data::postgres_handler::PostgresHandler;
 
-use crate::{
-    api::controller::{chronicle_controller, session_controller},
-    utility::constants::{files::FRONTEND_DIST_PATH, LOCAL_DEBUG, PROFILE},
-};
+use crate::utility::constants::{files::FRONTEND_DIST_PATH, LOCAL_DEBUG, PROFILE};
 
 #[rocket::main]
 async fn main() -> Result<()> {
@@ -43,9 +41,10 @@ async fn main() -> Result<()> {
     info!("Launching rocket HTTP server.");
     let _rocket = rocket::build()
         .manage(postgres_service)
-        .mount("/", session_controller::routes())
-        .mount("/", FileServer::from(FRONTEND_DIST_PATH))
-        .mount("/chronicle", chronicle_controller::routes())
+        .mount("/", controller::home::routes())
+        .mount("/authentication", controller::authentication::routes())
+        .mount("/", FileServer::from(FRONTEND_DIST_PATH).rank(1))
+        .mount("/chronicle", controller::chronicle::routes())
         .ignite()
         .await?
         .launch()

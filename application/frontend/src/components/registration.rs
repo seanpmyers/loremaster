@@ -41,11 +41,13 @@ pub fn RegistrationForm<G: Html>(context: Scope<'_>) -> View<G> {
     };
 
     view! { context,
-            form(on:submit=handle_subimt) {
+        div {
+                form(on:submit=handle_subimt) {
                     h1 { "Register"}
                     input(type="email", bind:value=email_address)
                     input(type="password", bind:value=password)
                     button(class="btn") { "Submit" }
             }
+        }
     }
 }

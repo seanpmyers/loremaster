@@ -18,6 +18,11 @@ use crate::{
     },
 };
 
+#[macro_export]
+macro_rules! chronicle_uri {
+    ($($t:tt)*) => (rocket::uri!("/chronicle/", $crate::controller:: $($t)*))
+}
+
 #[get("/today")]
 pub async fn today(
     postgres_service: &State<PostgresHandler>,
@@ -52,7 +57,7 @@ pub async fn today(
 
 #[get("/today", rank = 2)]
 pub async fn today_redirect() -> Redirect {
-    Redirect::to("http://localhost:8000/ssr")
+    Redirect::to("http://localhost:8000/registration")
 }
 
 #[get("/by_date")]

@@ -2,11 +2,13 @@ use anyhow::anyhow;
 use log::info;
 use rocket::{
     form::{Form, FromForm},
-    fs::NamedFile,
     get,
     http::{Cookie, CookieJar, SameSite},
     post,
-    response::content::{RawHtml, RawJson},
+    response::{
+        content::{RawHtml, RawJson},
+        Redirect,
+    },
     routes, State,
 };
 use sycamore::view;
@@ -24,9 +26,8 @@ use crate::{
     },
     utility::{
         constants::{
-            cookie_fields,
-            files::{FAVICON_PATH, INDEX_PATH},
-            FAILED_LOGIN_MESSAGE, REGISTRATION_SUCCESS_MESSAGE, SUCCESSFUL_LOGIN_MESSAGE,
+            cookie_fields, files::INDEX_PATH, FAILED_LOGIN_MESSAGE, REGISTRATION_SUCCESS_MESSAGE,
+            SUCCESSFUL_LOGIN_MESSAGE,
         },
         password_encryption::{PasswordEncryption, PasswordEncryptionService},
     },
@@ -40,33 +41,12 @@ struct CredentialsForm<'r> {
 
 #[macro_export]
 macro_rules! session_uri {
-    ($($t:tt)*) => (rocket::uri!("/", $crate::controller:: $($t)*))
+    ($($t:tt)*) => (rocket::uri!("/authentication/", $crate::controller:: $($t)*))
 }
 
 pub use session_uri as uri;
 
-#[get("/favicon.ico")]
-async fn favicon() -> Result<Option<NamedFile>, ApiError> {
-    let favicon_file: NamedFile = NamedFile::open(FAVICON_PATH)
-        .await
-        .map_err(|error| anyhow!("{}", error))?;
-
-    Ok(Some(favicon_file))
-}
-
-#[get("/")]
-async fn index() -> Result<RawHtml<String>, ApiError> {
-    let index_html: String = String::from_utf8(
-        fs::read(INDEX_PATH)
-            .await
-            .map_err(|error| anyhow!("{}", error))?,
-    )
-    .map_err(|error| anyhow!("{}", error))?;
-
-    Ok(RawHtml(index_html))
-}
-
-#[post("/register", data = "<registration_form>")]
+#[post("/register", data = "<registration_form>", rank = 1)]
 async fn register(
     postgres_service: &State<PostgresHandler>,
     registration_form: Form<CredentialsForm<'_>>,
@@ -105,7 +85,7 @@ async fn register(
     Ok(RawJson(REGISTRATION_SUCCESS_MESSAGE.to_string()))
 }
 
-#[post("/authenticate", data = "<authentication_form>")]
+#[post("/authenticate", data = "<authentication_form>", rank = 1)]
 async fn authenticate(
     postgres_service: &State<PostgresHandler>,
     cookie_jar: &CookieJar<'_>,
@@ -148,7 +128,7 @@ async fn authenticate(
     }
 }
 
-#[post("/logout")]
+#[post("/logout", rank = 1)]
 async fn logout(cookie_jar: &CookieJar<'_>) -> Result<String, ApiError> {
     info!("API CALL: /session/logout");
     cookie_jar.remove_private(Cookie::named(cookie_fields::USER_ID));
@@ -156,26 +136,26 @@ async fn logout(cookie_jar: &CookieJar<'_>) -> Result<String, ApiError> {
     Ok("Cookies cleared.".to_string())
 }
 
-#[get("/ssr")]
-async fn test() -> Result<RawHtml<String>, ApiError> {
-    let index_html: String = String::from_utf8(
-        fs::read(INDEX_PATH)
-            .await
-            .map_err(|error| anyhow!("{}", error))?,
-    )
-    .map_err(|error| anyhow!("{}", error))?;
+// #[get("/registration")]
+// async fn registration() -> Result<RawHtml<String>, ApiError> {
+//     let index_html: String = String::from_utf8(
+//         fs::read(INDEX_PATH)
+//             .await
+//             .map_err(|error| anyhow!("{}", error))?,
+//     )
+//     .map_err(|error| anyhow!("{}", error))?;
 
-    let rendered = sycamore::render_to_string(|context| {
-        view! { context,
-            frontend::App()
-        }
-    });
+//     let rendered = sycamore::render_to_string(|context| {
+//         view! { context,
+//             frontend::components::registration::RegistrationForm{}
+//         }
+//     });
 
-    let index_html = index_html.replace("%sycamore.body", &rendered);
+//     let index_html = index_html.replace("%sycamore.body", &rendered);
 
-    Ok(RawHtml(index_html))
-}
+//     Ok(RawHtml(index_html))
+// }
 
 pub fn routes() -> Vec<rocket::Route> {
-    routes![authenticate, favicon, index, logout, register, test]
+    routes![authenticate, logout, register,]
 }

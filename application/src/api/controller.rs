@@ -1,3 +1,3 @@
-pub mod chronicle_controller;
-pub mod person_controller;
-pub mod session_controller;
+pub mod authentication;
+pub mod chronicle;
+pub mod home;
