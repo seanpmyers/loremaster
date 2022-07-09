@@ -1,3 +1,5 @@
+use std::path::PathBuf;
+
 use anyhow::anyhow;
 use rocket::{fs::NamedFile, get, response::content::RawHtml, routes};
 use sycamore::view;
@@ -22,8 +24,8 @@ async fn favicon() -> Result<Option<NamedFile>, ApiError> {
     Ok(Some(favicon_file))
 }
 
-#[get("/<path>", rank = 2)]
-async fn index(path: String) -> Result<RawHtml<String>, ApiError> {
+#[get("/", rank = 3)]
+async fn index() -> Result<RawHtml<String>, ApiError> {
     let index_html: String = String::from_utf8(
         fs::read(INDEX_PATH)
             .await
@@ -31,9 +33,38 @@ async fn index(path: String) -> Result<RawHtml<String>, ApiError> {
     )
     .map_err(|error| anyhow!("{}", error))?;
 
-    let rendered: String = sycamore::render_to_string(|context| {
-        view! { context,
-            frontend::App(Some(String::from(path)))
+    let rendered: String = sycamore::render_to_string(|| {
+        view! {
+            frontend::App(Some(String::from("/")))
+        }
+    });
+
+    let index_html: String = index_html.replace("%sycamore.body", &rendered);
+
+    Ok(RawHtml(index_html))
+}
+
+#[get("/<path>", rank = 2)]
+async fn path(path: PathBuf) -> Result<RawHtml<String>, ApiError> {
+    let index_html: String = String::from_utf8(
+        fs::read(INDEX_PATH)
+            .await
+            .map_err(|error| anyhow!("{}", error))?,
+    )
+    .map_err(|error| anyhow!("{}", error))?;
+
+    let mut pathname = String::new();
+    for segment in &path {
+        pathname += match segment.to_str() {
+            Some(string) => string,
+            None => "",
+        };
+        pathname += "/";
+    }
+
+    let rendered: String = sycamore::render_to_string(|| {
+        view! {
+            frontend::App(Some(String::from(pathname)))
         }
     });
 
@@ -43,5 +74,5 @@ async fn index(path: String) -> Result<RawHtml<String>, ApiError> {
 }
 
 pub fn routes() -> Vec<rocket::Route> {
-    routes![index, favicon]
+    routes![index, path, favicon]
 }

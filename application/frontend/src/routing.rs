@@ -15,21 +15,21 @@ pub enum ApplicationRoute {
     NotFound,
 }
 
-pub fn switch<'a, G: Html>(context: Scope<'a>, route: &'a ReadSignal<ApplicationRoute>) -> View<G> {
-    view! { context,
+pub fn switch<G: Html>(route: ReadSignal<ApplicationRoute>) -> View<G> {
+    view! {
         div {
-            components::navigation_bar::NavigationBar {}
+        components::navigation::Navigation()
             (match route.get().as_ref() {
-                    ApplicationRoute::Index => view! { context,
+                    ApplicationRoute::Index => view! {
                             components::index::Index()
                     },
-                    ApplicationRoute::HelloWorld => view! { context,
+                    ApplicationRoute::HelloWorld => view! {
                             components::hello_world::HelloWorld()
                     },
-                    ApplicationRoute::Registration => view! { context,
+                    ApplicationRoute::Registration => view! {
                             components::registration::RegistrationForm()
                     },
-                    ApplicationRoute::NotFound => view! { context,
+                    ApplicationRoute::NotFound => view! {
                             "404 Not Found"
                     },
             })

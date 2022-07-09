@@ -20,12 +20,8 @@ log = "0.4.17"
 serde = { version = "1.0.137", features = ["derive"] }
 serde_json = "1.0.81"
 # Frontend WebAssembly library
-sycamore = { version = "0.8.0-beta.7", features = [
-	"hydrate",
-	"ssr",
-	"suspense",
-] }
-sycamore-router = { version = "0.8.0-beta.7" }
+sycamore = { version = "0.7.1", features = ["experimental-hydrate", "futures"] }
+sycamore-router = { version = "0.7.1" }
 # Time
 time = { version = "0.2.7", features = ["serde", "std"] }
 # Implementation of Universally Unique Identifiers (Uuid) - DOES NOT COMPILE CURRENTLY

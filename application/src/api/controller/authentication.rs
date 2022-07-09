@@ -2,17 +2,11 @@ use anyhow::anyhow;
 use log::info;
 use rocket::{
     form::{Form, FromForm},
-    get,
     http::{Cookie, CookieJar, SameSite},
     post,
-    response::{
-        content::{RawHtml, RawJson},
-        Redirect,
-    },
+    response::content::RawJson,
     routes, State,
 };
-use sycamore::view;
-use tokio::fs;
 
 use crate::{
     api::response::ApiError,
@@ -26,7 +20,7 @@ use crate::{
     },
     utility::{
         constants::{
-            cookie_fields, files::INDEX_PATH, FAILED_LOGIN_MESSAGE, REGISTRATION_SUCCESS_MESSAGE,
+            cookie_fields, FAILED_LOGIN_MESSAGE, REGISTRATION_SUCCESS_MESSAGE,
             SUCCESSFUL_LOGIN_MESSAGE,
         },
         password_encryption::{PasswordEncryption, PasswordEncryptionService},
@@ -135,26 +129,6 @@ async fn logout(cookie_jar: &CookieJar<'_>) -> Result<String, ApiError> {
     cookie_jar.remove_private(Cookie::named(cookie_fields::SESSION_ID));
     Ok("Cookies cleared.".to_string())
 }
-
-// #[get("/registration")]
-// async fn registration() -> Result<RawHtml<String>, ApiError> {
-//     let index_html: String = String::from_utf8(
-//         fs::read(INDEX_PATH)
-//             .await
-//             .map_err(|error| anyhow!("{}", error))?,
-//     )
-//     .map_err(|error| anyhow!("{}", error))?;
-
-//     let rendered = sycamore::render_to_string(|context| {
-//         view! { context,
-//             frontend::components::registration::RegistrationForm{}
-//         }
-//     });
-
-//     let index_html = index_html.replace("%sycamore.body", &rendered);
-
-//     Ok(RawHtml(index_html))
-// }
 
 pub fn routes() -> Vec<rocket::Route> {
     routes![authenticate, logout, register,]

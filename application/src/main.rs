@@ -2,7 +2,7 @@ use anyhow::Result;
 use api::controller;
 use env_logger::{Builder, Target};
 use log::{info, LevelFilter};
-use rocket::fs::FileServer;
+use rocket::fs::{FileServer, Options};
 use sqlx::types::time::OffsetDateTime;
 use std::io::Write;
 use time::format_description::well_known::Rfc3339;
@@ -43,7 +43,10 @@ async fn main() -> Result<()> {
         .manage(postgres_service)
         .mount("/", controller::home::routes())
         .mount("/authentication", controller::authentication::routes())
-        .mount("/", FileServer::from(FRONTEND_DIST_PATH).rank(1))
+        .mount(
+            "/",
+            FileServer::new(FRONTEND_DIST_PATH, Options::None).rank(1),
+        )
         .mount("/chronicle", controller::chronicle::routes())
         .ignite()
         .await?

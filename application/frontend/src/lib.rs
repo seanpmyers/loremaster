@@ -1,28 +1,24 @@
 use routing::{switch, ApplicationRoute};
 use sycamore::prelude::*;
-use sycamore_router::{HistoryIntegration, Route, Router, StaticRouter};
+use sycamore_router::{
+    HistoryIntegration, Route, Router, RouterProps, StaticRouter, StaticRouterProps,
+};
 
-pub mod components;
-pub mod routing;
-pub mod utility;
+mod components;
+mod routing;
+mod utility;
 
-#[component]
-pub fn App<G: Html>(context: Scope, possible_path: Option<String>) -> View<G> {
+#[component(App<G>)]
+pub fn app(possible_path: Option<String>) -> View<G> {
     match possible_path {
         Some(path) => {
-            let route = ApplicationRoute::match_path(&ApplicationRoute::Index, &path);
-            view! { context,
-                StaticRouter {
-                    view: switch,
-                    route: route,
-                }
+            let route = ApplicationRoute::match_path(&path);
+            view! {
+                StaticRouter(StaticRouterProps::new(route, |route: ApplicationRoute| switch(Signal::new(route).handle())))
             }
         }
-        None => view! { context,
-            Router {
-                view: switch,
-                integration: HistoryIntegration::new(),
-            }
+        None => view! {
+            Router(RouterProps::new(HistoryIntegration::new(), switch))
         },
     }
 }

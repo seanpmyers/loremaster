@@ -1,35 +1,25 @@
 use sycamore::prelude::*;
-use wasm_bindgen::JsCast;
-use web_sys::{Event, HtmlInputElement};
 
-#[component]
-pub fn HelloWorld<G: Html>(context: Scope<'_>) -> View<G> {
-    let name = create_signal(context, String::new());
+#[component(HelloWorld<G>)]
+pub fn hello_world() -> View<G> {
+    let name = Signal::new(String::new());
+    let name2 = name.clone();
 
-    let handle_change = move |event: Event| {
-        name.set(
-            event
-                .target()
-                .unwrap()
-                .dyn_into::<HtmlInputElement>()
-                .unwrap()
-                .value(),
-        );
-    };
-
-    view! { context,
+    view! {
         div {
             h1 {
                 "Hello "
-                ({if !name.get().is_empty() {
-                        view! { context, span { (name.get()) } }
+                (if *create_selector(cloned!((name) => move || !name.get().is_empty())).get() {
+                    cloned!((name) => view! {
+                        span { (name.get()) }
+                    })
                 } else {
-                        view! { context, span { "World" } }
-                }})
+                    view! { span { "World" } }
+                })
                 "!"
             }
 
-            input(placeholder="What is your name?", on:input=handle_change)
+            input(bind:value=name2)
         }
     }
 }

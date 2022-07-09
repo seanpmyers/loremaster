@@ -17,8 +17,5 @@ fn main() {
         .unwrap()
         .unwrap();
 
-    sycamore::hydrate_to(
-        |context| view! { context, App(Some(String::from("/"))) },
-        &root,
-    );
+    sycamore::hydrate_to(|| view! {App(None) }, &root);
 }

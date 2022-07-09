@@ -45,11 +45,7 @@ sqlx = { version = "0.6.0", features = [
 	"uuid",
 ] }
 # Frontend WebAssembly library
-sycamore = { version = "0.8.0-beta.7", features = [
-	"hydrate",
-	"ssr",
-	"suspense",
-] }
+sycamore = { version = "0.7.1", features = ["ssr"] }
 # Error/exception handling
 thiserror = "1.0.31"
 # Time

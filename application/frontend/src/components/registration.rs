@@ -13,20 +13,22 @@ fn submit_registration(email_address: String, password: String) -> bool {
     )
 }
 
-#[component]
-pub fn RegistrationForm<G: Html>(context: Scope<'_>) -> View<G> {
-    let email_address = create_signal(context, String::new());
-    let password = create_signal(context, String::new());
+#[component(RegistrationForm<G>)]
+pub fn registration_form() -> View<G> {
+    let email_address: Signal<String> = Signal::new(String::new());
+    let cloned_email_address = email_address.clone();
+    let password: Signal<String> = Signal::new(String::new());
+    let cloned_password = password.clone();
 
     let handle_subimt = move |event: Event| {
         event.prevent_default();
-        if email_address.get().is_empty() || password.get().is_empty() {
+        if cloned_email_address.get().is_empty() || cloned_password.get().is_empty() {
             return;
         }
 
         let response: bool = submit_registration(
-            email_address.get().as_ref().to_string(),
-            password.get().as_ref().to_string(),
+            cloned_email_address.get().as_ref().to_string(),
+            cloned_password.get().as_ref().to_string(),
         );
 
         match response {
@@ -40,7 +42,7 @@ pub fn RegistrationForm<G: Html>(context: Scope<'_>) -> View<G> {
         }
     };
 
-    view! { context,
+    view! {
         div {
                 form(on:submit=handle_subimt) {
                     h1 { "Register"}
