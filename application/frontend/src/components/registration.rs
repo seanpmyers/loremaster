@@ -43,12 +43,30 @@ pub fn registration_form() -> View<G> {
     };
 
     view! {
-        div {
-                form(on:submit=handle_subimt) {
-                    h1 { "Register"}
-                    input(type="email", bind:value=email_address)
-                    input(type="password", bind:value=password)
-                    button(class="btn") { "Submit" }
+        div(class="container background-acrylic-white border-0 rounded p-5 shadow") {
+            div(class="row") {
+                div(class="col-12") {
+                    div(clas="card") {
+                        div(class="card-body") {
+                            form(on:submit=handle_subimt) {
+                                h1 { "Register"}
+                                div(class="mb-3") {
+                                    label(class="form-label", for="email") {"Email Address"}
+                                    input(class="form-control", type="email", bind:value=email_address)
+
+                                }
+                                div(class="mb-3") {
+                                    label(class="form-label", for="password") {"Password"}
+                                    input(class="form-control", type="password", bind:value=password)
+                                    div(class="form-text") {
+                                        "We recommend using a password manager like KeePass to generate and store your password."
+                                    }
+                                }
+                                button(class="btn btn-primary") { "Submit" }
+                            }
+                        }
+                    }
+                }
             }
         }
     }

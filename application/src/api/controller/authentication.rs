@@ -4,7 +4,7 @@ use rocket::{
     form::{Form, FromForm},
     http::{Cookie, CookieJar, SameSite},
     post,
-    response::content::RawJson,
+    response::{content::RawJson, Redirect},
     routes, State,
 };
 
@@ -44,7 +44,7 @@ pub use session_uri as uri;
 async fn register(
     postgres_service: &State<PostgresHandler>,
     registration_form: Form<CredentialsForm<'_>>,
-) -> Result<RawJson<String>, ApiError> {
+) -> Result<Redirect, ApiError> {
     info!("API CALL: /session/register");
     info!("Checking for existing users with provided email address.");
     let existing_credentials: Option<Credentials> = credential_by_email_address_query(
@@ -57,7 +57,7 @@ async fn register(
     if existing_credentials.is_some() {
         info!("Existing user found!");
         //TODO: Send an email to the specified address and indicate someone tried to re-register using that email
-        return Ok(RawJson(REGISTRATION_SUCCESS_MESSAGE.to_string()));
+        return Ok(Redirect::to("http://localhost:8000/login"));
     }
 
     info!("Email can be registered.");
@@ -76,7 +76,7 @@ async fn register(
     .await
     .map_err(|error| anyhow!("{}", error))?;
 
-    Ok(RawJson(REGISTRATION_SUCCESS_MESSAGE.to_string()))
+    Ok(Redirect::to("http://localhost:8000/login"))
 }
 
 #[post("/authenticate", data = "<authentication_form>", rank = 1)]

@@ -26,9 +26,17 @@ body {
    background-color: #24282b;
 }
 
+.background-acrylic-white {
+   position: relative;
+   background: rgba(255, 255, 255, 0.8);
+   -webkit-backdrop-filter: blur(10px);
+   backdrop-filter: blur(10px);
+}
+
 .acrylic {
    position: relative;
-   background: rgba(55, 54, 54, 0.8);
+   background: rgba(234, 235, 236, 0.8);
+   // background: radial-gradient(circle, rgba(185, 219, 235, 1) 0%, rgba(139, 252, 214, 1) 100%);
    -webkit-backdrop-filter: blur(10px);
    backdrop-filter: blur(10px);
 }
@@ -40,7 +48,7 @@ body {
 }
 
 .acrylic-link:hover {
-   background: rgba(77, 77, 77, 0.8);
+   background: rgba(226, 229, 230, 0.8);
    -webkit-backdrop-filter: blur(10px);
    backdrop-filter: blur(10px);
 }

@@ -7,21 +7,12 @@ use tokio::fs;
 
 use crate::{
     api::response::ApiError,
-    utility::constants::files::{FAVICON_PATH, INDEX_PATH},
+    utility::constants::files::{FAVICON_PATH, INDEX_PATH, LOGO_PATH},
 };
 
 #[macro_export]
 macro_rules! home_uri {
     ($($t:tt)*) => (rocket::uri!("/", $crate::controller:: $($t)*))
-}
-
-#[get("/favicon.ico")]
-async fn favicon() -> Result<Option<NamedFile>, ApiError> {
-    let favicon_file: NamedFile = NamedFile::open(FAVICON_PATH)
-        .await
-        .map_err(|error| anyhow!("{}", error))?;
-
-    Ok(Some(favicon_file))
 }
 
 #[get("/", rank = 3)]
@@ -73,6 +64,24 @@ async fn path(path: PathBuf) -> Result<RawHtml<String>, ApiError> {
     Ok(RawHtml(index_html))
 }
 
+#[get("/favicon.ico")]
+async fn favicon() -> Result<Option<NamedFile>, ApiError> {
+    let favicon_file: NamedFile = NamedFile::open(FAVICON_PATH)
+        .await
+        .map_err(|error| anyhow!("{}", error))?;
+
+    Ok(Some(favicon_file))
+}
+
+#[get("/logo.svg")]
+async fn logo() -> Result<Option<NamedFile>, ApiError> {
+    let logo_file: NamedFile = NamedFile::open(LOGO_PATH)
+        .await
+        .map_err(|error| anyhow!("{}", error))?;
+
+    Ok(Some(logo_file))
+}
+
 pub fn routes() -> Vec<rocket::Route> {
-    routes![index, path, favicon]
+    routes![index, path, favicon, logo]
 }
