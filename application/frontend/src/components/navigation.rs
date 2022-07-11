@@ -19,7 +19,7 @@ pub fn navigation() -> View<G> {
                 div(class="navbar-collapse") {
                     ul(class="navbar-nav") {
                         li(class=list_item_class) { a(class=link_class, href="/") { "Home" } }
-                        li(class=list_item_class) { a(class=link_class, href="/hello_world", ) { "Hello World"}  }
+                        li(class=list_item_class) { a(class=link_class, href="/demo", ) { "Demo"}  }
                         li(class=list_item_class) { a(class=link_class, href="/registration") { "Register" } }
                         li(class=list_item_class) { a(class=link_class, href="/login") { "Login" } }
                     }

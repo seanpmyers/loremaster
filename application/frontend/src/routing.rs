@@ -9,8 +9,8 @@ pub enum ApplicationRoute {
     Index,
     #[to("/registration")]
     Registration,
-    #[to("/hello_world")]
-    HelloWorld,
+    #[to("/demo")]
+    Demo,
     #[to("/login")]
     Login,
     #[not_found]
@@ -25,14 +25,14 @@ pub fn switch<G: Html>(route: ReadSignal<ApplicationRoute>) -> View<G> {
                 ApplicationRoute::Index => view! {
                     components::index::Index()
                 },
-                ApplicationRoute::HelloWorld => view! {
-                    components::hello_world::HelloWorld()
+                ApplicationRoute::Demo => view! {
+                    components::demo::Demo()
                 },
                 ApplicationRoute::Registration => view! {
                     components::registration::RegistrationForm()
                 },
                 ApplicationRoute::Login => view! {
-                    components::hello_world::HelloWorld()
+                    components::login::LoginForm()
                 },
                 ApplicationRoute::NotFound => view! {
                         "404 Not Found"
