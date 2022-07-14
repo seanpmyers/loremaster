@@ -54,7 +54,7 @@ thiserror = "1.0.31"
 # Time
 time = { version = "0.3.11", features = ["serde", "std"] }
 # Backend async I/O functionality
-tokio = { version = "1.19.2", features = ["full"] }
+tokio = { version = "1.20.0", features = ["full"] }
 tokio-stream = "0.1.9"
 tokio-test = "0.4.2"
 # Encode/decode TOML content/files
