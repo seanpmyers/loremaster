@@ -7,7 +7,10 @@ use tokio::fs;
 
 use crate::{
     api::response::ApiError,
-    utility::constants::files::{FAVICON_PATH, INDEX_PATH, LOGO_PATH},
+    utility::constants::files::{
+        FAVICON_PATH, INDEX_PATH, LOGO_PATH, PURPLE_BLUE_WAVES_PATH, STACKED_WAVES_PATH,
+        WHITE_GREEN_WAVES_PATH,
+    },
 };
 
 #[macro_export]
@@ -82,6 +85,41 @@ async fn logo() -> Result<Option<NamedFile>, ApiError> {
     Ok(Some(logo_file))
 }
 
+#[get("/stacked_waves.svg")]
+async fn stacked_waves() -> Result<Option<NamedFile>, ApiError> {
+    let logo_file: NamedFile = NamedFile::open(STACKED_WAVES_PATH)
+        .await
+        .map_err(|error| anyhow!("{}", error))?;
+
+    Ok(Some(logo_file))
+}
+
+#[get("/purple_blue_waves.svg")]
+async fn purple_blue_waves() -> Result<Option<NamedFile>, ApiError> {
+    let logo_file: NamedFile = NamedFile::open(PURPLE_BLUE_WAVES_PATH)
+        .await
+        .map_err(|error| anyhow!("{}", error))?;
+
+    Ok(Some(logo_file))
+}
+
+#[get("/white_green_waves.svg")]
+async fn white_green_waves() -> Result<Option<NamedFile>, ApiError> {
+    let logo_file: NamedFile = NamedFile::open(WHITE_GREEN_WAVES_PATH)
+        .await
+        .map_err(|error| anyhow!("{}", error))?;
+
+    Ok(Some(logo_file))
+}
+
 pub fn routes() -> Vec<rocket::Route> {
-    routes![index, path, favicon, logo]
+    routes![
+        index,
+        path,
+        favicon,
+        logo,
+        stacked_waves,
+        purple_blue_waves,
+        white_green_waves
+    ]
 }
