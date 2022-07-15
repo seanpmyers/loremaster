@@ -28,3 +28,28 @@ Docker compose command
 ```sh
 docker-compose -f infrastructure/docker-compose.yml up
 ```
+
+### Configuration File Schema - Loremaster.toml
+
+```toml
+TestField = "TestValue"
+
+[local_debug]
+
+[local_debug.database]
+POSTGRESQL = "postgres://<user_name>:<password>@localhost/postgres"
+
+[local_debug.encryption]
+HASH_ITERATIONS = 1
+SITE_SECRET = "<secret>"
+
+[local_debug.web_server]
+IPV4_ADDRESS = [127, 0, 0, 0]
+PORT = 8000
+
+[dev]
+
+[qa]
+
+[prod]
+```
