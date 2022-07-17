@@ -3,7 +3,6 @@ use anyhow::{anyhow, Result};
 use super::toml_reader::{self};
 
 pub const ITERATIONS_FIELD: &str = "HASH_ITERATIONS";
-pub const POSTGRES_TOML_FIELD: &str = "POSTGRESQL";
 pub const SITE_SECRET_FIELD: &str = "SITE_SECRET";
 
 const LOREMASTER_FILE_PATH: &str = "./loremaster.toml";

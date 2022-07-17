@@ -21,15 +21,14 @@ mod utility;
 use data::postgres_handler::PostgresHandler;
 
 use crate::utility::{
-    constants::{ENVIRONMENT, FRONTEND_ORIGIN_URL, LOCAL_DEBUG},
+    constants::{ENVIRONMENT, FRONTEND_ORIGIN_URL},
     loremaster_configuration::get_configuration_from_file,
 };
 
 #[tokio::main]
 async fn main() -> Result<()> {
     info!("Starting up.");
-    let environment: String =
-        std::env::var(ENVIRONMENT).unwrap_or_else(|_| LOCAL_DEBUG.to_string());
+    let environment: String = std::env::var(ENVIRONMENT)?;
 
     Builder::new()
         .target(Target::Stdout)
@@ -37,7 +36,7 @@ async fn main() -> Result<()> {
             writeln!(
                 buf,
                 "LOREMASTER_{}: {} [{}] - {}",
-                std::env::var(ENVIRONMENT).unwrap_or_else(|_| LOCAL_DEBUG.to_string()),
+                std::env::var(ENVIRONMENT).unwrap(),
                 OffsetDateTime::now_utc().format(&Rfc3339).unwrap(),
                 record.level(),
                 record.args()
