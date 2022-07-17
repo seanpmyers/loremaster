@@ -1,25 +1,33 @@
-use axum::response::{IntoResponse, Response};
+use std::error::Error;
+
+use axum::{
+    http::StatusCode,
+    response::{IntoResponse, Response},
+    Json,
+};
 use log::error;
+use serde_json::json;
 use thiserror::Error;
 
 #[derive(Error, Debug)]
 pub enum ApiError {
-    #[error("Anyhow Error {source:?}")]
+    #[error("{source:?}")]
     Anyhow {
         #[from]
         source: anyhow::Error,
     },
+    //Something went wrong during authentication
+    // AuthenticationError(String),
 }
 
 impl IntoResponse for ApiError {
     fn into_response(self) -> Response {
-        // log `self` to your favored error tracker, e.g. sentry
-        error!("{}", self);
+        error!("{self}");
 
-        Status::InternalServerError.respond_to(request)
-        // match self {
-        //     // in our simplistic example, we're happy to respond with the default 500 responder in all cases
-        //     _ => Status::InternalServerError.respond_to(request),
-        // }
+        let body: Json<serde_json::Value> = Json(json!({
+            "error": "Something went wrong on our side. Sorry.",
+        }));
+
+        (StatusCode::INTERNAL_SERVER_ERROR, body).into_response()
     }
 }

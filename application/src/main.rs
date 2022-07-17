@@ -1,10 +1,12 @@
 use anyhow::Result;
 use axum::{
-    http::{HeaderValue, Method},
-    response::{Html, IntoResponse},
-    routing::get,
-    Extension, Json, Router,
+    http::{
+        header::{AUTHORIZATION, CONTENT_TYPE, COOKIE, SET_COOKIE},
+        HeaderValue, Method,
+    },
+    Extension, Router,
 };
+use axum_extra::extract::cookie::Key;
 use env_logger::{Builder, Target};
 use log::{info, LevelFilter};
 use sqlx::types::time::OffsetDateTime;
@@ -52,24 +54,37 @@ async fn main() -> Result<()> {
         PostgresHandler::new(configuration.postgresql_connection_string).await?;
     info!("Connection established.");
 
-    let backend_router: Router = Router::new()
-        .route("/", get(hello_world))
-        .route("/json", get(json))
+    let utility_router: Router = Router::new()
         .layer(Extension(postgres_service))
+        .layer(Extension(Key::from(configuration.site_secret.as_bytes())))
         .layer(
             // pay attention that for some request types like posting content-type: application/json
             // it is required to add ".allow_headers([http::header::CONTENT_TYPE])"
             // or see this issue https://github.com/tokio-rs/axum/issues/849
             CorsLayer::new()
                 .allow_origin(FRONTEND_ORIGIN_URL.parse::<HeaderValue>()?)
-                .allow_methods([Method::GET]),
+                .allow_headers([AUTHORIZATION, SET_COOKIE, COOKIE, CONTENT_TYPE])
+                .allow_methods([
+                    Method::GET,
+                    Method::POST,
+                    Method::PATCH,
+                    Method::DELETE,
+                    Method::PUT,
+                ]),
         );
+
+    let application_router: Router = Router::new()
+        .merge(utility_router)
+        .merge(api::router::session::router())
+        .merge(api::router::chronicle::router());
 
     let socket_address: SocketAddr =
         SocketAddr::from((configuration.ipv4_address, configuration.port));
+
     let address_string: String = socket_address.to_string();
     info!("Launching HTTP server at: http://{address_string}");
-    serve(backend_router, socket_address).await?;
+
+    serve(application_router, socket_address).await?;
 
     info!("Shutting down.");
 
@@ -81,14 +96,4 @@ async fn serve(router: Router, socket_address: SocketAddr) -> Result<()> {
         .serve(router.into_make_service())
         .await?;
     Ok(())
-}
-
-async fn json() -> impl IntoResponse {
-    info!("Json requested!");
-    Json(vec!["one", "two", "three"])
-}
-
-async fn hello_world() -> Html<&'static str> {
-    info!("Hello World requested!");
-    Html("<h1>Hello, World!</h1>")
 }

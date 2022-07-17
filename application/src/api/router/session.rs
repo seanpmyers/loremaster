@@ -1,9 +1,11 @@
 use anyhow::anyhow;
-use axum::{response::IntoResponse, Extension, Router};
-use axum_extra::extract::{CookieJar, Form};
+use axum::{response::IntoResponse, routing::post, Extension, Router};
+use axum_extra::extract::{
+    cookie::{Cookie, SameSite},
+    Form, PrivateCookieJar,
+};
 use log::info;
 use serde::Deserialize;
-use tokio::fs;
 
 use crate::{
     api::response::ApiError,
@@ -30,84 +32,47 @@ struct CredentialsForm {
     password: String,
 }
 
-// #[macro_export]
-// macro_rules! session_uri {
-//     ($($t:tt)*) => (rocket::uri!("/", $crate::controller:: $($t)*))
-// }
+async fn register(
+    postgres_service: Extension<PostgresHandler>,
+    Form(registration_form): Form<CredentialsForm>,
+) -> Result<String, ApiError> {
+    info!("API CALL: /session/register");
+    info!("Checking for existing users with provided email address.");
+    let existing_credentials: Option<Credentials> = credential_by_email_address_query(
+        &postgres_service.database_pool,
+        &registration_form.email_address,
+    )
+    .await
+    .map_err(|error| anyhow!("{}", error))?;
 
-// pub use session_uri as uri;
+    if existing_credentials.is_some() {
+        info!("Existing user found!");
+        //TODO: Send an email to the specified address and indicate someone tried to re-register using that email
+        return Ok(REGISTRATION_SUCCESS_MESSAGE.to_string());
+    }
 
-// #[get("/favicon.ico")]
-// async fn favicon() -> Result<Option<NamedFile>, ApiError> {
-//     let favicon_file: NamedFile = NamedFile::open(FAVICON_PATH)
-//         .await
-//         .map_err(|error| anyhow!("{}", error))?;
+    info!("Email can be registered.");
+    let encrypted_password: String =
+        PasswordEncryptionService::encrypt_password(&registration_form.password)
+            .map_err(|error| anyhow!("{}", error))?;
 
-//     Ok(Some(favicon_file))
-// }
+    info!("Adding new user to database.");
+    create_person_query(
+        &postgres_service.database_pool,
+        &registration_form.email_address,
+        &encrypted_password,
+        None,
+        None,
+    )
+    .await
+    .map_err(|error| anyhow!("{}", error))?;
 
-// #[get("/registration")]
-// async fn registration() -> Result<RawHtml<String>, ApiError> {
-//     let index_html: String = String::from_utf8(
-//         fs::read(INDEX_PATH)
-//             .await
-//             .map_err(|error| anyhow!("{}", error))?,
-//     )
-//     .map_err(|error| anyhow!("{}", error))?;
-
-//     let rendered = sycamore::render_to_string(|context| {
-//         view! { context,
-//             frontend::App()
-//         }
-//     });
-
-//     let index_html: String = index_html.replace(SYCAMORE_BODY, &rendered);
-
-//     Ok(RawHtml(index_html))
-// }
-
-// #[post("/register", data = "<registration_form>")]
-// async fn register(
-//     postgres_service: &State<PostgresHandler>,
-//     registration_form: Form<CredentialsForm<'_>>,
-// ) -> Result<String, ApiError> {
-//     info!("API CALL: /session/register");
-//     info!("Checking for existing users with provided email address.");
-//     let existing_credentials: Option<Credentials> = credential_by_email_address_query(
-//         &postgres_service.database_pool,
-//         registration_form.email_address,
-//     )
-//     .await
-//     .map_err(|error| anyhow!("{}", error))?;
-
-//     if existing_credentials.is_some() {
-//         info!("Existing user found!");
-//         //TODO: Send an email to the specified address and indicate someone tried to re-register using that email
-//         return Ok(REGISTRATION_SUCCESS_MESSAGE.to_string());
-//     }
-
-//     info!("Email can be registered.");
-//     let encrypted_password: String =
-//         PasswordEncryptionService::encrypt_password(registration_form.password)
-//             .map_err(|error| anyhow!("{}", error))?;
-
-//     info!("Adding new user to database.");
-//     create_person_query(
-//         &postgres_service.database_pool,
-//         registration_form.email_address,
-//         &encrypted_password,
-//         None,
-//         None,
-//     )
-//     .await
-//     .map_err(|error| anyhow!("{}", error))?;
-
-//     Ok(REGISTRATION_SUCCESS_MESSAGE.to_string())
-// }
+    Ok(REGISTRATION_SUCCESS_MESSAGE.to_string())
+}
 
 async fn authenticate(
     postgres_service: Extension<PostgresHandler>,
-    cookie_jar: CookieJar,
+    cookie_jar: PrivateCookieJar,
     Form(authentication_form): Form<CredentialsForm>,
 ) -> Result<impl IntoResponse, ApiError> {
     info!("API CALL: /session/authenticate");
@@ -131,14 +96,15 @@ async fn authenticate(
             });
         }
 
-        cookie_jar.add_private(
+        let updated_cookie_jar: PrivateCookieJar = cookie_jar.add(
             Cookie::build(cookie_fields::USER_ID, person.id.to_string())
-                // .http_only(true)
-                // .secure(true)
-                // .same_site(SameSite::Strict)
+                .same_site(SameSite::Strict)
+                .http_only(true)
+                .secure(true)
                 .finish(),
         );
-        Ok(SUCCESSFUL_LOGIN_MESSAGE.to_string())
+
+        Ok((updated_cookie_jar, SUCCESSFUL_LOGIN_MESSAGE.to_string()))
         //return Ok(Redirect::to(uri!(index)));
     } else {
         Err(ApiError::Anyhow {
@@ -147,14 +113,17 @@ async fn authenticate(
     }
 }
 
-// #[post("/logout")]
-// async fn logout(cookie_jar: &CookieJar<'_>) -> Result<String, ApiError> {
-//     info!("API CALL: /session/logout");
-//     cookie_jar.remove_private(Cookie::named(cookie_fields::USER_ID));
-//     cookie_jar.remove_private(Cookie::named(cookie_fields::SESSION_ID));
-//     Ok("Cookies cleared.".to_string())
-// }
+async fn logout(cookie_jar: PrivateCookieJar) -> Result<impl IntoResponse, ApiError> {
+    info!("API CALL: /session/logout");
+    let updated_cookie_jar = cookie_jar
+        .remove(Cookie::named(cookie_fields::USER_ID))
+        .remove(Cookie::named(cookie_fields::SESSION_ID));
+    Ok((updated_cookie_jar, "Successfully logged out."))
+}
 
-pub fn router() -> Result<Router> {
-    Ok(Router::new().route("/authenticate", post(authenticate)))
+pub fn router() -> Router {
+    Router::new()
+        .route("/authenticate", post(authenticate))
+        .route("/logout", post(logout))
+        .route("/register", post(register))
 }

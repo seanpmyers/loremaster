@@ -19,7 +19,7 @@ const QUERY: &str = "
 
 pub async fn credential_by_email_address_query(
     database_connection: &PgPool,
-    email_address: &String,
+    email_address: &str,
 ) -> Result<Option<Credentials>> {
     info!("QUERY CALL: credential_by_email_address_query");
     let query_result = query_as::<_, Credentials>(QUERY)
