@@ -54,7 +54,9 @@ async fn main() -> Result<()> {
         PostgresHandler::new(configuration.postgresql_connection_string).await?;
     info!("Connection established.");
 
-    let utility_router: Router = Router::new()
+    let application_router: Router = Router::new()
+        .merge(api::router::session::router())
+        .merge(api::router::chronicle::router())
         .layer(Extension(postgres_service))
         .layer(Extension(Key::from(configuration.site_secret.as_bytes())))
         .layer(
@@ -72,11 +74,6 @@ async fn main() -> Result<()> {
                     Method::PUT,
                 ]),
         );
-
-    let application_router: Router = Router::new()
-        .merge(utility_router)
-        .merge(api::router::session::router())
-        .merge(api::router::chronicle::router());
 
     let socket_address: SocketAddr =
         SocketAddr::from((configuration.ipv4_address, configuration.port));

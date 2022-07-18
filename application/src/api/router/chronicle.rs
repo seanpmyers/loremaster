@@ -85,13 +85,13 @@ use crate::{
 //     }
 // }
 
-pub fn server_time() -> Result<String, ApiError> {
+pub async fn server_time() -> Result<String, ApiError> {
     Ok(OffsetDateTime::now_utc()
         .format(&Rfc3339)
         .map_err(|error| anyhow!("{}", error))?)
 }
 
-pub fn example() -> Result<Json<Chronicle>, ApiError> {
+pub async fn example() -> Result<Json<Chronicle>, ApiError> {
     let result: Chronicle = Chronicle {
         id: Uuid::nil(),
         date_recorded: OffsetDateTime::now_utc().date(),
@@ -104,6 +104,6 @@ pub fn example() -> Result<Json<Chronicle>, ApiError> {
 
 pub fn router() -> Router {
     Router::new()
-        .route("/chronicle/example", get(example))
         .route("/chronicle/server_time", get(server_time))
+        .route("/chronicle/example", get(example))
 }

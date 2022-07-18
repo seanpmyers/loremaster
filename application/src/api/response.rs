@@ -1,5 +1,3 @@
-use std::error::Error;
-
 use axum::{
     http::StatusCode,
     response::{IntoResponse, Response},
