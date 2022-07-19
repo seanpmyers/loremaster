@@ -3,16 +3,14 @@ use axum::{
     extract::{FromRequest, RequestParts, TypedHeader},
     headers::Cookie,
     http::StatusCode,
-    Extension,
 };
-use axum_extra::extract::cookie::Key;
 use serde::{Deserialize, Serialize};
 use uuid::Uuid;
 
 use crate::utility::constants::cookie_fields;
 
 #[derive(Serialize, Deserialize, Debug, Clone, Copy)]
-struct UserId(Uuid);
+pub struct UserId(Uuid);
 
 pub enum User {
     Found(UserId),
@@ -29,7 +27,6 @@ where
             .await
             .unwrap();
 
-        let Extension(key) = Extension::<Key>::from_request(req).await.unwrap();
         let session_cookie = cookie
             .as_ref()
             .and_then(|cookie| cookie.get(cookie_fields::USER_ID));

@@ -25,6 +25,7 @@ use data::postgres_handler::PostgresHandler;
 use crate::utility::{
     constants::{ENVIRONMENT, FRONTEND_ORIGIN_URL},
     loremaster_configuration::get_configuration_from_file,
+    password_encryption::{PasswordEncryption, PasswordEncryptionService},
 };
 
 #[tokio::main]
@@ -47,16 +48,24 @@ async fn main() -> Result<()> {
         .filter(None, LevelFilter::Info)
         .init();
 
-    let configuration: LoremasterConfiguration = get_configuration_from_file(environment)?;
+    let configuration: LoremasterConfiguration = get_configuration_from_file(&environment)?;
 
-    info!("Attempting database connection...");
+    info!("Attempting a database connection...");
     let postgres_service: PostgresHandler =
         PostgresHandler::new(configuration.postgresql_connection_string).await?;
     info!("Connection established.");
 
+    info!("Creating encryption service...");
+    let encryption_service = PasswordEncryptionService::new(
+        configuration.hash_iterations,
+        configuration.site_secret.clone(),
+    );
+
+    info!("Configuring routers...");
     let application_router: Router = Router::new()
         .merge(api::router::session::router())
         .merge(api::router::chronicle::router())
+        .layer(Extension(encryption_service))
         .layer(Extension(postgres_service))
         .layer(Extension(Key::from(configuration.site_secret.as_bytes())))
         .layer(
@@ -79,9 +88,9 @@ async fn main() -> Result<()> {
         SocketAddr::from((configuration.ipv4_address, configuration.port));
 
     let address_string: String = socket_address.to_string();
-    info!("Launching HTTP server at: http://{address_string}");
 
     serve(application_router, socket_address).await?;
+    info!("Loremaster backend is running at\n: http://{address_string}\n");
 
     info!("Shutting down.");
 

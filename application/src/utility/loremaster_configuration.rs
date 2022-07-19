@@ -4,7 +4,7 @@ use std::fs;
 
 use super::constants::LOREMASTER_CONFIGURATION_FILE_PATH;
 
-#[derive(Deserialize, Serialize)]
+#[derive(Clone, Deserialize, Serialize)]
 pub struct LoremasterConfiguration {
     pub test_field: String,
     pub postgresql_connection_string: String,
@@ -68,7 +68,7 @@ struct WebServer {
     pub ipv4_address: [i64; 4],
 }
 
-pub fn get_configuration_from_file(environment: String) -> Result<LoremasterConfiguration> {
+pub fn get_configuration_from_file(environment: &String) -> Result<LoremasterConfiguration> {
     let file_content: String = fs::read_to_string(LOREMASTER_CONFIGURATION_FILE_PATH)?;
 
     let configuration: LoremasterConfigurationFile = toml::from_str(&file_content)?;
@@ -128,14 +128,14 @@ mod tests {
 
     #[test]
     fn test_field_exists() -> Result<()> {
-        let result: LoremasterConfiguration = get_configuration_from_file(String::from("dev"))?;
+        let result: LoremasterConfiguration = get_configuration_from_file(&String::from("dev"))?;
         assert_eq!(result.test_field, TEST_SECRET_VALUE);
         Ok(())
     }
 
     #[test]
     fn environment_test() -> Result<()> {
-        let result: LoremasterConfiguration = get_configuration_from_file(String::from("dev"))?;
+        let result: LoremasterConfiguration = get_configuration_from_file(&String::from("dev"))?;
         assert_eq!(result.port, 8000);
         Ok(())
     }

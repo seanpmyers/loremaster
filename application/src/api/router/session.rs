@@ -34,6 +34,7 @@ struct CredentialsForm {
 
 async fn register(
     postgres_service: Extension<PostgresHandler>,
+    encryption_service: Extension<PasswordEncryptionService>,
     Form(registration_form): Form<CredentialsForm>,
 ) -> Result<String, ApiError> {
     info!("API CALL: /session/register");
@@ -52,9 +53,9 @@ async fn register(
     }
 
     info!("Email can be registered.");
-    let encrypted_password: String =
-        PasswordEncryptionService::encrypt_password(&registration_form.password)
-            .map_err(|error| anyhow!("{}", error))?;
+    let encrypted_password: String = encryption_service
+        .encrypt_password(&registration_form.password)
+        .map_err(|error| anyhow!("{}", error))?;
 
     info!("Adding new user to database.");
     create_person_query(
@@ -72,6 +73,7 @@ async fn register(
 
 async fn authenticate(
     postgres_service: Extension<PostgresHandler>,
+    encryption_service: Extension<PasswordEncryptionService>,
     cookie_jar: PrivateCookieJar,
     Form(authentication_form): Form<CredentialsForm>,
 ) -> Result<impl IntoResponse, ApiError> {
@@ -84,11 +86,9 @@ async fn authenticate(
     .map_err(|error| anyhow!("{}", error))?;
 
     if let Some(person) = query_result {
-        let valid_password: bool = PasswordEncryptionService::verify_password(
-            &person.encrypted_password,
-            &authentication_form.password,
-        )
-        .map_err(|error| anyhow!("{}", error))?;
+        let valid_password: bool = encryption_service
+            .verify_password(&person.encrypted_password, &authentication_form.password)
+            .map_err(|error| anyhow!("{}", error))?;
 
         if !valid_password {
             return Err(ApiError::Anyhow {

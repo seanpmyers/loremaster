@@ -4,29 +4,37 @@ use argon2::{
     Argon2, ParamsBuilder, PasswordVerifier,
 };
 
-use crate::utility::secret_service::{get_secret, ITERATIONS_FIELD, SITE_SECRET_FIELD};
-
-pub struct PasswordEncryptionService {}
+#[derive(Clone)]
+pub struct PasswordEncryptionService {
+    pub iterations: u32,
+    pub site_secret: String,
+}
 
 pub trait PasswordEncryption {
-    fn encrypt_password(input: &str) -> Result<String>;
-    fn verify_password(encrypted_password: &str, user_input: &str) -> Result<bool>;
+    fn new(iterations: u32, site_secret: String) -> Self;
+    fn encrypt_password(&self, input: &str) -> Result<String>;
+    fn verify_password(&self, encrypted_password: &str, user_input: &str) -> Result<bool>;
 }
 
 impl PasswordEncryptionService {}
 
 impl PasswordEncryption for PasswordEncryptionService {
-    fn encrypt_password(credential: &str) -> Result<String> {
-        let site_secret: String = get_secret(SITE_SECRET_FIELD)?;
-        let iterations_setting: u32 = get_secret(ITERATIONS_FIELD)?.parse::<u32>()?;
+    fn new(iterations: u32, site_secret: String) -> Self {
+        PasswordEncryptionService {
+            iterations,
+            site_secret,
+        }
+    }
+
+    fn encrypt_password(&self, credential: &str) -> Result<String> {
         let mut argon2_parameters: ParamsBuilder = argon2::ParamsBuilder::new();
 
         argon2_parameters
-            .t_cost(iterations_setting)
+            .t_cost(self.iterations)
             .map_err(|error| anyhow!("{}", error))?;
 
         let argon2 = Argon2::new_with_secret(
-            site_secret.as_bytes(),
+            self.site_secret.as_bytes(),
             argon2::Algorithm::Argon2id,
             argon2::Version::V0x13,
             argon2_parameters.params().unwrap(),
@@ -43,15 +51,12 @@ impl PasswordEncryption for PasswordEncryptionService {
         Ok(result)
     }
 
-    fn verify_password(encrypted_password: &str, credential: &str) -> Result<bool> {
-        let site_secret: String = get_secret(SITE_SECRET_FIELD)?;
-        let iterations_setting: u32 = get_secret(ITERATIONS_FIELD)?.parse::<u32>()?;
-
+    fn verify_password(&self, encrypted_password: &str, credential: &str) -> Result<bool> {
         let mut argon2_parameters: ParamsBuilder = argon2::ParamsBuilder::new();
-        argon2_parameters.t_cost(iterations_setting).unwrap();
+        argon2_parameters.t_cost(self.iterations).unwrap();
 
         let argon2 = Argon2::new_with_secret(
-            site_secret.as_bytes(),
+            self.site_secret.as_bytes(),
             argon2::Algorithm::Argon2id,
             argon2::Version::V0x13,
             argon2_parameters.params().unwrap(),
@@ -68,15 +73,23 @@ impl PasswordEncryption for PasswordEncryptionService {
 
 #[cfg(test)]
 mod tests {
-    use crate::utility::password_encryption::{PasswordEncryption, PasswordEncryptionService};
+    use crate::utility::{
+        loremaster_configuration::{get_configuration_from_file, LoremasterConfiguration},
+        password_encryption::{PasswordEncryption, PasswordEncryptionService},
+    };
     use anyhow::Result;
 
     #[test]
     fn verify_same_key() -> Result<()> {
-        let encrypted_key: String = PasswordEncryptionService::encrypt_password("input")?;
-        let encrypted_key2: String = PasswordEncryptionService::encrypt_password("input")?;
-        let verify_result: bool =
-            PasswordEncryptionService::verify_password(&encrypted_key, "input")?;
+        let configuration: LoremasterConfiguration =
+            get_configuration_from_file(&String::from("local"))?;
+        let encryption_service = PasswordEncryptionService::new(
+            configuration.hash_iterations,
+            configuration.site_secret,
+        );
+        let encrypted_key: String = encryption_service.encrypt_password("input")?;
+        let encrypted_key2: String = encryption_service.encrypt_password("input")?;
+        let verify_result: bool = encryption_service.verify_password(&encrypted_key, "input")?;
         assert_ne!(encrypted_key, encrypted_key2);
         assert_ne!("input", encrypted_key);
         assert_eq!(verify_result, true);
@@ -85,9 +98,15 @@ mod tests {
 
     #[test]
     fn verify_different_keys() -> Result<()> {
+        let configuration: LoremasterConfiguration =
+            get_configuration_from_file(&String::from("local"))?;
+        let encryption_service = PasswordEncryptionService::new(
+            configuration.hash_iterations,
+            configuration.site_secret,
+        );
         // The check function should return false if
-        let verify_result: bool = PasswordEncryptionService::verify_password(
-            &PasswordEncryptionService::encrypt_password("pancakes123!")?,
+        let verify_result: bool = encryption_service.verify_password(
+            &encryption_service.encrypt_password("pancakes123!")?,
             "blueberries325&",
         )?;
         assert_eq!(verify_result, false);
@@ -96,9 +115,15 @@ mod tests {
 
     #[test]
     fn unique_encryption_check() -> Result<()> {
+        let configuration: LoremasterConfiguration =
+            get_configuration_from_file(&String::from("local"))?;
+        let encryption_service = PasswordEncryptionService::new(
+            configuration.hash_iterations,
+            configuration.site_secret,
+        );
         assert_ne!(
-            PasswordEncryptionService::encrypt_password("input")?,
-            PasswordEncryptionService::encrypt_password("input")?
+            encryption_service.encrypt_password("input")?,
+            encryption_service.encrypt_password("input")?
         );
         Ok(())
     }
