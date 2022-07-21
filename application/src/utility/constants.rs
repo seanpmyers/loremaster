@@ -10,5 +10,5 @@ pub const REGISTRATION_SUCCESS_MESSAGE: &str = "Account created successfully!";
 
 pub const ENVIRONMENT: &str = "environment";
 
-pub const FRONTEND_ORIGIN_URL: &str = "http://localhost:3000";
+pub const FRONTEND_ORIGIN_URL: &str = "http://localhost:";
 pub const LOREMASTER_CONFIGURATION_FILE_PATH: &str = "./Loremaster.toml";

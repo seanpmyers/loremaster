@@ -33,20 +33,7 @@ async fn main() -> Result<()> {
     info!("Starting up.");
     let environment: String = std::env::var(ENVIRONMENT)?;
 
-    Builder::new()
-        .target(Target::Stdout)
-        .format(|buf, record| -> Result<(), std::io::Error> {
-            writeln!(
-                buf,
-                "LOREMASTER_{}: {} [{}] - {}",
-                std::env::var(ENVIRONMENT).unwrap(),
-                OffsetDateTime::now_utc().format(&Rfc3339).unwrap(),
-                record.level(),
-                record.args()
-            )
-        })
-        .filter(None, LevelFilter::Info)
-        .init();
+    configure_logging();
 
     let configuration: LoremasterConfiguration = get_configuration_from_file(&environment)?;
 
@@ -61,6 +48,12 @@ async fn main() -> Result<()> {
         configuration.site_secret.clone(),
     );
 
+    let frontend_url: String = format!(
+        "{}{}",
+        FRONTEND_ORIGIN_URL,
+        configuration.frontend_port.to_string()
+    );
+
     info!("Configuring routers...");
     let application_router: Router = Router::new()
         .merge(api::router::session::router())
@@ -73,7 +66,7 @@ async fn main() -> Result<()> {
             // it is required to add ".allow_headers([http::header::CONTENT_TYPE])"
             // or see this issue https://github.com/tokio-rs/axum/issues/849
             CorsLayer::new()
-                .allow_origin(FRONTEND_ORIGIN_URL.parse::<HeaderValue>()?)
+                .allow_origin(frontend_url.parse::<HeaderValue>()?)
                 .allow_headers([AUTHORIZATION, SET_COOKIE, COOKIE, CONTENT_TYPE])
                 .allow_methods([
                     Method::GET,
@@ -88,9 +81,12 @@ async fn main() -> Result<()> {
         SocketAddr::from((configuration.ipv4_address, configuration.port));
 
     let address_string: String = socket_address.to_string();
+    info!("Loremaster servers are available at:\n\n BACKEDND API: > http://{} <\n\n FRONTEND_CLIENT: > http://{} <\n"
+        , address_string
+        , frontend_url
+    );
 
     serve(application_router, socket_address).await?;
-    info!("Loremaster backend is running at\n: http://{address_string}\n");
 
     info!("Shutting down.");
 
@@ -102,4 +98,21 @@ async fn serve(router: Router, socket_address: SocketAddr) -> Result<()> {
         .serve(router.into_make_service())
         .await?;
     Ok(())
+}
+
+fn configure_logging() {
+    Builder::new()
+        .target(Target::Stdout)
+        .format(|buf, record| -> Result<(), std::io::Error> {
+            writeln!(
+                buf,
+                "LOREMASTER_{}: {} [{}] - {}",
+                std::env::var(ENVIRONMENT).unwrap(),
+                OffsetDateTime::now_utc().format(&Rfc3339).unwrap(),
+                record.level(),
+                record.args()
+            )
+        })
+        .filter(None, LevelFilter::Info)
+        .init();
 }

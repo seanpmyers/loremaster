@@ -12,6 +12,7 @@ pub struct LoremasterConfiguration {
     pub ipv4_address: [u8; 4],
     pub hash_iterations: u32,
     pub site_secret: String,
+    pub frontend_port: u16,
 }
 
 #[derive(Deserialize, Serialize)]
@@ -28,6 +29,7 @@ struct Local {
     pub database: Database,
     pub encryption: Encryption,
     pub web_server: WebServer,
+    pub frontend: Frontend,
 }
 
 #[derive(Deserialize, Serialize)]
@@ -35,6 +37,7 @@ struct Dev {
     pub database: Database,
     pub encryption: Encryption,
     pub web_server: WebServer,
+    pub frontend: Frontend,
 }
 
 #[derive(Deserialize, Serialize)]
@@ -42,6 +45,7 @@ struct QA {
     pub database: Database,
     pub encryption: Encryption,
     pub web_server: WebServer,
+    pub frontend: Frontend,
 }
 
 #[derive(Deserialize, Serialize)]
@@ -49,6 +53,7 @@ struct Prod {
     pub database: Database,
     pub encryption: Encryption,
     pub web_server: WebServer,
+    pub frontend: Frontend,
 }
 
 #[derive(Deserialize, Serialize)]
@@ -68,6 +73,11 @@ struct WebServer {
     pub ipv4_address: [i64; 4],
 }
 
+#[derive(Deserialize, Serialize)]
+struct Frontend {
+    pub port: i64,
+}
+
 pub fn get_configuration_from_file(environment: &String) -> Result<LoremasterConfiguration> {
     let file_content: String = fs::read_to_string(LOREMASTER_CONFIGURATION_FILE_PATH)?;
 
@@ -81,6 +91,7 @@ pub fn get_configuration_from_file(environment: &String) -> Result<LoremasterCon
             ipv4_address: convert_i64_vec_to_u8(configuration.local.web_server.ipv4_address)?,
             hash_iterations: configuration.local.encryption.hash_iterations as u32,
             site_secret: configuration.local.encryption.site_secret,
+            frontend_port: configuration.local.frontend.port as u16,
         }),
         "dev" => Ok(LoremasterConfiguration {
             test_field: configuration.test_field,
@@ -89,6 +100,7 @@ pub fn get_configuration_from_file(environment: &String) -> Result<LoremasterCon
             ipv4_address: convert_i64_vec_to_u8(configuration.dev.web_server.ipv4_address)?,
             hash_iterations: configuration.dev.encryption.hash_iterations as u32,
             site_secret: configuration.dev.encryption.site_secret,
+            frontend_port: configuration.dev.frontend.port as u16,
         }),
         "qa" => Ok(LoremasterConfiguration {
             test_field: configuration.test_field,
@@ -97,6 +109,7 @@ pub fn get_configuration_from_file(environment: &String) -> Result<LoremasterCon
             ipv4_address: convert_i64_vec_to_u8(configuration.qa.web_server.ipv4_address)?,
             hash_iterations: configuration.qa.encryption.hash_iterations as u32,
             site_secret: configuration.qa.encryption.site_secret,
+            frontend_port: configuration.qa.frontend.port as u16,
         }),
         "prod" => Ok(LoremasterConfiguration {
             test_field: configuration.test_field,
@@ -105,6 +118,7 @@ pub fn get_configuration_from_file(environment: &String) -> Result<LoremasterCon
             ipv4_address: convert_i64_vec_to_u8(configuration.prod.web_server.ipv4_address)?,
             hash_iterations: configuration.prod.encryption.hash_iterations as u32,
             site_secret: configuration.prod.encryption.site_secret,
+            frontend_port: configuration.prod.frontend.port as u16,
         }),
         _ => panic!("Invalid environment!"),
     }
