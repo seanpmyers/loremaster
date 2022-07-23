@@ -4,7 +4,7 @@ use axum_extra::extract::{
     cookie::{Cookie, SameSite},
     Form, PrivateCookieJar,
 };
-use log::info;
+use log::{info, warn};
 use serde::Deserialize;
 
 use crate::{
@@ -37,7 +37,7 @@ async fn register(
     encryption_service: Extension<PasswordEncryptionService>,
     Form(registration_form): Form<CredentialsForm>,
 ) -> Result<String, ApiError> {
-    info!("API CALL: /session/register");
+    info!("API CALL: /authentication/register");
     info!("Checking for existing users with provided email address.");
     let existing_credentials: Option<Credentials> = credential_by_email_address_query(
         &postgres_service.database_pool,
@@ -77,7 +77,7 @@ async fn authenticate(
     cookie_jar: PrivateCookieJar,
     Form(authentication_form): Form<CredentialsForm>,
 ) -> Result<impl IntoResponse, ApiError> {
-    info!("API CALL: /session/authenticate");
+    info!("API CALL: /authentication/authenticate");
     let query_result: Option<Credentials> = credential_by_email_address_query(
         &postgres_service.database_pool,
         &authentication_form.email_address,
@@ -91,6 +91,10 @@ async fn authenticate(
             .map_err(|error| anyhow!("{}", error))?;
 
         if !valid_password {
+            warn!(
+                "Invalid password for email: {}",
+                &authentication_form.email_address
+            );
             return Err(ApiError::Anyhow {
                 source: anyhow!(FAILED_LOGIN_MESSAGE),
             });
@@ -98,7 +102,7 @@ async fn authenticate(
 
         let updated_cookie_jar: PrivateCookieJar = cookie_jar.add(
             Cookie::build(cookie_fields::USER_ID, person.id.to_string())
-                .same_site(SameSite::Strict)
+                .same_site(SameSite::None)
                 .http_only(true)
                 .secure(true)
                 .finish(),
@@ -107,6 +111,10 @@ async fn authenticate(
         Ok((updated_cookie_jar, SUCCESSFUL_LOGIN_MESSAGE.to_string()))
         //return Ok(Redirect::to(uri!(index)));
     } else {
+        info!(
+            "No email found matching user input: {}",
+            &authentication_form.email_address
+        );
         Err(ApiError::Anyhow {
             source: anyhow!(FAILED_LOGIN_MESSAGE),
         })
@@ -114,7 +122,7 @@ async fn authenticate(
 }
 
 async fn logout(cookie_jar: PrivateCookieJar) -> Result<impl IntoResponse, ApiError> {
-    info!("API CALL: /session/logout");
+    info!("API CALL: /authentication/logout");
     let updated_cookie_jar = cookie_jar
         .remove(Cookie::named(cookie_fields::USER_ID))
         .remove(Cookie::named(cookie_fields::SESSION_ID));
@@ -123,7 +131,7 @@ async fn logout(cookie_jar: PrivateCookieJar) -> Result<impl IntoResponse, ApiEr
 
 pub fn router() -> Router {
     Router::new()
-        .route("/authenticate", post(authenticate))
-        .route("/logout", post(logout))
-        .route("/register", post(register))
+        .route("/authentication/authenticate", post(authenticate))
+        .route("/authentication/logout", post(logout))
+        .route("/authentication/register", post(register))
 }

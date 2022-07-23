@@ -6,3 +6,4 @@ Loremaster.toml
 /application/frontend/target
 /application/frontend/dist
 .env
+application/frontend/static/bootstrap-5.2.0-dist/

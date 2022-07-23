@@ -1,7 +1,9 @@
 use anyhow::Result;
 use axum::{
     http::{
-        header::{AUTHORIZATION, CONTENT_TYPE, COOKIE, SET_COOKIE},
+        header::{
+            ACCESS_CONTROL_ALLOW_CREDENTIALS, AUTHORIZATION, CONTENT_TYPE, COOKIE, SET_COOKIE,
+        },
         HeaderValue, Method,
     },
     Extension, Router,
@@ -30,10 +32,10 @@ use crate::utility::{
 
 #[tokio::main]
 async fn main() -> Result<()> {
-    info!("Starting up.");
     let environment: String = std::env::var(ENVIRONMENT)?;
 
     configure_logging();
+    info!("Starting up!");
 
     let configuration: LoremasterConfiguration = get_configuration_from_file(&environment)?;
 
@@ -67,7 +69,13 @@ async fn main() -> Result<()> {
             // or see this issue https://github.com/tokio-rs/axum/issues/849
             CorsLayer::new()
                 .allow_origin(frontend_url.parse::<HeaderValue>()?)
-                .allow_headers([AUTHORIZATION, SET_COOKIE, COOKIE, CONTENT_TYPE])
+                .allow_headers([
+                    AUTHORIZATION,
+                    ACCESS_CONTROL_ALLOW_CREDENTIALS,
+                    SET_COOKIE,
+                    COOKIE,
+                    CONTENT_TYPE,
+                ])
                 .allow_methods([
                     Method::GET,
                     Method::POST,
@@ -81,7 +89,7 @@ async fn main() -> Result<()> {
         SocketAddr::from((configuration.ipv4_address, configuration.port));
 
     let address_string: String = socket_address.to_string();
-    info!("Loremaster servers are available at:\n\n BACKEDND API: > http://{} <\n\n FRONTEND_CLIENT: > http://{} <\n"
+    info!("Loremaster servers are available at:\n\n BACKEDND API: > http://{} <\n\n FRONTEND_CLIENT: > {} <\n"
         , address_string
         , frontend_url
     );

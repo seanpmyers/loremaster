@@ -138,6 +138,7 @@ dependencies = [
  "serde_json",
  "sycamore",
  "wasm-bindgen",
+ "web-sys",
 ]
 
 [[package]]

@@ -14,3 +14,4 @@ serde = { version = "1.0.140", features = ["derive"] }
 serde_json = { version = "1.0.82" }
 sycamore = { version = "0.7.1" }
 wasm-bindgen = { version = "0.2.81" }
+web-sys = { version = "0.3.58", features = ["Event", "EventTarget"] }

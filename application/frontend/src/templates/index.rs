@@ -1,6 +1,8 @@
 use perseus::{Html, RenderFnResultWithCause, SsrNode, Template};
 use sycamore::prelude::{view, View};
 
+use crate::components::navigation::NavigationLinks;
+
 #[perseus::make_rx(IndexPageStateRx)]
 pub struct IndexPageState {
     pub greeting: String,
@@ -9,9 +11,11 @@ pub struct IndexPageState {
 #[perseus::template_rx]
 pub fn index_page(state: IndexPageStateRx) -> View<G> {
     view! {
-        p { (state.greeting.get()) }
-        a(href = "about", id = "about-link") { "About!" }
-        a(href = "login", id = "login-link") { "Login" }
+        NavigationLinks()
+        div() {
+            h2() { "Welcome to Loremaster "}
+            p() { (state.greeting.get()) }
+        }
     }
 }
 
@@ -28,7 +32,7 @@ pub async fn get_build_state(
     _locale: String,
 ) -> RenderFnResultWithCause<IndexPageState> {
     Ok(IndexPageState {
-        greeting: "Hello World!".to_string(),
+        greeting: String::from(""),
     })
 }
 

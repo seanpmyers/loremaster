@@ -1,16 +1,52 @@
 use perseus::{Html, RenderFnResultWithCause, SsrNode, Template};
-use sycamore::prelude::{view, View};
+use sycamore::prelude::{cloned, view, Signal, View};
+use web_sys::Event;
+
+use crate::components::navigation::NavigationLinks;
+use crate::utility::constants::{API_LOGIN_URL, API_REGISTER_URL};
+use crate::utility::http_service;
 
 #[perseus::make_rx(LoginPageStateRx)]
 pub struct LoginPageState {
-    pub greeting: String,
+    pub email_address: String,
+    pub password: String,
 }
 
 #[perseus::template_rx]
 pub fn login_page(state: LoginPageStateRx) -> View<G> {
+    let email_address: Signal<String> = state.email_address;
+    let email_address_input: Signal<String> = email_address.clone();
+
+    let password: Signal<String> = state.password;
+    let password_input: Signal<String> = password.clone();
+
+    let login_handler = move |event: Event| {
+        event.prevent_default();
+        perseus::spawn_local(cloned!((email_address, password) => async move {
+
+            let response = http_service::post_html_form(&String::from(API_LOGIN_URL), &vec![
+                (String::from("email_address"), email_address.get().as_ref().to_string()),
+                (String::from("password"), password.get().as_ref().to_string()),
+            ]).await;
+        }));
+    };
+
     view! {
-        p { (state.greeting.get()) }
-        a(href = "about", id = "about-link") { "About!" }
+        NavigationLinks()
+        div() {
+            h3() {"Login"}
+            form(on:submit=login_handler) {
+                div(class="mb-3") {
+                    label(class="form-label") { "Email Address" }
+                    input(class="form-control", bind:value= email_address_input, placeholder = "Enter your email address") {}
+                }
+                div(class="mb-3") {
+                    label(class="form-label") { "Password" }
+                    input(class="form-control", bind:value= password_input, placeholder = "Enter your password") {}
+                }
+                button(class="btn btn-primary", type="submit"){ "Submit"}
+            }
+        }
     }
 }
 
@@ -27,7 +63,8 @@ pub async fn get_build_state(
     _locale: String,
 ) -> RenderFnResultWithCause<LoginPageState> {
     Ok(LoginPageState {
-        greeting: "Hello World!".to_string(),
+        email_address: String::new(),
+        password: String::new(),
     })
 }
 
