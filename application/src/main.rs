@@ -4,18 +4,20 @@ use axum::{
         header::{
             ACCESS_CONTROL_ALLOW_CREDENTIALS, AUTHORIZATION, CONTENT_TYPE, COOKIE, SET_COOKIE,
         },
-        HeaderValue, Method,
+        HeaderValue, Method, StatusCode,
     },
+    response::IntoResponse,
+    routing::get_service,
     Extension, Router,
 };
 use axum_extra::extract::cookie::Key;
 use env_logger::{Builder, Target};
 use log::{info, LevelFilter};
 use sqlx::types::time::OffsetDateTime;
-use std::io::Write;
+use std::io::{self, Write};
 use std::net::SocketAddr;
 use time::format_description::well_known::Rfc3339;
-use tower_http::cors::CorsLayer;
+use tower_http::{cors::CorsLayer, services::ServeDir};
 use utility::loremaster_configuration::LoremasterConfiguration;
 
 mod api;
@@ -25,7 +27,7 @@ mod utility;
 use data::postgres_handler::PostgresHandler;
 
 use crate::utility::{
-    constants::{ENVIRONMENT, FRONTEND_ORIGIN_URL},
+    constants::{files::FRONTEND_DIST_PATH, ENVIRONMENT, FRONTEND_ORIGIN_URL},
     loremaster_configuration::get_configuration_from_file,
     password_encryption::{PasswordEncryption, PasswordEncryptionService},
 };
@@ -83,7 +85,8 @@ async fn main() -> Result<()> {
                     Method::DELETE,
                     Method::PUT,
                 ]),
-        );
+        )
+        .fallback(get_service(ServeDir::new(FRONTEND_DIST_PATH)).handle_error(handle_error));
 
     let socket_address: SocketAddr =
         SocketAddr::from((configuration.ipv4_address, configuration.port));
@@ -99,6 +102,10 @@ async fn main() -> Result<()> {
     info!("Shutting down.");
 
     Ok(())
+}
+
+async fn handle_error(_err: io::Error) -> impl IntoResponse {
+    (StatusCode::INTERNAL_SERVER_ERROR, "Something went wrong...")
 }
 
 async fn serve(router: Router, socket_address: SocketAddr) -> Result<()> {
