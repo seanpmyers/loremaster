@@ -1,5 +1,5 @@
 use anyhow::anyhow;
-use axum::{response::IntoResponse, routing::post, Extension, Router};
+use axum::{http::StatusCode, response::IntoResponse, routing::post, Extension, Router};
 use axum_extra::extract::{
     cookie::{Cookie, SameSite},
     Form, PrivateCookieJar,
@@ -32,12 +32,25 @@ struct CredentialsForm {
     password: String,
 }
 
+const ALLOWED_EMAIL_ADDRESSES: [&str; 2] = ["person@loremaster.xyz", "spmyers@proton.me"];
+
 async fn register(
     postgres_service: Extension<PostgresHandler>,
     encryption_service: Extension<PasswordEncryptionService>,
     Form(registration_form): Form<CredentialsForm>,
-) -> Result<String, ApiError> {
+) -> Result<impl IntoResponse, ApiError> {
     info!("API CALL: /authentication/register");
+
+    if !ALLOWED_EMAIL_ADDRESSES
+        .map(|email| email.to_string())
+        .contains(&registration_form.email_address)
+    {
+        return Ok((
+            StatusCode::FORBIDDEN,
+            String::from("Registration is currently closed as the application is not ready for public users yet. Sorry!"),
+        ));
+    }
+
     info!("Checking for existing users with provided email address.");
     let existing_credentials: Option<Credentials> = credential_by_email_address_query(
         &postgres_service.database_pool,
@@ -49,7 +62,10 @@ async fn register(
     if existing_credentials.is_some() {
         info!("Existing user found!");
         //TODO: Send an email to the specified address and indicate someone tried to re-register using that email
-        return Ok(REGISTRATION_SUCCESS_MESSAGE.to_string());
+        return Ok((
+            StatusCode::ACCEPTED,
+            REGISTRATION_SUCCESS_MESSAGE.to_string(),
+        ));
     }
 
     info!("Email can be registered.");
@@ -68,7 +84,10 @@ async fn register(
     .await
     .map_err(|error| anyhow!("{}", error))?;
 
-    Ok(REGISTRATION_SUCCESS_MESSAGE.to_string())
+    Ok((
+        StatusCode::ACCEPTED,
+        REGISTRATION_SUCCESS_MESSAGE.to_string(),
+    ))
 }
 
 async fn authenticate(

@@ -14,6 +14,7 @@ Current style libraries:
 Statically serve
 
 ```bash
+perseus export -w // export and watch
 perseus export -sw
 ```
 

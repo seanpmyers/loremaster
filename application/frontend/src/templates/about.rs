@@ -1,13 +1,15 @@
 use perseus::Template;
 use sycamore::prelude::{view, Html, SsrNode, View};
 
-use crate::components::navigation::NavigationLinks;
+use crate::components::container::{Container, ContainerProperties};
 
 #[perseus::template_rx]
 pub fn about_page() -> View<G> {
     view! {
-        NavigationLinks()
-        p { "About." }
+        Container(ContainerProperties{title: String::from("About"), children: view!{
+            h1() { "About" }
+            p { "This is a website." }
+        }})
     }
 }
 

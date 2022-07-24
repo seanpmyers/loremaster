@@ -2,7 +2,7 @@ use perseus::{Html, RenderFnResultWithCause, SsrNode, Template};
 use sycamore::prelude::{cloned, view, Signal, View};
 use web_sys::Event;
 
-use crate::components::navigation::NavigationLinks;
+use crate::components::container::{Container, ContainerProperties};
 use crate::utility::constants::{API_LOGIN_URL, API_REGISTER_URL};
 use crate::utility::http_service;
 
@@ -24,7 +24,7 @@ pub fn login_page(state: LoginPageStateRx) -> View<G> {
         event.prevent_default();
         perseus::spawn_local(cloned!((email_address, password) => async move {
 
-            let response = http_service::post_html_form(&String::from(API_LOGIN_URL), &vec![
+            http_service::post_html_form(&String::from(API_LOGIN_URL), &vec![
                 (String::from("email_address"), email_address.get().as_ref().to_string()),
                 (String::from("password"), password.get().as_ref().to_string()),
             ]).await;
@@ -32,21 +32,40 @@ pub fn login_page(state: LoginPageStateRx) -> View<G> {
     };
 
     view! {
-        NavigationLinks()
-        div() {
-            h3() {"Login"}
-            form(on:submit=login_handler) {
-                div(class="mb-3") {
-                    label(class="form-label") { "Email Address" }
-                    input(class="form-control", bind:value= email_address_input, placeholder = "Enter your email address") {}
+        Container(ContainerProperties{
+            title: String::from("Login"),
+            children: view! {
+                div() {
+                    h3() {"Login"}
+                    form(on:submit=login_handler) {
+                        div(class="mb-3") {
+                            label(
+                                name="email_address",
+                                class="form-label") { "Email Address" }
+                            input(
+                                type="email",
+                                class="form-control",
+                                bind:value= email_address_input,
+                                placeholder = "Enter your email address"
+                            ) {}
+                        }
+                        div(class="mb-3") {
+                            label(
+                                name="password",
+                                class="form-label"
+                            ) { "Password" }
+                            input(
+                                type="password",
+                                class="form-control",
+                                bind:value= password_input,
+                                placeholder = "Enter your password"
+                            ) {}
+                        }
+                        button(class="btn btn-primary", type="submit"){ "Submit"}
+                    }
                 }
-                div(class="mb-3") {
-                    label(class="form-label") { "Password" }
-                    input(class="form-control", bind:value= password_input, placeholder = "Enter your password") {}
-                }
-                button(class="btn btn-primary", type="submit"){ "Submit"}
             }
-        }
+        })
     }
 }
 

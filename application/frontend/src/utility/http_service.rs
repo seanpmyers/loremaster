@@ -1,3 +1,5 @@
+use web_sys::RequestMode;
+
 use super::constants::{HTTP_HEADER_CONTENT_TYPE, HTTP_HEADER_CONTENT_TYPE_FORM};
 
 pub async fn post_html_form(endpoint_url: &String, fields: &Vec<(String, String)>) -> bool {
@@ -11,6 +13,7 @@ pub async fn post_html_form(endpoint_url: &String, fields: &Vec<(String, String)
     }
     let request_attempt: Result<reqwasm::http::Response, reqwasm::Error> =
         reqwasm::http::Request::post(endpoint_url)
+            .mode(RequestMode::SameOrigin)
             .header(HTTP_HEADER_CONTENT_TYPE, HTTP_HEADER_CONTENT_TYPE_FORM)
             .body(body_string)
             .send()

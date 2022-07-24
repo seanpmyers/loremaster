@@ -1,15 +1,5 @@
 use anyhow::Result;
-use axum::{
-    http::{
-        header::{
-            ACCESS_CONTROL_ALLOW_CREDENTIALS, AUTHORIZATION, CONTENT_TYPE, COOKIE, SET_COOKIE,
-        },
-        HeaderValue, Method, StatusCode,
-    },
-    response::IntoResponse,
-    routing::get_service,
-    Extension, Router,
-};
+use axum::{http::StatusCode, response::IntoResponse, routing::get_service, Extension, Router};
 use axum_extra::extract::cookie::Key;
 use env_logger::{Builder, Target};
 use log::{info, LevelFilter};
@@ -17,7 +7,7 @@ use sqlx::types::time::OffsetDateTime;
 use std::io::{self, Write};
 use std::net::SocketAddr;
 use time::format_description::well_known::Rfc3339;
-use tower_http::{cors::CorsLayer, services::ServeDir};
+use tower_http::services::ServeDir;
 use utility::loremaster_configuration::LoremasterConfiguration;
 
 mod api;
@@ -27,7 +17,7 @@ mod utility;
 use data::postgres_handler::PostgresHandler;
 
 use crate::utility::{
-    constants::{files::FRONTEND_DIST_PATH, ENVIRONMENT, FRONTEND_ORIGIN_URL},
+    constants::{files::FRONTEND_DIST_PATH, ENVIRONMENT},
     loremaster_configuration::get_configuration_from_file,
     password_encryption::{PasswordEncryption, PasswordEncryptionService},
 };
@@ -52,49 +42,22 @@ async fn main() -> Result<()> {
         configuration.site_secret.clone(),
     );
 
-    let frontend_url: String = format!(
-        "{}{}",
-        FRONTEND_ORIGIN_URL,
-        configuration.frontend_port.to_string()
-    );
-
     info!("Configuring routers...");
     let application_router: Router = Router::new()
-        .merge(api::router::session::router())
+        .merge(api::router::authentication::router())
         .merge(api::router::chronicle::router())
         .layer(Extension(encryption_service))
         .layer(Extension(postgres_service))
         .layer(Extension(Key::from(configuration.site_secret.as_bytes())))
-        .layer(
-            // pay attention that for some request types like posting content-type: application/json
-            // it is required to add ".allow_headers([http::header::CONTENT_TYPE])"
-            // or see this issue https://github.com/tokio-rs/axum/issues/849
-            CorsLayer::new()
-                .allow_origin(frontend_url.parse::<HeaderValue>()?)
-                .allow_headers([
-                    AUTHORIZATION,
-                    ACCESS_CONTROL_ALLOW_CREDENTIALS,
-                    SET_COOKIE,
-                    COOKIE,
-                    CONTENT_TYPE,
-                ])
-                .allow_methods([
-                    Method::GET,
-                    Method::POST,
-                    Method::PATCH,
-                    Method::DELETE,
-                    Method::PUT,
-                ]),
-        )
         .fallback(get_service(ServeDir::new(FRONTEND_DIST_PATH)).handle_error(handle_error));
 
     let socket_address: SocketAddr =
         SocketAddr::from((configuration.ipv4_address, configuration.port));
 
     let address_string: String = socket_address.to_string();
-    info!("Loremaster servers are available at:\n\n BACKEDND API: > http://{} <\n\n FRONTEND_CLIENT: > {} <\n"
-        , address_string
-        , frontend_url
+    info!(
+        "Loremaster servers are available at:\n\n BACKEND API: > http://{} <\n",
+        address_string
     );
 
     serve(application_router, socket_address).await?;
