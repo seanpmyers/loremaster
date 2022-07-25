@@ -1,3 +1,5 @@
+use std::collections::HashSet;
+
 use anyhow::anyhow;
 use axum::{http::StatusCode, response::IntoResponse, routing::post, Extension, Router};
 use axum_extra::extract::{
@@ -41,10 +43,14 @@ async fn register(
 ) -> Result<impl IntoResponse, ApiError> {
     info!("API CALL: /authentication/register");
 
-    if !ALLOWED_EMAIL_ADDRESSES
-        .map(|email| email.to_string())
-        .contains(&registration_form.email_address)
-    {
+    let clean_email: &str = registration_form.email_address.trim();
+    let clean_password: &str = registration_form.password.trim();
+
+    info!(
+        "{}",
+        &registration_form.email_address.trim() == &"person@loremaster.xyz"
+    );
+    if !ALLOWED_EMAIL_ADDRESSES.contains(&clean_email) {
         return Ok((
             StatusCode::FORBIDDEN,
             String::from("Registration is currently closed as the application is not ready for public users yet. Sorry!"),
@@ -52,12 +58,10 @@ async fn register(
     }
 
     info!("Checking for existing users with provided email address.");
-    let existing_credentials: Option<Credentials> = credential_by_email_address_query(
-        &postgres_service.database_pool,
-        &registration_form.email_address,
-    )
-    .await
-    .map_err(|error| anyhow!("{}", error))?;
+    let existing_credentials: Option<Credentials> =
+        credential_by_email_address_query(&postgres_service.database_pool, &clean_email)
+            .await
+            .map_err(|error| anyhow!("{}", error))?;
 
     if existing_credentials.is_some() {
         info!("Existing user found!");
@@ -70,13 +74,13 @@ async fn register(
 
     info!("Email can be registered.");
     let encrypted_password: String = encryption_service
-        .encrypt_password(&registration_form.password)
+        .encrypt_password(&clean_password)
         .map_err(|error| anyhow!("{}", error))?;
 
     info!("Adding new user to database.");
     create_person_query(
         &postgres_service.database_pool,
-        &registration_form.email_address,
+        &clean_email,
         &encrypted_password,
         None,
         None,
