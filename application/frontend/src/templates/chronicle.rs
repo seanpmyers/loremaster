@@ -9,7 +9,12 @@ pub fn chronicle_page() -> View<G> {
             Container(ContainerProperties {
                 title: String::from("Chronicle"),
                 children: view! {
-                    h1 { "Chronicle" }
+                    div(class="row flex-grow-1"){
+                        div(class="col-10 bg-white p-4 shadow border-0 rounded") {
+                            h1 { "Chronicle" }
+                        }
+                        div(class="col-2") {}
+                    }
             },
         })
     }

@@ -25,7 +25,7 @@ pub fn main<G: Html>() -> PerseusApp<G> {
                 head {
                     
                 }
-                body {
+                body() {
                     // This creates an element into which our app will be interpolated
                     // This uses a few tricks internally beyond the classic `<div id="root">`, so we use this wrapper for convenience
                     PerseusRoot()

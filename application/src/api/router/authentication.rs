@@ -1,5 +1,3 @@
-use std::collections::HashSet;
-
 use anyhow::anyhow;
 use axum::{http::StatusCode, response::IntoResponse, routing::post, Extension, Router};
 use axum_extra::extract::{
@@ -46,10 +44,6 @@ async fn register(
     let clean_email: &str = registration_form.email_address.trim();
     let clean_password: &str = registration_form.password.trim();
 
-    info!(
-        "{}",
-        &registration_form.email_address.trim() == &"person@loremaster.xyz"
-    );
     if !ALLOWED_EMAIL_ADDRESSES.contains(&clean_email) {
         return Ok((
             StatusCode::FORBIDDEN,
@@ -101,23 +95,22 @@ async fn authenticate(
     Form(authentication_form): Form<CredentialsForm>,
 ) -> Result<impl IntoResponse, ApiError> {
     info!("API CALL: /authentication/authenticate");
-    let query_result: Option<Credentials> = credential_by_email_address_query(
-        &postgres_service.database_pool,
-        &authentication_form.email_address,
-    )
-    .await
-    .map_err(|error| anyhow!("{}", error))?;
+
+    let clean_email: &str = authentication_form.email_address.trim();
+    let clean_password: &str = authentication_form.password.trim();
+
+    let query_result: Option<Credentials> =
+        credential_by_email_address_query(&postgres_service.database_pool, clean_email)
+            .await
+            .map_err(|error| anyhow!("{}", error))?;
 
     if let Some(person) = query_result {
         let valid_password: bool = encryption_service
-            .verify_password(&person.encrypted_password, &authentication_form.password)
+            .verify_password(&person.encrypted_password, clean_password)
             .map_err(|error| anyhow!("{}", error))?;
 
         if !valid_password {
-            warn!(
-                "Invalid password for email: {}",
-                &authentication_form.email_address
-            );
+            warn!("Invalid password for email: {}", clean_email);
             return Err(ApiError::Anyhow {
                 source: anyhow!(FAILED_LOGIN_MESSAGE),
             });
@@ -134,10 +127,7 @@ async fn authenticate(
         Ok((updated_cookie_jar, SUCCESSFUL_LOGIN_MESSAGE.to_string()))
         //return Ok(Redirect::to(uri!(index)));
     } else {
-        info!(
-            "No email found matching user input: {}",
-            &authentication_form.email_address
-        );
+        info!("No email found matching user input: {}", clean_email);
         Err(ApiError::Anyhow {
             source: anyhow!(FAILED_LOGIN_MESSAGE),
         })

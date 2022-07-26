@@ -35,33 +35,35 @@ pub fn login_page(state: LoginPageStateRx) -> View<G> {
         Container(ContainerProperties{
             title: String::from("Login"),
             children: view! {
-                div() {
-                    h3() {"Login"}
-                    form(on:submit=login_handler) {
-                        div(class="mb-3") {
-                            label(
-                                name="email_address",
-                                class="form-label") { "Email Address" }
-                            input(
-                                type="email",
-                                class="form-control",
-                                bind:value= email_address_input,
-                                placeholder = "Enter your email address"
-                            ) {}
+                div(class="container shadow card p-4 border-0 rounded") {
+                    div(class="card-body") {
+                        h3(class="card-title") {"Login"}
+                        form(on:submit=login_handler) {
+                            div(class="mb-3") {
+                                label(
+                                    name="email_address",
+                                    class="form-label") { "Email Address" }
+                                input(
+                                    type="email",
+                                    class="form-control",
+                                    bind:value= email_address_input,
+                                    placeholder = "Enter your email address"
+                                ) {}
+                            }
+                            div(class="mb-3") {
+                                label(
+                                    name="password",
+                                    class="form-label"
+                                ) { "Password" }
+                                input(
+                                    type="password",
+                                    class="form-control",
+                                    bind:value= password_input,
+                                    placeholder = "Enter your password"
+                                ) {}
+                            }
+                            button(class="btn btn-primary", type="submit"){ "Submit"}
                         }
-                        div(class="mb-3") {
-                            label(
-                                name="password",
-                                class="form-label"
-                            ) { "Password" }
-                            input(
-                                type="password",
-                                class="form-control",
-                                bind:value= password_input,
-                                placeholder = "Enter your password"
-                            ) {}
-                        }
-                        button(class="btn btn-primary", type="submit"){ "Submit"}
                     }
                 }
             }

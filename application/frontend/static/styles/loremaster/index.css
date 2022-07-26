@@ -1,18 +1,56 @@
 html {
 	margin: 0;
 	padding: 0;
-	height: 100vh;
-	width: 100vw;
+	height: 100%;
+	width: 100%;
 	font-family: 'Fira Sans', sans-serif;
 	background: white;
 }
 
 body {
+	width: 100%;
+	height: 100%;
 	margin: 0;
 	padding: 0;
 	font-family: 'Fira Sans', sans-serif;
+	background: #F7F4F9B8;
 }
 
+body div {
+	margin: 0;
+	padding: 0;
+}
+
+
 #loremaster-main {
-	padding-top: 75px;
+	/* padding-top: 75px; */
+	height: calc(100vh - 100px);
+}
+
+.hover-border-bottom {
+	border-bottom: medium #36c6e600 solid;
+	border-radius: 4px;
+}
+
+.hover-border-bottom:hover {
+	border-bottom: medium #36c5e6 solid;
+	border-radius: 4px;
+}
+
+.background-acrylic-white {
+	background: rgba(255, 255, 255, 0.8);
+	-webkit-backdrop-filter: blur(10px);
+	backdrop-filter: blur(10px);
+}
+
+.acrylic-link {
+	background: transparent;
+	-webkit-backdrop-filter: blur(10px);
+	backdrop-filter: blur(10px);
+}
+
+.acrylic-link:hover {
+	background: rgba(226, 229, 230, 0.8);
+	-webkit-backdrop-filter: blur(10px);
+	backdrop-filter: blur(10px);
 }
