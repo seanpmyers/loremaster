@@ -32,7 +32,7 @@ struct CredentialsForm {
     password: String,
 }
 
-const ALLOWED_EMAIL_ADDRESSES: [&str; 2] = ["person@loremaster.xyz", "spmyers@proton.me"];
+const ALLOWED_EMAIL_ADDRESSES: [&str; 2] = ["person@loremaster.xyz", "mail@seanmyers.xyz"];
 
 async fn register(
     postgres_service: Extension<PostgresHandler>,
