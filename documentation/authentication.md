@@ -3,6 +3,7 @@
 ## Options
 
 - Password
+- [fido2](https://en.wikipedia.org/wiki/FIDO2_Project) through Client to Authenticator Protocol ([CTAP](https://en.wikipedia.org/wiki/Client_to_Authenticator_Protocol))
 
 ## How
  We therefore act as the gatekeeper of the user's data, and must also be aware of their key. This means that we are responsible for keeping the user's key secure. 
