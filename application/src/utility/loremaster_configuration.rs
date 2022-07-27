@@ -63,19 +63,19 @@ struct Database {
 
 #[derive(Deserialize, Serialize)]
 struct Encryption {
-    pub hash_iterations: i64,
+    pub hash_iterations: u32,
     pub site_secret: String,
 }
 
 #[derive(Deserialize, Serialize)]
 struct WebServer {
-    pub port: i64,
-    pub ipv4_address: [i64; 4],
+    pub port: u16,
+    pub ipv4_address: [u8; 4],
 }
 
 #[derive(Deserialize, Serialize)]
 struct Frontend {
-    pub port: i64,
+    pub port: u16,
 }
 
 pub fn get_configuration_from_file(environment: &String) -> Result<LoremasterConfiguration> {
@@ -87,49 +87,41 @@ pub fn get_configuration_from_file(environment: &String) -> Result<LoremasterCon
         "local" => Ok(LoremasterConfiguration {
             test_field: configuration.test_field,
             postgresql_connection_string: configuration.local.database.postgresql_connection_string,
-            port: configuration.local.web_server.port as u16,
-            ipv4_address: convert_i64_vec_to_u8(configuration.local.web_server.ipv4_address)?,
-            hash_iterations: configuration.local.encryption.hash_iterations as u32,
+            port: configuration.local.web_server.port,
+            ipv4_address: configuration.local.web_server.ipv4_address,
+            hash_iterations: configuration.local.encryption.hash_iterations,
             site_secret: configuration.local.encryption.site_secret,
-            frontend_port: configuration.local.frontend.port as u16,
+            frontend_port: configuration.local.frontend.port,
         }),
         "dev" => Ok(LoremasterConfiguration {
             test_field: configuration.test_field,
             postgresql_connection_string: configuration.dev.database.postgresql_connection_string,
-            port: configuration.dev.web_server.port as u16,
-            ipv4_address: convert_i64_vec_to_u8(configuration.dev.web_server.ipv4_address)?,
-            hash_iterations: configuration.dev.encryption.hash_iterations as u32,
+            port: configuration.dev.web_server.port,
+            ipv4_address: configuration.dev.web_server.ipv4_address,
+            hash_iterations: configuration.dev.encryption.hash_iterations,
             site_secret: configuration.dev.encryption.site_secret,
-            frontend_port: configuration.dev.frontend.port as u16,
+            frontend_port: configuration.dev.frontend.port,
         }),
         "qa" => Ok(LoremasterConfiguration {
             test_field: configuration.test_field,
             postgresql_connection_string: configuration.qa.database.postgresql_connection_string,
-            port: configuration.qa.web_server.port as u16,
-            ipv4_address: convert_i64_vec_to_u8(configuration.qa.web_server.ipv4_address)?,
-            hash_iterations: configuration.qa.encryption.hash_iterations as u32,
+            port: configuration.qa.web_server.port,
+            ipv4_address: configuration.qa.web_server.ipv4_address,
+            hash_iterations: configuration.qa.encryption.hash_iterations,
             site_secret: configuration.qa.encryption.site_secret,
-            frontend_port: configuration.qa.frontend.port as u16,
+            frontend_port: configuration.qa.frontend.port,
         }),
         "prod" => Ok(LoremasterConfiguration {
             test_field: configuration.test_field,
             postgresql_connection_string: configuration.prod.database.postgresql_connection_string,
-            port: configuration.prod.web_server.port as u16,
-            ipv4_address: convert_i64_vec_to_u8(configuration.prod.web_server.ipv4_address)?,
-            hash_iterations: configuration.prod.encryption.hash_iterations as u32,
+            port: configuration.prod.web_server.port,
+            ipv4_address: configuration.prod.web_server.ipv4_address,
+            hash_iterations: configuration.prod.encryption.hash_iterations,
             site_secret: configuration.prod.encryption.site_secret,
-            frontend_port: configuration.prod.frontend.port as u16,
+            frontend_port: configuration.prod.frontend.port,
         }),
         _ => panic!("Invalid environment!"),
     }
-}
-
-fn convert_i64_vec_to_u8(address: [i64; 4]) -> Result<[u8; 4]> {
-    let mut result: [u8; 4] = [0_u8; 4];
-    for (index, value) in address.iter().enumerate() {
-        result[index] = value.to_owned() as u8;
-    }
-    Ok(result)
 }
 
 #[cfg(test)]
