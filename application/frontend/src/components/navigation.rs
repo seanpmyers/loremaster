@@ -1,37 +1,28 @@
-use crate::components::home::Home;
-use crate::components::registration::Registration;
-use crate::components::login::Login;
-use crate::components::chronicle::Chronicle;
+use sycamore::prelude::*;
 
-use dioxus::router::{Link, Route, Router};
-use dioxus::{events::FormEvent, prelude::*};
-
-pub fn Navigation(context: Scope) -> Element {
-    context.render(rsx! {
-        Router {
-            nav { class: "navbar rounded navbar-expand-lg",
-                div { class: "container-fluid",
-                    Link { class: "navbar-brand btn acrylic-link text-white", to: "/",  "Loremaster" }
-                    div { class: "me-2 navbar-collapse",
-                        ul { class: "navbar-nav",
-                        li { class: "nav-item", Link { class: "nav-link btn acrylic-link text-white", to: "/",  "Home" } }
-                        li { class: "nav-item", Link { class: "nav-link btn acrylic-link text-white", to: "/chronicle",  "Chronicle" } }
-                        li { class: "nav-item", Link { class: "nav-link btn acrylic-link text-white", to: "/registration", li { "Registration" } } } 
-                        li { class: "nav-item", Link { class: "nav-link btn acrylic-link text-white", to: "/login", li { "Login" } } } 
-                        }
-                    }
-                    
+#[component(NavigationLinks<G>)]
+pub fn navigation_links() -> View<G> {
+    let a_class: &str = "nav-link text-black fs-5";
+    let li_class: &str = "nav-item hover-border-bottom";
+    view! {
+        nav(class="container-fluid border-bottom-1 rounded p-3") {
+            ul(class="nav") {
+                li(class = (li_class)) {
+                    a(href = "/", id="home-link", class = (a_class) ) { "Home" }
+                }
+                li(class = (li_class)) {
+                    a(href = "/about", id="about-link", class = (a_class) ) { "About" }
+                }
+                li(class = (li_class)) {
+                    a(href = "/chronicle", id="chronicle-link", class = (a_class) ) { "Chronicle" }
+                }
+                li(class = (li_class)) {
+                    a(href = "/registration", id="registration-link", class = (a_class) ) { "Registration" }
+                }
+                li(class = (li_class)) {
+                    a(href = "/login", id="login-link", class = (a_class) ) { "Login" }
                 }
             }
-            div { class: "d-flex flex-grow-1 justify-content-center border-0 background-secondary rounded",
-                Route { to: "/", Home {} }
-                Route { to: "/chronicle", Chronicle {} }
-                Route { to: "/registration", Registration {} }
-                Route { to: "/login", Login {} }
-                Route { to: "", "Err 404 Route Not Found" }
-            }
-            
         }
-        
-    })
+    }
 }

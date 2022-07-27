@@ -1,29 +1,31 @@
-use log::error;
-use rocket::{
-    http::Status,
-    response::{self, Responder},
-    Request,
+use axum::{
+    http::StatusCode,
+    response::{IntoResponse, Response},
+    Json,
 };
+use log::error;
+use serde_json::json;
 use thiserror::Error;
 
 #[derive(Error, Debug)]
 pub enum ApiError {
-    #[error("Anyhow Error {source:?}")]
+    #[error("{source:?}")]
     Anyhow {
         #[from]
         source: anyhow::Error,
     },
+    //Something went wrong during authentication
+    // AuthenticationError(String),
 }
 
-impl<'r, 'o: 'r> Responder<'r, 'o> for ApiError {
-    fn respond_to(self, request: &'r Request<'_>) -> response::Result<'o> {
-        // log `self` to your favored error tracker, e.g. sentry
-        error!("{}", self);
+impl IntoResponse for ApiError {
+    fn into_response(self) -> Response {
+        error!("{self}");
 
-        Status::InternalServerError.respond_to(request)
-        // match self {
-        //     // in our simplistic example, we're happy to respond with the default 500 responder in all cases
-        //     _ => Status::InternalServerError.respond_to(request),
-        // }
+        let body: Json<serde_json::Value> = Json(json!({
+            "error": "Something went wrong on our side. Sorry.",
+        }));
+
+        (StatusCode::INTERNAL_SERVER_ERROR, body).into_response()
     }
 }

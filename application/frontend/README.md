@@ -9,22 +9,17 @@ Current style libraries:
 
 - [Bootstrap 5.1](https://getbootstrap.com/docs/5.1/getting-started/download/)
 
-## Local Debugging
+## Perseus CLI
 
-This command will compile the source code and create a ```dist/``` folder with the compiled contents to be served.
+Statically serve
 
 ```bash
-trunk build
+perseus export -w // export and watch
+perseus export -sw
 ```
 
-This command also compiles the source code, but will continue to monitor changes in the code and auto-rebuild when a file is changed.
+Use server
 
 ```bash
-trunk watch
-```
-
-Trunk can also serve the content with the following command, but I don't see a use for this at the moment besides if the backend isn't avaialble for some reason.
-
-```bash
-trunk serve
+perseus serve -w
 ```

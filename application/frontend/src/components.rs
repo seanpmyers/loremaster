@@ -1,5 +1,2 @@
-pub mod chronicle;
-pub mod home;
-pub mod login;
+pub mod container;
 pub mod navigation;
-pub mod registration;

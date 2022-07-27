@@ -1,23 +1,23 @@
-
+@test_password=Test123!
 
 GET http://localhost:8000/
 
 ### REGISTER
-POST http://localhost:8000/register HTTP/1.1
+POST http://localhost:8000/authentication/register HTTP/1.1
 Content-Type: application/x-www-form-urlencoded
 
 email_address=person@loremaster.xyz
-&password=Test123!
+&password={{test_password}}
 
 ### LOGIN
-POST http://localhost:8000/authenticate HTTP/1.1
+POST http://localhost:8000/authentication/authenticate HTTP/1.1
 Content-Type: application/x-www-form-urlencoded
 
 email_address=person@loremaster.xyz
-&password=Test123!
+&password={{test_password}}
 
 ### LOGOUT
-POST http://localhost:8000/logout HTTP/1.1
+POST http://localhost:8000/authentication/logout HTTP/1.1
 
 ###
 GET http://localhost:8000/chronicle/today

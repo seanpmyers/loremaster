@@ -11,8 +11,14 @@ edition = "2021"
 anyhow = "1.0.58"
 # Password Encryption
 argon2 = "0.4.1"
-# A concurrent renderer-agnostic Virtual DOM for interactive user experiences
-dioxus = { version = "0.2.4", features = ["web", "ssr"] }
+# A web application framework that focuses on ergonomics and modularity.
+axum = { version = "0.5.13", features = ["headers"] }
+axum-extra = { version = "0.3.6", features = [
+	"cookie",
+	"cookie-private",
+	"cookie-signed",
+	"form",
+] }
 # Logging
 env_logger = "0.9.0"
 # Provides async programming foundational functionality
@@ -21,17 +27,6 @@ futures = "0.3.21"
 log = "0.4.17"
 # Random nubmer generation
 rand = "0.8.5"
-# Http requests library for WebAssembly
-reqwasm = "0.5.0"
-# Higher level HTTP client library 
-reqwest = "0.11.11"
-# Backend web framework
-rocket = { version = "0.5.0-rc.2", features = [
-	"secrets",
-	"json",
-	"tls",
-	"uuid",
-] }
 # Serialization
 serde = { version = "1.0.140", features = ["derive"] }
 serde_json = "1.0.82"
@@ -47,8 +42,6 @@ sqlx = { version = "0.6.0", features = [
 	"tls",
 	"uuid",
 ] }
-# Frontend WebAssembly library
-sycamore = { version = "0.8.0-beta.7", features = ["ssr", "suspense"] }
 # Error/exception handling
 thiserror = "1.0.31"
 # Time
@@ -59,9 +52,8 @@ tokio-stream = "0.1.9"
 tokio-test = "0.4.2"
 # Encode/decode TOML content/files
 toml = "0.5.9"
+# Tower middleware and utilities for HTTP clients and servers
+tower-http = { version = "0.3.4", features = ["cors", "fs"] }
+ureq = "2.4.0"
 # Implementation of Universally Unique Identifiers (Uuid)
 uuid = { version = "1.1.2", features = ["v4", "serde"] }
-
-
-# [workspace]
-# members = ["frontend"]

@@ -1,27 +1,50 @@
-use log::info;
-use rocket::{
-    outcome::IntoOutcome,
-    request::{self, FromRequest},
-    Request,
+use axum::{
+    async_trait,
+    extract::{FromRequest, RequestParts, TypedHeader},
+    headers::Cookie,
+    http::StatusCode,
 };
+use serde::{Deserialize, Serialize};
 use uuid::Uuid;
 
-use crate::utility::constants::cookie_fields::USER_ID;
+use crate::utility::constants::cookie_fields;
 
-#[derive(Debug)]
-pub struct User(pub Uuid);
+#[derive(Serialize, Deserialize, Debug, Clone, Copy)]
+pub struct UserId(Uuid);
 
-#[rocket::async_trait]
-impl<'r> FromRequest<'r> for User {
-    type Error = std::convert::Infallible;
+pub enum User {
+    Found(UserId),
+}
 
-    async fn from_request(request: &'r Request<'_>) -> request::Outcome<User, Self::Error> {
-        info!("Checking for user_id cookie.");
-        let user_id: Option<Uuid> = request
-            .cookies()
-            .get_private(USER_ID)
-            .and_then(|cookie| Uuid::parse_str(cookie.value()).ok());
+#[async_trait]
+impl<B> FromRequest<B> for User
+where
+    B: Send,
+{
+    type Rejection = (StatusCode, &'static str);
+    async fn from_request(req: &mut RequestParts<B>) -> Result<Self, Self::Rejection> {
+        let cookie = Option::<TypedHeader<Cookie>>::from_request(req)
+            .await
+            .unwrap();
 
-        return user_id.map(User).or_forward(());
+        let session_cookie = cookie
+            .as_ref()
+            .and_then(|cookie| cookie.get(cookie_fields::USER_ID));
+        match session_cookie {
+            Some(value) => Ok(Self::Found(UserId(Uuid::parse_str(value).unwrap()))),
+            None => Err((StatusCode::UNAUTHORIZED, "No `user_id` found!")),
+        }
     }
+
+    // type Error = std::convert::Infallible;
+
+    // async fn from_request(request: &'r Request<'_>) -> request::Outcome<User, Self::Error> {
+    //     info!("Checking for user_id cookie.");
+    //     let user_id: Option<Uuid> = request
+    //         .cookies()
+    //         .get_private(USER_ID)
+    //         .and_then(|cookie| Uuid::parse_str(cookie.value()).ok());
+
+    //     return user_id.map(User).or_forward(());
+    // }
 }
