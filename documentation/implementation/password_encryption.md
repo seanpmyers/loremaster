@@ -1,7 +1,7 @@
-# Password Hashing
-
+# Password Encryption
 
 ## Why
+
 TODO:
 
 ## How
@@ -15,7 +15,7 @@ Flow looks something like this:
          - Sitewide secret
             - This is a string generated from a secure psuedo random number generator
             - Use argon2 to hash this with user specific salt to create the salt used in argon2 hash of user password. This makes it so that if your database is compromised the attacker must also have access to local files to crack passwords from the database.
-         - Number of iterations for argon2 
+         - Number of iterations for argon2
             - This is an implementation of a concept called Key Strengthening/Stretching
             - If it takes 0.00001 seconds for your hash function to return, someone can attempt to brute forcing 100,000 passwords a second until they find a match. But if it takes 1 second for your hash function to spit out a result, it means brute forcing therefore takes 100,000 times longer to test each case.
             - In order to slow down the hashing function, we run the argon2 hash however many times specified in this field.

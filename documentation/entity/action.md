@@ -1,11 +1,13 @@
 # Action
 
 ## Description
+
 The fact or process of doing something, typically to achieve an intention.
 A thing done by a person.
 Actions can be repeated.
 
 ## Attributes
+
 - Name
 - Category
 
