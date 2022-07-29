@@ -1,0 +1,14 @@
+openapi: 3.1.0
+info:
+  title: Chronicles
+  description: |
+    This API provides chronicle data for loremaster users
+  version: 1.0.0
+paths:
+  /chronicle/today:
+    get:
+      parameters:
+        - name: user_id
+          in: header
+        - name: date
+          in: query

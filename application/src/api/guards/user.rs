@@ -10,11 +10,7 @@ use uuid::Uuid;
 use crate::utility::constants::cookie_fields;
 
 #[derive(Serialize, Deserialize, Debug, Clone, Copy)]
-pub struct UserId(Uuid);
-
-pub enum User {
-    Found(UserId),
-}
+pub struct User(pub Uuid);
 
 #[async_trait]
 impl<B> FromRequest<B> for User
@@ -31,7 +27,7 @@ where
             .as_ref()
             .and_then(|cookie| cookie.get(cookie_fields::USER_ID));
         match session_cookie {
-            Some(value) => Ok(Self::Found(UserId(Uuid::parse_str(value).unwrap()))),
+            Some(value) => Ok(User(Uuid::parse_str(value).unwrap())),
             None => Err((StatusCode::UNAUTHORIZED, "No `user_id` found!")),
         }
     }
