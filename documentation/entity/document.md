@@ -1,6 +1,7 @@
 # Document
 
 ## Attributes
+
 - Type
 - Category
 - Owner

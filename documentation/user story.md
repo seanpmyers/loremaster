@@ -12,6 +12,7 @@ They can record an optional *outcome* for every action they take (what was the r
 For example if they complete and interview, they might be rejected which is an outcome or result. 
 
 Actions:
+
   - Apply
     - Send Resume
       - Update Resume
