@@ -23,7 +23,7 @@ where
             .await
             .unwrap();
 
-        let session_cookie = cookie
+        let session_cookie: Option<&str> = cookie
             .as_ref()
             .and_then(|cookie| cookie.get(cookie_fields::USER_ID));
         match session_cookie {

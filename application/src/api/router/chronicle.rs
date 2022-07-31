@@ -105,5 +105,5 @@ pub fn router() -> Router {
         .route("/chronicle/example", get(example))
         .route("/chronicle/today", get(today))
         .route("/chronicle/by_date", get(by_date))
-        .route("chronicle/by_id", get(by_id))
+        .route("/chronicle/by_id", get(by_id))
 }

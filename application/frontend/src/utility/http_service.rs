@@ -34,3 +34,50 @@ pub async fn post_html_form(endpoint_url: &String, fields: &Vec<(String, String)
         }
     }
 }
+
+pub async fn get_endpoint(
+    endpoint_url: &str,
+    authentication: (String, String),
+    query_parameters: Option<&Vec<(String, String)>>,
+) -> Option<String> {
+    let mut full_request_string: String = String::from(endpoint_url);
+    full_request_string.push('?');
+    if let Some(parameters) = query_parameters {
+        if parameters.len() > 0_usize {
+            full_request_string.push_str(&format!(
+                "{}={}",
+                parameters[0_usize].0, parameters[0_usize].1
+            ));
+
+            for parameter in parameters.iter().skip(1) {
+                full_request_string.push_str(&format!("&{}={}", parameter.0, parameter.1));
+            }
+        }
+    }
+
+    let request_attempt: Result<reqwasm::http::Response, reqwasm::Error> =
+        reqwasm::http::Request::get(&full_request_string)
+            .header(&authentication.0, &authentication.1)
+            .mode(RequestMode::SameOrigin)
+            .send()
+            .await;
+    match request_attempt {
+        Ok(response) => {
+            if response.status() != 200 {
+                log::info!("{}", response.status_text());
+                return None;
+            }
+            match response.text().await {
+                Ok(text) => Some(text),
+                Err(error) => {
+                    log::error!("{}", error.to_string());
+                    None
+                }
+            }
+        }
+        Err(error) => {
+            log::error!("{}", error.to_string());
+            None
+        }
+    }
+}

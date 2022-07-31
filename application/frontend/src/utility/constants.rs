@@ -1,7 +1,21 @@
 pub const API_BASE_URL: &str = "http://127.0.0.1:8000";
 pub const API_REGISTER_URL: &str = "http://127.0.0.1:8000/authentication/register";
 pub const API_LOGIN_URL: &str = "http://127.0.0.1:8000/authentication/authenticate";
+pub const API_CHRONICLE_TODAY_URL: &str = "http://127.0.0.1:8000/chronicle/today";
 pub const HTTP_HEADER_CONTENT_TYPE: &str = "Content-Type";
 pub const HTTP_HEADER_CONTENT_TYPE_FORM: &str = "application/x-www-form-urlencoded";
 pub const EMAIL_ADDRESS_FIELD: &str = "email_address";
 pub const PASSWORD_FIELD: &str = "password";
+
+pub const JANUARY: &str = "January";
+pub const FEBRUARY: &str = "February";
+pub const MARCH: &str = "March";
+pub const APRIL: &str = "April";
+pub const MAY: &str = "May";
+pub const JUNE: &str = "June";
+pub const JULY: &str = "July";
+pub const AUGUST: &str = "August";
+pub const SEPTEMBER: &str = "September";
+pub const OCTOBER: &str = "October";
+pub const NOVEMBER: &str = "November";
+pub const DECEMBER: &str = "December";
