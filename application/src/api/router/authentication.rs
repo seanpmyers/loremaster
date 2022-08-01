@@ -119,6 +119,7 @@ async fn authenticate(
         let updated_cookie_jar: PrivateCookieJar = cookie_jar.add(
             Cookie::build(cookie_fields::USER_ID, person.id.to_string())
                 .same_site(SameSite::Strict)
+                .path("/")
                 .http_only(true)
                 .secure(true)
                 .finish(),
