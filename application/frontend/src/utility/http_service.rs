@@ -1,8 +1,12 @@
+use perseus::web_log;
 use web_sys::RequestMode;
 
 use super::constants::{HTTP_HEADER_CONTENT_TYPE, HTTP_HEADER_CONTENT_TYPE_FORM};
 
-pub async fn post_html_form(endpoint_url: &String, fields: &Vec<(String, String)>) -> bool {
+pub async fn post_html_form(
+    endpoint_url: &String,
+    fields: &Vec<(String, String)>,
+) -> Option<String> {
     let mut body_string: String = String::new();
     if fields.len() > 0_usize {
         body_string.push_str(&format!("{}={}", fields[0_usize].0, fields[0_usize].1));
@@ -22,22 +26,21 @@ pub async fn post_html_form(endpoint_url: &String, fields: &Vec<(String, String)
     match request_attempt {
         Ok(response) => {
             if response.status() != 200 {
-                log::info!("{}", response.status_text());
-                return false;
+                web_log!("{}", response.status_text());
+                return None;
             }
 
-            true
+            None
         }
         Err(error) => {
-            log::error!("{}", error.to_string());
-            false
+            web_log!("{}", error.to_string());
+            None
         }
     }
 }
 
 pub async fn get_endpoint(
     endpoint_url: &str,
-    authentication: (String, String),
     query_parameters: Option<&Vec<(String, String)>>,
 ) -> Option<String> {
     let mut full_request_string: String = String::from(endpoint_url);
@@ -57,7 +60,6 @@ pub async fn get_endpoint(
 
     let request_attempt: Result<reqwasm::http::Response, reqwasm::Error> =
         reqwasm::http::Request::get(&full_request_string)
-            .header(&authentication.0, &authentication.1)
             .mode(RequestMode::SameOrigin)
             .send()
             .await;
