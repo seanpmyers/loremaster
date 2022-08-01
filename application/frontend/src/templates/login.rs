@@ -28,6 +28,7 @@ pub fn login_page(state: LoginPageStateRx) -> View<G> {
                 (String::from("email_address"), email_address.get().as_ref().to_string()),
                 (String::from("password"), password.get().as_ref().to_string()),
             ]).await;
+
         }));
     };
 

@@ -1,9 +1,7 @@
 use js_sys::{Date, JsString};
-use log::info;
+
 use perseus::{RenderFnResultWithCause, Template};
-use sycamore::prelude::{cloned, view, Html, Signal, SsrNode, View};
-use wasm_bindgen::JsCast;
-use web_sys::HtmlDocument;
+use sycamore::prelude::{cloned, view, Html, SsrNode, View};
 
 use crate::{
     components::container::{Container, ContainerProperties},
@@ -18,7 +16,8 @@ use crate::{
 pub struct ChroniclePageState {
     pub user_alias: String,
     pub chronicle_id: String,
-    pub date_time: String,
+    pub date_display: String,
+    pub time_display: String,
 }
 
 #[perseus::template_rx]
@@ -26,12 +25,13 @@ pub fn chronicle_page(
     ChroniclePageStateRx {
         user_alias,
         chronicle_id,
-        date_time,
+        date_display,
+        time_display,
     }: ChroniclePageStateRx,
 ) -> View<G> {
     if G::IS_BROWSER {
         perseus::spawn_local(
-            cloned!((user_alias, date_time, chronicle_id) => async move {
+            cloned!((date_display, time_display, chronicle_id) => async move {
                 let javascript_date: Date = Date::new_0();
 
                 let day_of_week: String = get_day_of_week_from_integer(javascript_date.get_day());
@@ -40,18 +40,12 @@ pub fn chronicle_page(
                 let month: String = get_month_from_integer(javascript_date.get_month());
 
                 let time: JsString = Date::to_time_string(&javascript_date);
+                time_display.set(time.as_string().unwrap());
                 let date_time_value: String = format!("{day_of_week} , {month} {date}, {year}");
-                date_time.set(date_time_value);
-                let window = web_sys::window().unwrap();
-                let document = window.document().unwrap();
-                let html_document = document.dyn_into::<web_sys::HtmlDocument>().unwrap();
-                let cookies_string = html_document.cookie().unwrap();
-                let cookie_value = cookies_string.split("; user_id=");
-                for cookie in cookie_value {
-                    info!("{cookie}");
-                    let query_response = http_service::get_endpoint(API_CHRONICLE_TODAY_URL, ("user_id".to_string(), cookie.to_string()),None).await;
+                date_display.set(date_time_value);
 
-                }
+                let query_response = http_service::get_endpoint(API_CHRONICLE_TODAY_URL ,None).await;
+
 
             }),
         );
@@ -66,8 +60,9 @@ pub fn chronicle_page(
                 children: view! {
                     div(class="row flex-grow-1"){
                         div(class="col-10 bg-white p-4 shadow border-0 rounded") {
-                            h1 { "Hello, " (user_alias.get()) }
-                            h2 { (date_time.get()) }
+                            h2 { (date_display.get()) }
+                            h3 { (time_display.get()) }
+                            h3 { "Hello, " (user_alias.get()) }
                         }
                         div(class="col-2") {}
                     }
@@ -84,7 +79,8 @@ pub async fn get_build_state(
     Ok(ChroniclePageState {
         user_alias: String::from("Stranger"),
         chronicle_id: String::new(),
-        date_time: String::new(),
+        date_display: String::new(),
+        time_display: String::new(),
     })
 }
 
