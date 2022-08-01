@@ -2,6 +2,7 @@ pub mod components;
 pub mod error_pages;
 pub mod templates;
 pub mod utility;
+pub mod global_state;
 
 use perseus::{Html, PerseusApp, PerseusRoot};
 
@@ -34,4 +35,5 @@ pub fn main<G: Html>() -> PerseusApp<G> {
                 }
             }
         })
+        .global_state_creator(crate::global_state::get_global_state_creator())
 }
