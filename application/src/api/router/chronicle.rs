@@ -7,34 +7,43 @@ use uuid::Uuid;
 use crate::{
     api::{guards::user::User, response::ApiError},
     data::{
-        entity::chronicle::Chronicle,
+        entity::{chronicle::Chronicle, transfer::person_chronicle::PersonChroncile},
         postgres_handler::PostgresHandler,
-        query::chronicle::{
-            chronicle_by_date::chronicle_by_date_query, chronicle_by_id::chronicle_by_id_query,
-            create_chronicle::create_chronicle_query,
-            current_chronicle_by_person::get_current_chronicle_by_person_query,
+        query::{
+            self,
+            chronicle::{
+                chronicle_by_date::chronicle_by_date_query, chronicle_by_id::chronicle_by_id_query,
+                create_chronicle::create_chronicle_query,
+                current_chronicle_by_person::get_current_chronicle_by_person_query,
+            },
         },
     },
 };
 
+//TODO: Take in requestor's local UTC time zone
 pub async fn today(
     postgres_service: Extension<PostgresHandler>,
     user: User,
-) -> Result<Json<Chronicle>, ApiError> {
+) -> Result<Json<PersonChroncile>, ApiError> {
     info!("Querying for today's chronicle.");
     let today: OffsetDateTime = OffsetDateTime::now_utc();
 
-    let query_result: Option<Chronicle> =
+    let person_alias: Option<String> =
+        query::person::alias_by_id::alias_by_id_query(&postgres_service.database_pool, &user.0)
+            .await
+            .map_err(|error| anyhow!("{}", error))?;
+
+    let chronicle_query_result: Option<Chronicle> =
         get_current_chronicle_by_person_query(&postgres_service.database_pool, &today, &user.0)
             .await
             .map_err(|error| anyhow!("{}", error))?;
 
-    match query_result {
-        Some(result) => Ok(Json(result)),
+    let chronicle: Chronicle = match chronicle_query_result {
+        Some(existing_chronicle) => existing_chronicle,
         None => {
             info!("No chronicle exits for the current date. Creating one.");
             let new_chronicle_id: Uuid = Uuid::new_v4();
-            let result = create_chronicle_query(
+            create_chronicle_query(
                 &postgres_service.database_pool,
                 &today.date(),
                 &today,
@@ -42,10 +51,15 @@ pub async fn today(
                 &Some(new_chronicle_id),
             )
             .await
-            .map_err(|error| anyhow!("{}", error))?;
-            Ok(Json(result))
+            .map_err(|error| anyhow!("{}", error))?
         }
-    }
+    };
+
+    Ok(Json(PersonChroncile {
+        chronicle_id: chronicle.id,
+        chronicle_date: chronicle.date_recorded,
+        person_alias: person_alias,
+    }))
 }
 
 pub async fn by_date(
