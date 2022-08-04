@@ -11,9 +11,11 @@ pub struct IndexPageState {
 #[perseus::template_rx]
 pub fn index_page(state: IndexPageStateRx) -> View<G> {
     view! {
-        Container(ContainerProperties{title: String::from("Home"), children: view!{
-            h1() { "Loremaster" }
-            p() { "Welcome!" }
+        Container(ContainerProperties{title: String::from("Loremaster"), children: view!{
+            div(class="d-flex flex-column flex-grow-1 p-4 align-items-center") {
+                h1(class="display-3") { "Loremaster" }
+                p() { "Welcome!" }
+            }
         }})
     }
 }

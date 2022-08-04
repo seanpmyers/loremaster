@@ -7,8 +7,10 @@ use crate::components::container::{Container, ContainerProperties};
 pub fn about_page() -> View<G> {
     view! {
         Container(ContainerProperties{title: String::from("About"), children: view!{
-            h1() { "About" }
-            p { "This is a website." }
+            div(class="d-flex flex-column flex-grow-1 p-4 align-items-center") {
+                h1(class="display-3") { "About" }
+                p() { "This is a website." }
+            }
         }})
     }
 }

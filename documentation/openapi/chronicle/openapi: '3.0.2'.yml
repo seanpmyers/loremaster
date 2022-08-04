@@ -1,0 +1,14 @@
+openapi: "3.0.2"
+info:
+  title: Chronicle
+  description: |
+    This API provides chronicle data for loremaster users
+  version: "1.0"
+servers:
+  - url: https://loremaster.chronilore.day/api/v1
+paths:
+  /crhonicle/today:
+    get:
+      responses:
+        "200":
+          description: OK

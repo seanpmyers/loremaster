@@ -35,9 +35,9 @@ pub fn registration_page(state: RegistrationPageStateRx) -> View<G> {
         Container(ContainerProperties{
             title: String::from("Registration"),
             children: view! {
-                div(class="container shadow card p-4 border-0 rounded") {
+                div(class="container shadow card p-4 border-0 rounded text-black") {
                     div(class="card-body") {
-                        h3(class="card-title") {"Registration"}
+                        h3(class="card-title display-6") {"Registration"}
                         form(on:submit=registration_handler) {
                             div(class="mb-3") {
                                 label(

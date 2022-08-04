@@ -1,5 +1,5 @@
 use anyhow::anyhow;
-use axum::{routing::get, Json, Router};
+use axum::{routing::get, Extension, Json, Router};
 use log::info;
 use time::{format_description::well_known::Rfc3339, OffsetDateTime};
 use uuid::Uuid;
@@ -7,83 +7,94 @@ use uuid::Uuid;
 use crate::{
     api::{guards::user::User, response::ApiError},
     data::{
-        entity::chronicle::Chronicle,
+        entity::{chronicle::Chronicle, transfer::person_chronicle::PersonChroncile},
         postgres_handler::PostgresHandler,
-        query::chronicle::{
-            chronicle_by_date::chronicle_by_date_query, chronicle_by_id::chronicle_by_id_query,
-            create_chronicle::create_chronicle_query,
-            current_chronicle_by_person::get_current_chronicle_by_person_query,
+        query::{
+            self,
+            chronicle::{
+                chronicle_by_date::chronicle_by_date_query, chronicle_by_id::chronicle_by_id_query,
+                create_chronicle::create_chronicle_query,
+                current_chronicle_by_person::get_current_chronicle_by_person_query,
+            },
         },
     },
 };
 
-// #[get("/today")]
-// pub async fn today(
-//     postgres_service: &State<PostgresHandler>,
-//     user: User,
-// ) -> Result<Json<Chronicle>, ApiError> {
-//     info!("Querying for today's chronicle.");
-//     let today: OffsetDateTime = OffsetDateTime::now_utc();
+//TODO: Take in requestor's local UTC time zone
+pub async fn today(
+    postgres_service: Extension<PostgresHandler>,
+    user: User,
+) -> Result<Json<PersonChroncile>, ApiError> {
+    info!("Querying for today's chronicle.");
+    let today: OffsetDateTime = OffsetDateTime::now_utc();
 
-//     let query_result: Option<Chronicle> =
-//         get_current_chronicle_by_person_query(&postgres_service.database_pool, &today, &user.0)
-//             .await
-//             .map_err(|error| anyhow!("{}", error))?;
+    let person_alias: Option<String> =
+        query::person::alias_by_id::alias_by_id_query(&postgres_service.database_pool, &user.0)
+            .await
+            .map_err(|error| anyhow!("{}", error))?;
 
-//     match query_result {
-//         Some(result) => Ok(Json(result)),
-//         None => {
-//             info!("No chronicle exits for the current date. Creating one.");
-//             let new_chronicle_id: Uuid = Uuid::new_v4();
-//             let result = create_chronicle_query(
-//                 &postgres_service.database_pool,
-//                 &today.date(),
-//                 &today,
-//                 &user.0,
-//                 &Some(new_chronicle_id),
-//             )
-//             .await
-//             .map_err(|error| anyhow!("{}", error))?;
-//             Ok(Json(result))
-//         }
-//     }
-// }
+    let chronicle_query_result: Option<Chronicle> =
+        get_current_chronicle_by_person_query(&postgres_service.database_pool, &today, &user.0)
+            .await
+            .map_err(|error| anyhow!("{}", error))?;
 
-// #[get("/by_date")]
-// pub async fn by_date(
-//     postgres_service: &State<PostgresHandler>,
-//     user: User,
-// ) -> Result<Option<Json<Chronicle>>, ApiError> {
-//     let chronicle_date: OffsetDateTime = OffsetDateTime::now_utc();
+    let chronicle: Chronicle = match chronicle_query_result {
+        Some(existing_chronicle) => existing_chronicle,
+        None => {
+            info!("No chronicle exits for the current date. Creating one.");
+            let new_chronicle_id: Uuid = Uuid::new_v4();
+            create_chronicle_query(
+                &postgres_service.database_pool,
+                &today.date(),
+                &today,
+                &user.0,
+                &Some(new_chronicle_id),
+            )
+            .await
+            .map_err(|error| anyhow!("{}", error))?
+        }
+    };
 
-//     let query_result: Option<Chronicle> =
-//         chronicle_by_date_query(&postgres_service.database_pool, &chronicle_date, &user.0)
-//             .await
-//             .map_err(|error| anyhow!("{}", error))?;
+    Ok(Json(PersonChroncile {
+        chronicle_id: chronicle.id,
+        chronicle_date: chronicle.date_recorded,
+        person_alias: person_alias,
+    }))
+}
 
-//     if let Some(result) = query_result {
-//         Ok(Some(Json(result)))
-//     } else {
-//         Ok(None)
-//     }
-// }
+pub async fn by_date(
+    postgres_service: Extension<PostgresHandler>,
+    user: User,
+) -> Result<Json<Option<Chronicle>>, ApiError> {
+    let chronicle_date: OffsetDateTime = OffsetDateTime::now_utc();
 
-// #[get("/by_id")]
-// pub async fn by_id(
-//     postgres_service: &State<PostgresHandler>,
-// ) -> Result<Option<Json<Chronicle>>, ApiError> {
-//     let chronicle_id: Uuid = Uuid::new_v4();
+    let query_result: Option<Chronicle> =
+        chronicle_by_date_query(&postgres_service.database_pool, &chronicle_date, &user.0)
+            .await
+            .map_err(|error| anyhow!("{}", error))?;
 
-//     let query_result: Option<Chronicle> =
-//         chronicle_by_id_query(&postgres_service.database_pool, &chronicle_id)
-//             .await
-//             .map_err(|error| anyhow!("{}", error))?;
+    if let Some(result) = query_result {
+        Ok(Json(Some(result)))
+    } else {
+        Ok(Json(None))
+    }
+}
 
-//     match query_result {
-//         Some(result) => Ok(Some(Json(result))),
-//         None => Ok(None),
-//     }
-// }
+pub async fn by_id(
+    postgres_service: Extension<PostgresHandler>,
+) -> Result<Json<Option<Chronicle>>, ApiError> {
+    let chronicle_id: Uuid = Uuid::new_v4();
+
+    let query_result: Option<Chronicle> =
+        chronicle_by_id_query(&postgres_service.database_pool, &chronicle_id)
+            .await
+            .map_err(|error| anyhow!("{}", error))?;
+
+    match query_result {
+        Some(result) => Ok(Json(Some(result))),
+        None => Ok(Json(None)),
+    }
+}
 
 pub async fn server_time() -> Result<String, ApiError> {
     Ok(OffsetDateTime::now_utc()
@@ -106,4 +117,7 @@ pub fn router() -> Router {
     Router::new()
         .route("/chronicle/server_time", get(server_time))
         .route("/chronicle/example", get(example))
+        .route("/chronicle/today", get(today))
+        .route("/chronicle/by_date", get(by_date))
+        .route("/chronicle/by_id", get(by_id))
 }
