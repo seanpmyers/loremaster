@@ -26,24 +26,12 @@ where
                     let user_id = Uuid::parse_str(cookie.value()).unwrap();
                     Ok(User(user_id))
                 }
-                None => Err((
-                    StatusCode::INTERNAL_SERVER_ERROR,
-                    "Failed to match authorization.",
-                )),
+                None => Err((StatusCode::UNAUTHORIZED, "No authorization found!")),
             },
-            Err(_) => Err((StatusCode::UNAUTHORIZED, "No authorization found!")),
+            Err(_) => Err((
+                StatusCode::INTERNAL_SERVER_ERROR,
+                "Failed to evalute authorization.",
+            )),
         }
     }
-
-    // type Error = std::convert::Infallible;
-
-    // async fn from_request(request: &'r Request<'_>) -> request::Outcome<User, Self::Error> {
-    //     info!("Checking for user_id cookie.");
-    //     let user_id: Option<Uuid> = request
-    //         .cookies()
-    //         .get_private(USER_ID)
-    //         .and_then(|cookie| Uuid::parse_str(cookie.value()).ok());
-
-    //     return user_id.map(User).or_forward(());
-    // }
 }
