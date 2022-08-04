@@ -1,5 +1,6 @@
 pub mod components;
 pub mod error_pages;
+pub mod data;
 pub mod templates;
 pub mod utility;
 pub mod global_state;

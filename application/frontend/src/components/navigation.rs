@@ -2,13 +2,14 @@ use sycamore::prelude::*;
 
 #[component(NavigationLinks<G>)]
 pub fn navigation_links() -> View<G> {
-    let a_class: &str = "nav-link text-black fs-5";
+    let app_name_class: &str = "nav-link loremaster-text fs-3";
+    let a_class: &str = "nav-link loremaster-text fs-5";
     let li_class: &str = "nav-item hover-border-bottom";
     view! {
         nav(class="container-fluid border-bottom-1 rounded p-3") {
-            ul(class="nav") {
+            ul(class="nav align-items-baseline") {
                 li(class = (li_class)) {
-                    a(href = "/", id="home-link", class = (a_class) ) { "Home" }
+                    a(href = "/", id="index-link", class = (app_name_class) ) { "Loremaster" }
                 }
                 li(class = (li_class)) {
                     a(href = "/about", id="about-link", class = (a_class) ) { "About" }

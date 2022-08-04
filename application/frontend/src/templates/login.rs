@@ -36,9 +36,9 @@ pub fn login_page(state: LoginPageStateRx) -> View<G> {
         Container(ContainerProperties{
             title: String::from("Login"),
             children: view! {
-                div(class="container shadow card p-4 border-0 rounded") {
+                div(class="container shadow card p-4 border-0 rounded text-black") {
                     div(class="card-body") {
-                        h3(class="card-title") {"Login"}
+                        h3(class="card-title display-6") {"Login"}
                         form(on:submit=login_handler) {
                             div(class="mb-3") {
                                 label(

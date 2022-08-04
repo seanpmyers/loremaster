@@ -5,6 +5,7 @@ use sycamore::prelude::{cloned, view, Html, SsrNode, View};
 
 use crate::{
     components::container::{Container, ContainerProperties},
+    data::entity::person_chronicle::PersonChroncile,
     utility::{
         constants::API_CHRONICLE_TODAY_URL,
         date_time_helper::{get_day_of_week_from_integer, get_month_from_integer},
@@ -17,7 +18,9 @@ pub struct ChroniclePageState {
     pub user_alias: String,
     pub chronicle_id: String,
     pub date_display: String,
+    pub short_date_display: String,
     pub time_display: String,
+    pub greeting: String,
 }
 
 #[perseus::template_rx]
@@ -26,12 +29,14 @@ pub fn chronicle_page(
         user_alias,
         chronicle_id,
         date_display,
+        short_date_display,
         time_display,
+        greeting,
     }: ChroniclePageStateRx,
 ) -> View<G> {
     if G::IS_BROWSER {
         perseus::spawn_local(
-            cloned!((date_display, time_display, chronicle_id) => async move {
+            cloned!((date_display, short_date_display, time_display, chronicle_id, greeting) => async move {
                 let javascript_date: Date = Date::new_0();
 
                 let day_of_week: String = get_day_of_week_from_integer(javascript_date.get_day());
@@ -39,32 +44,62 @@ pub fn chronicle_page(
                 let year: u32 = javascript_date.get_full_year();
                 let month: String = get_month_from_integer(javascript_date.get_month());
 
-                let time: JsString = Date::to_time_string(&javascript_date);
+                let time: JsString = Date::to_locale_time_string(&javascript_date, "en-US");
                 time_display.set(time.as_string().unwrap());
-                let date_time_value: String = format!("{day_of_week} , {month} {date}, {year}");
-                date_display.set(date_time_value);
+                date_display.set(format!("{day_of_week}, {month} {date}, {year}"));
+                short_date_display.set(format!("{}/{}/{}", javascript_date.get_full_year(), javascript_date.get_month(), javascript_date.get_day()));
 
                 let query_response = http_service::get_endpoint(API_CHRONICLE_TODAY_URL ,None).await;
-
+                match query_response {
+                    Some(response) => {
+                        let chronicle_data: PersonChroncile = serde_json::from_str(&response).unwrap();
+                        chronicle_id.set(chronicle_data.chronicle_id);
+                        if let Some(alias) = chronicle_data.person_alias {
+                            user_alias.set(alias);
+                        }
+                    },
+                    None => todo!(),
+                }
+                match javascript_date.get_hours() {
+                    hour if hour < 11_u32 && hour >= 5_u32 => greeting.set(format!("Good Morning, {}", user_alias.get())),
+                    hour if hour >= 12_u32 && hour < 17_u32 => greeting.set(format!("Good Afternoon, {}", user_alias.get())),
+                    hour if hour >= 17_u32 || hour < 5_u32 => greeting.set(format!("Good Evening, {}", user_alias.get())),
+                    _ => greeting.set(format!("Hello, {}", user_alias.get()))
+                }
 
             }),
         );
-
-        perseus::spawn_local(cloned!( => async move {
-        }));
     }
 
     view! {
             Container(ContainerProperties {
                 title: String::from("Chronicle"),
                 children: view! {
-                    div(class="row flex-grow-1"){
-                        div(class="col-10 bg-white p-4 shadow border-0 rounded") {
-                            h2 { (date_display.get()) }
-                            h3 { (time_display.get()) }
-                            h3 { "Hello, " (user_alias.get()) }
+                    div(class="container-fluid d-flex flex-grow-1") {
+                        div(class="row flex-grow-1 text-black"){
+                            div(class="col-10 bg-white p-5 shadow border-0 rounded") {
+                                div(class="d-flex align-items-baseline") {
+                                    h2(class="display-6 flex-grow-1") { (date_display.get()) }
+                                    div(class="fw-normal flex-shrink-1 badge fs-5 bg-success") {
+                                        (format!("{} {}", short_date_display.get(), time_display.get()))
+                                    }
+                                }
+
+                                h3(class="display-6") { (greeting.get()) }
+                            }
+                            div(class="col-2") {
+                                div(class="card shadow border-0 rounded") {
+                                    div(class="card-body") {
+                                        h3(class="card-title") { "Objectives" }
+                                        p(class="card-text") {
+                                            ul() {
+                                                li() { "-" }
+                                            }
+                                        }
+                                    }
+                                }
+                            }
                         }
-                        div(class="col-2") {}
                     }
             },
         })
@@ -80,7 +115,9 @@ pub async fn get_build_state(
         user_alias: String::from("Stranger"),
         chronicle_id: String::new(),
         date_display: String::new(),
+        short_date_display: String::new(),
         time_display: String::new(),
+        greeting: String::new(),
     })
 }
 
