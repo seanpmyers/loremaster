@@ -8,7 +8,7 @@ edition = "2021"
 
 [dependencies]
 # Error handling
-anyhow = "1.0.60"
+anyhow = "1.0.61"
 # Password Encryption
 argon2 = "0.4.1"
 # A web application framework that focuses on ergonomics and modularity.
