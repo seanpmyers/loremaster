@@ -15,6 +15,9 @@ pub fn navigation_links() -> View<G> {
                     a(href = "/about", id="about-link", class = (a_class) ) { "About" }
                 }
                 li(class = (li_class)) {
+                    a(href = "/you", id="you-link", class = (a_class) ) { "You" }
+                }
+                li(class = (li_class)) {
                     a(href = "/chronicle", id="chronicle-link", class = (a_class) ) { "Chronicle" }
                 }
                 li(class = (li_class)) {
