@@ -8,12 +8,12 @@ edition = "2021"
 
 [dependencies]
 # Error handling
-anyhow = "1.0.60"
+anyhow = "1.0.61"
 # Password Encryption
 argon2 = "0.4.1"
 # A web application framework that focuses on ergonomics and modularity.
-axum = { version = "0.5.13", features = ["headers"] }
-axum-extra = { version = "0.3.6", features = [
+axum = { version = "0.5.15", features = ["headers"] }
+axum-extra = { version = "0.3.7", features = [
 	"cookie",
 	"cookie-private",
 	"cookie-signed",
@@ -22,13 +22,13 @@ axum-extra = { version = "0.3.6", features = [
 # Logging
 env_logger = "0.9.0"
 # Provides async programming foundational functionality
-futures = "0.3.21"
+futures = "0.3.23"
 # Logging
 log = "0.4.17"
 # Random nubmer generation
 rand = "0.8.5"
 # Serialization
-serde = { version = "1.0.142", features = ["derive"] }
+serde = { version = "1.0.143", features = ["derive"] }
 serde_json = "1.0.83"
 # Database client/pool/toolkit
 sqlx = { version = "0.6.1", features = [
@@ -45,7 +45,7 @@ sqlx = { version = "0.6.1", features = [
 # Error/exception handling
 thiserror = "1.0.32"
 # Time
-time = { version = "0.3.12", features = ["serde", "std"] }
+time = { version = "0.3.13", features = ["serde", "std"] }
 # Backend async I/O functionality
 tokio = { version = "1.20.1", features = ["full"] }
 tokio-stream = "0.1.9"
