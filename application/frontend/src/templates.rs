@@ -3,3 +3,4 @@ pub mod chronicle;
 pub mod index;
 pub mod login;
 pub mod registration;
+pub mod you;
