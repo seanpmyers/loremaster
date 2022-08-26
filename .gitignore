@@ -1,9 +1,23 @@
-/application/target
-application/frontend/resources/styles/library/*
+# Rust Rocket File
 Rocket.toml
+
+# Application Configuration File
 loremaster.toml
 Loremaster.toml
+
+# Rust
+/application/target
 /application/frontend/target
 /application/frontend/dist
+
+# Environment files
 .env
+
+# Third Party CSS Frameworks/Stylesheets
 application/frontend/static/bootstrap-5.2.0-dist/
+application/frontend/resources/styles/library/*
+
+# Terraform
+*.gcp-service-account.json
+.terraform/
+*.tfstate
