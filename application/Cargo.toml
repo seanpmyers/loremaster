@@ -22,7 +22,7 @@ axum-extra = { version = "0.3.7", features = [
 # Logging
 env_logger = "0.9.0"
 # Provides async programming foundational functionality
-futures = "0.3.23"
+futures = "0.3.24"
 # Logging
 log = "0.4.17"
 # Random nubmer generation
