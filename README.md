@@ -1,6 +1,7 @@
 # loremaster
 
-[![Build Status](https://github.com/seanpmyers/loremaster/workflows/Build/badge.svg)](https://github.com/seanpmyers/loremaster/actions)[![rust-clippy analyze](https://github.com/seanpmyers/loremaster/workflows/rust-clippy%20analyze/badge.svg)](https://github.com/seanpmyers/loremaster/actions)
+[![Backend Build](https://github.com/seanpmyers/loremaster/actions/workflows/backend_build.yml/badge.svg)](https://github.com/seanpmyers/loremaster/actions/workflows/backend_build.yml)
+[![rust-clippy analyze](https://github.com/seanpmyers/loremaster/workflows/rust-clippy%20analyze/badge.svg)](https://github.com/seanpmyers/loremaster/actions)
 
 Streamlined planning and tracking of life goals, actions, and outcomes.
 
