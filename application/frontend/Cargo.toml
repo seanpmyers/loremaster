@@ -11,10 +11,10 @@ js-sys = { version = "0.3.59" }
 log = { version = "0.4.17" }
 perseus = { version = "0.3.5" }
 reqwasm = { version = "0.5.0" }
-serde = { version = "1.0.142", features = ["derive"] }
-serde_json = { version = "1.0.83" }
+serde = { version = "1.0.144", features = ["derive"] }
+serde_json = { version = "1.0.85" }
 sycamore = { version = "0.7.1" }
-time = { version = "0.3.12", features = ["serde", "std"] }
+time = { version = "0.3.14", features = ["serde", "std"] }
 ureq = { version = "2.5.0" }
 wasm-bindgen = { version = "0.2.82" }
 web-sys = { version = "0.3.59", features = [
