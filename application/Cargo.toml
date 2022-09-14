@@ -43,7 +43,7 @@ sqlx = { version = "0.6.1", features = [
 	"uuid",
 ] }
 # Error/exception handling
-thiserror = "1.0.34"
+thiserror = "1.0.35"
 # Time
 time = { version = "0.3.14", features = ["serde", "std"] }
 # Backend async I/O functionality
