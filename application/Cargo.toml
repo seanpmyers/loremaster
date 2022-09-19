@@ -20,7 +20,7 @@ axum-extra = { version = "0.3.7", features = [
 	"form",
 ] }
 # Logging
-env_logger = "0.9.0"
+env_logger = "0.9.1"
 # Provides async programming foundational functionality
 futures = "0.3.24"
 # Logging
@@ -48,7 +48,7 @@ thiserror = "1.0.35"
 time = { version = "0.3.14", features = ["serde", "std"] }
 # Backend async I/O functionality
 tokio = { version = "1.21.1", features = ["full"] }
-tokio-stream = "0.1.9"
+tokio-stream = "0.1.10"
 tokio-test = "0.4.2"
 # Encode/decode TOML content/files
 toml = "0.5.9"
