@@ -14,7 +14,7 @@ reqwasm = { version = "0.5.0" }
 serde = { version = "1.0.145", features = ["derive"] }
 serde_json = { version = "1.0.85" }
 sycamore = { version = "0.7.1" }
-time = { version = "0.3.14", features = ["serde", "std"] }
+time = { version = "0.3.15", features = ["serde", "std"] }
 ureq = { version = "2.5.0" }
 wasm-bindgen = { version = "0.2.83" }
 web-sys = { version = "0.3.60", features = [
