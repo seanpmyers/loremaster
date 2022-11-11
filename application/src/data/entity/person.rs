@@ -23,4 +23,14 @@ pub struct Credentials {
     pub encrypted_password: String,
 }
 
+#[derive(Deserialize, Serialize, Debug, Clone, sqlx::FromRow)]
+pub struct PersonMeta {
+    pub id: Uuid,
+    #[serde(rename(serialize = "emailAddress"))]
+    pub email_address: String,
+    #[serde(rename(serialize = "registrationDate"))]
+    pub registration_date: OffsetDateTime,
+    pub alias: Option<String>,
+}
+
 // pub struct SessionKey (String);

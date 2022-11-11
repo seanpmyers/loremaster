@@ -46,6 +46,7 @@ async fn main() -> Result<()> {
     let application_router: Router = Router::new()
         .merge(api::router::authentication::router())
         .merge(api::router::chronicle::router())
+        .merge(api::router::person::router())
         .layer(Extension(encryption_service))
         .layer(Extension(postgres_service))
         .layer(Extension(Key::from(configuration.site_secret.as_bytes())))

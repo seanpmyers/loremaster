@@ -47,7 +47,7 @@ pub fn chronicle_page(
                 let time: JsString = Date::to_locale_time_string(&javascript_date, "en-US");
                 time_display.set(time.as_string().unwrap());
                 date_display.set(format!("{day_of_week}, {month} {date}, {year}"));
-                short_date_display.set(format!("{}/{}/{}", javascript_date.get_full_year(), javascript_date.get_month(), javascript_date.get_day()));
+                short_date_display.set(format!("{}/{}/{}", javascript_date.get_full_year(), javascript_date.get_month(), javascript_date.get_date()));
 
                 let query_response = http_service::get_endpoint(API_CHRONICLE_TODAY_URL ,None).await;
                 match query_response {
