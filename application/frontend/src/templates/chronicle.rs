@@ -5,7 +5,7 @@ use sycamore::prelude::{cloned, view, Html, SsrNode, View};
 
 use crate::{
     components::container::{Container, ContainerProperties},
-    data::entity::person_chronicle::PersonChroncile,
+    data::entity::person_chronicle::PersonChronicle,
     utility::{
         constants::API_CHRONICLE_TODAY_URL,
         date_time_helper::{get_day_of_week_from_integer, get_month_from_integer},
@@ -52,7 +52,7 @@ pub fn chronicle_page(
                 let query_response = http_service::get_endpoint(API_CHRONICLE_TODAY_URL ,None).await;
                 match query_response {
                     Some(response) => {
-                        let chronicle_data: PersonChroncile = serde_json::from_str(&response).unwrap();
+                        let chronicle_data: PersonChronicle = serde_json::from_str(&response).unwrap();
                         chronicle_id.set(chronicle_data.chronicle_id);
                         if let Some(alias) = chronicle_data.person_alias {
                             user_alias.set(alias);
