@@ -1,14 +1,18 @@
 use axum::{
     http::StatusCode,
     response::{IntoResponse, Response},
-    routing::get,
+    routing::{get, post},
     Extension, Json, Router,
 };
 use axum_extra::extract::Form;
 use serde::{Deserialize, Serialize};
 
 use crate::{
-    api::{guards::user::User, handler::person::get_person_meta_data, response::ApiError},
+    api::{
+        guards::user::User,
+        handler::person::{get_person_meta_data, update_person_meta_data},
+        response::ApiError,
+    },
     data::{entity::person::PersonMeta, postgres_handler::PostgresHandler},
 };
 
@@ -26,6 +30,30 @@ pub async fn meta(
         )
             .into_response()),
     }
+}
+
+#[derive(Deserialize, Debug)]
+pub struct UpdatePersonMetaForm {
+    email_address: String,
+    alias: String,
+}
+
+pub async fn update_meta(
+    postgres_service: Extension<PostgresHandler>,
+    user: User,
+    Form(form): Form<UpdatePersonMetaForm>,
+) -> Result<Response, ApiError> {
+    let sanitized_email_address: &str = form.email_address.trim();
+    let sanitized_alias: &str = form.alias.trim();
+
+    let result: PersonMeta = update_person_meta_data(
+        &postgres_service.database_pool,
+        &user.0,
+        sanitized_email_address,
+        sanitized_alias,
+    )
+    .await?;
+    Ok((StatusCode::OK, Json(result)).into_response())
 }
 
 #[derive(Deserialize, Serialize, Debug)]
@@ -51,8 +79,11 @@ pub async fn compounding_interest_calculator(
 }
 
 pub fn router() -> Router {
-    Router::new().route("/person/meta", get(meta)).route(
-        "/person/compounding_interest_calculator",
-        get(compounding_interest_calculator),
-    )
+    Router::new()
+        .route("/person/meta", get(meta))
+        .route("/person/update/meta", post(update_meta))
+        .route(
+            "/person/compounding-interest-calculator",
+            get(compounding_interest_calculator),
+        )
 }
