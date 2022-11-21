@@ -1,13 +1,13 @@
 use serde::{Deserialize, Serialize};
-use time::{Date, OffsetDateTime};
+use time::OffsetDateTime;
 use uuid::Uuid;
 
 #[derive(Deserialize, Serialize, Debug, Clone, sqlx::FromRow)]
 #[serde(rename_all = "camelCase")]
-pub struct Chronicle {
+pub struct Intention {
     pub id: Uuid,
+    pub action_id: Uuid,
     pub person_id: Uuid,
-    pub date_recorded: Date,
-    pub notes: Option<String>,
-    pub creation_time: Option<OffsetDateTime>,
+    pub chronicle_id: Option<Uuid>,
+    pub intended_time: Option<OffsetDateTime>,
 }

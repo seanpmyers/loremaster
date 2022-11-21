@@ -2,6 +2,7 @@ use js_sys::{Date, JsString};
 
 use perseus::{RenderFnResultWithCause, Template};
 use sycamore::prelude::{cloned, view, Html, SsrNode, View};
+use uuid::Uuid;
 
 use crate::{
     components::container::{Container, ContainerProperties},
@@ -16,7 +17,7 @@ use crate::{
 #[perseus::make_rx(ChroniclePageStateRx)]
 pub struct ChroniclePageState {
     pub user_alias: String,
-    pub chronicle_id: String,
+    pub chronicle_id: Uuid,
     pub date_display: String,
     pub short_date_display: String,
     pub time_display: String,
@@ -86,6 +87,9 @@ pub fn chronicle_page(
                                 }
 
                                 h3(class="display-6") { (greeting.get()) }
+                                div() {
+                                    div() { "What do you intend to do today?" }
+                                }
                             }
                             div(class="col-3") {
                                 div(class="card shadow border-0 rounded") {
@@ -113,7 +117,7 @@ pub async fn get_build_state(
 ) -> RenderFnResultWithCause<ChroniclePageState> {
     Ok(ChroniclePageState {
         user_alias: String::from("Stranger"),
-        chronicle_id: String::new(),
+        chronicle_id: Uuid::nil(),
         date_display: String::new(),
         short_date_display: String::new(),
         time_display: String::new(),

@@ -10,10 +10,16 @@ use serde::{Deserialize, Serialize};
 use crate::{
     api::{
         guards::user::User,
-        handler::person::{get_person_meta_data, update_person_meta_data},
+        handler::person::{
+            create_action, get_action_list_handler, get_person_meta_data, update_person_meta_data,
+            UniqueEntryResult,
+        },
         response::ApiError,
     },
-    data::{entity::person::PersonMeta, postgres_handler::PostgresHandler},
+    data::{
+        entity::{action::Action, person::PersonMeta},
+        postgres_handler::PostgresHandler,
+    },
 };
 
 pub async fn meta(
@@ -56,6 +62,36 @@ pub async fn update_meta(
     Ok((StatusCode::OK, Json(result)).into_response())
 }
 
+#[derive(Deserialize, Debug)]
+pub struct NewActionForm {
+    action: String,
+}
+
+pub async fn new_action(
+    postgres_service: Extension<PostgresHandler>,
+    _user: User,
+    Form(form): Form<NewActionForm>,
+) -> Result<Response, ApiError> {
+    let sanitized_action = form.action.trim().to_ascii_lowercase();
+    let result = create_action(&postgres_service.database_pool, &sanitized_action).await?;
+    match result {
+        UniqueEntryResult::Created => {
+            Ok((StatusCode::CREATED, "New action successfully created!").into_response())
+        }
+        UniqueEntryResult::Exists => {
+            Ok((StatusCode::ALREADY_REPORTED, "Action already exists.").into_response())
+        }
+    }
+}
+
+pub async fn get_action_list(
+    postgres_service: Extension<PostgresHandler>,
+    _user: User,
+) -> Result<Response, ApiError> {
+    let result: Vec<Action> = get_action_list_handler(&postgres_service.database_pool).await?;
+    Ok((StatusCode::OK, Json(result)).into_response())
+}
+
 #[derive(Deserialize, Serialize, Debug)]
 pub struct CompoundingInterestInputs {
     pub duration_in_years: u16,
@@ -82,6 +118,8 @@ pub fn router() -> Router {
     Router::new()
         .route("/person/meta", get(meta))
         .route("/person/update/meta", post(update_meta))
+        .route("/action/new", post(new_action))
+        .route("/action/list", get(get_action_list))
         .route(
             "/person/compounding-interest-calculator",
             get(compounding_interest_calculator),

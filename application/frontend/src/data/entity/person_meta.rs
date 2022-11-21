@@ -1,9 +1,10 @@
 use serde::{Deserialize, Serialize};
 use time::OffsetDateTime;
+use uuid::Uuid;
 
 #[derive(Deserialize, Serialize, Debug, Clone)]
 pub struct PersonMeta {
-    pub id: String,
+    pub id: Uuid,
     #[serde(rename(deserialize = "emailAddress"))]
     pub email_address: String,
     #[serde(rename(deserialize = "registrationDate"))]

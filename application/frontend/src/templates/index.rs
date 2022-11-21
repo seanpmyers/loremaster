@@ -4,6 +4,7 @@ use sycamore::{
     prelude::{view, View},
     reactive::cloned,
 };
+use web_sys::Event;
 
 use crate::components::container::{Container, ContainerProperties};
 
@@ -28,7 +29,8 @@ pub fn index_page(
         current_tab,
     }: IndexPageStateRx,
 ) -> View<G> {
-    let click_first = cloned!((current_tab) => move |_| {
+    let click_first = cloned!((current_tab) => move |event: Event| {
+        event.prevent_default();
         current_tab.set(Tab::First);
     });
     let click_second = cloned!((current_tab) => move |_| {
@@ -45,7 +47,7 @@ pub fn index_page(
             div(class="d-flex flex-column flex-grow-1 p-4 align-items-center") {
                 h1(class="display-3") { "Loremaster" }
                 p() { (greeting.get()) }
-                div(class="d-flex") {
+                div(class="d-flex", id="lm-tab-test") {
                     button(class="p-1 btn btn-primary", on:click=click_first) { "First" }
                     button(class="p-1 btn btn-primary", on:click=click_second) { "Second" }
                     button(class="p-1 btn btn-primary", on:click=click_third) { "Third" }
