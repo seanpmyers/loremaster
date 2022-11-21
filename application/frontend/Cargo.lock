@@ -193,6 +193,7 @@ dependencies = [
  "sycamore",
  "time 0.3.17",
  "ureq",
+ "uuid",
  "wasm-bindgen",
  "web-sys",
 ]
@@ -1035,6 +1036,15 @@ name = "utf8-width"
 version = "0.1.6"
 source = "registry+https://github.com/rust-lang/crates.io-index"
 checksum = "5190c9442dcdaf0ddd50f37420417d219ae5261bbf5db120d0f9bab996c9cba1"
+
+[[package]]
+name = "uuid"
+version = "1.2.2"
+source = "registry+https://github.com/rust-lang/crates.io-index"
+checksum = "422ee0de9031b5b948b97a8fc04e3aa35230001a722ddd27943e0be31564ce4c"
+dependencies = [
+ "serde",
+]
 
 [[package]]
 name = "version_check"

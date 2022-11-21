@@ -23,6 +23,8 @@ axum-extra = { version = "0.3.7", features = [
 env_logger = "0.9.3"
 # Provides async programming foundational functionality
 futures = "0.3.25"
+# A library for HTML entity encoding and decoding
+htmlescape = { version = "0.3.1" }
 # Logging
 log = "0.4.17"
 # Random nubmer generation
