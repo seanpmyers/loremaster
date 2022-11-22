@@ -12,7 +12,7 @@ log = { version = "0.4.17" }
 perseus = { version = "0.3.6" }
 reqwasm = { version = "0.5.0" }
 serde = { version = "1.0.147", features = ["derive"] }
-serde_json = { version = "1.0.87" }
+serde_json = { version = "1.0.88" }
 sycamore = { version = "0.7.1" }
 time = { version = "0.3.17", features = ["serde", "std"] }
 ureq = { version = "2.5.0" }
