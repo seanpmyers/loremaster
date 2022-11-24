@@ -7,11 +7,13 @@ use crate::data::entity::person::PersonMeta;
 const QUERY: &str = "
 SELECT
    person.id
-	 , person.email_address
+	 , email_address.display as email_address
 	 , registration_date
 	 , alias
 FROM
    public.person
+INNER JOIN
+   public.email_address ON email_address.id = person.email_address_id
 WHERE
    person.id = $1
 LIMIT 

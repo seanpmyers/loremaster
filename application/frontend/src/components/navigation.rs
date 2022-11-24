@@ -6,25 +6,25 @@ pub fn navigation_links() -> View<G> {
     let a_class: &str = "nav-link loremaster-text fs-5";
     let li_class: &str = "nav-item hover-border-bottom";
     view! {
-        nav(class="container-fluid border-bottom-1 rounded p-3") {
+        nav(class="container-fluid border-bottom-1 border p-3") {
             ul(class="nav align-items-baseline") {
                 li(class = (li_class)) {
                     a(href = "/", id="index-link", class = (app_name_class) ) { "Loremaster" }
                 }
                 li(class = (li_class)) {
-                    a(href = "/about", id="about-link", class = (a_class) ) { "About" }
+                    a(href = "/about/", id="about-link", class = (a_class) ) { "About" }
                 }
                 li(class = (li_class)) {
-                    a(href = "/you", id="you-link", class = (a_class) ) { "You" }
+                    a(href = "/you/", id="you-link", class = (a_class) ) { "You" }
                 }
                 li(class = (li_class)) {
-                    a(href = "/chronicle", id="chronicle-link", class = (a_class) ) { "Chronicle" }
+                    a(href = "/chronicle/", id="chronicle-link", class = (a_class) ) { "Chronicle" }
                 }
                 li(class = (li_class)) {
-                    a(href = "/registration", id="registration-link", class = (a_class) ) { "Registration" }
+                    a(href = "/registration/", id="registration-link", class = (a_class) ) { "Registration" }
                 }
                 li(class = (li_class)) {
-                    a(href = "/login", id="login-link", class = (a_class) ) { "Login" }
+                    a(href = "/login/", id="login-link", class = (a_class) ) { "Login" }
                 }
             }
         }

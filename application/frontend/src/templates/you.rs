@@ -7,7 +7,8 @@ use crate::{
     data::entity::{action::Action, person_meta::PersonMeta},
     utility::{
         constants::{
-            API_ACTION_LIST_ROUTE, API_ACTION_NEW_ROUTE, API_BASE_URL, API_PERSON_META_DATA_ROUTE,
+            API_ACTION_LIST_ROUTE, API_ACTION_NEW_ROUTE, API_BASE_URL,
+            API_PERSON_EMAIL_ADDRESS_UPDATE_ROUTE, API_PERSON_META_DATA_ROUTE,
             API_PERSON_META_UPDATE_ROUTE,
         },
         http_service,
@@ -33,6 +34,7 @@ pub fn you_page(
 ) -> View<G> {
     let email_address_input: Signal<String> = email_address.clone();
     let alias_input: Signal<String> = alias.clone();
+    let display_alias: Signal<String> = alias.clone();
     let new_action_input: Signal<String> = new_action.clone();
     if G::IS_BROWSER {
         perseus::spawn_local(cloned!((email_address, alias, action_list) => async move {
@@ -59,19 +61,26 @@ pub fn you_page(
         }));
     }
 
-    let save_handler = move |event: Event| {
+    let update_email_address_handler = move |event: Event| {
         event.prevent_default();
-        perseus::spawn_local(cloned!((email_address, alias) => async move {
-
-            http_service::post_html_form(&format!("{}/{}",API_BASE_URL,API_PERSON_META_UPDATE_ROUTE), &vec![
+        perseus::spawn_local(cloned!((email_address) => async move {
+            http_service::post_html_form(&format!("{}/{}",API_BASE_URL,API_PERSON_EMAIL_ADDRESS_UPDATE_ROUTE), &vec![
                 (String::from("email_address"), email_address.get().as_ref().to_string()),
-                (String::from("alias"), alias.get().as_ref().to_string()),
             ]).await;
 
         }));
     };
 
-    let save_action_handler = move |event: Event| {
+    let update_meta_handler = move |event: Event| {
+        event.prevent_default();
+        perseus::spawn_local(cloned!((alias) => async move {
+            http_service::post_html_form(&format!("{}/{}",API_BASE_URL,API_PERSON_META_UPDATE_ROUTE), &vec![
+                (String::from("alias"), alias.get().as_ref().to_string()),
+            ]).await;
+        }));
+    };
+
+    let new_action_handler = move |event: Event| {
         event.prevent_default();
         perseus::spawn_local(cloned!((new_action) => async move {
             http_service::post_html_form(&format!("{}/{}",API_BASE_URL,API_ACTION_NEW_ROUTE), &vec![
@@ -81,17 +90,17 @@ pub fn you_page(
         }));
     };
 
-    let section_classes: &str = "border rounded border-success p-2 m-2";
+    let section_classes: &str = "border rounded bg-white shadow p-2 m-2 ";
 
     view! {
         Container(ContainerProperties{title: String::from("You"), children: view!{
             div(class="d-flex flex-column flex-grow-1 p-4 align-items-center") {
                 div() {
-                    h1(class="display-3") { "You" }
+                    h1(class="display-3") { ( display_alias.get()) }
                     p() { "This is a page dedicated to you." }
                 }
-                div(class="d-flex") {
-                    form(on:submit=save_handler, class=(section_classes)) {
+                div(class="d-flex flex-wrap") {
+                    form(on:submit=update_email_address_handler, class=(section_classes)) {
                         div(class="mb-3") {
                             label(class="form-label") {"Email Address"}
                             input(
@@ -102,6 +111,11 @@ pub fn you_page(
                                 placeholder = "Enter your email address"
                             ) {}
                         }
+                        div(class="mb-3") {
+                            button(class="btn btn-primary", type="submit") { "Save" }
+                        }
+                     }
+                     form(on:submit=update_meta_handler, class=(section_classes)) {
                         div(class="mb-3") {
                             label(class="form-label") {"Alias"}
                             input(
@@ -116,7 +130,7 @@ pub fn you_page(
                             button(class="btn btn-primary", type="submit") { "Save" }
                         }
                      }
-                     form(on:submit=save_action_handler, class=(section_classes)) {
+                     form(on:submit=new_action_handler, class=(section_classes)) {
                         div(class="mb-3") {
                             label(class="form-label") {"New Action"}
                             input(
@@ -143,6 +157,44 @@ pub fn you_page(
                             })
                          }
                      }
+                     form(class=(section_classes)) {
+                        div(class="mb-3") {
+                            label(class="form-label") {"New Intention"}
+
+                        }
+                        div(class="mb-3") {
+                            label(class="form-label") {"Select action"}
+                            select(name="action", class="form-select") {
+                                option(selected=true, disabled=true) { "Select an action" }
+                                Keyed(KeyedProps {
+                                    iterable: action_list.handle(),
+                                    template: move |action| view! {
+                                        option(value=(action.id)) { (action.name) }
+                                    },
+                                    key: |action| action.id
+                                })
+                            }
+                        }
+                        div(class="mb-3") {
+                            label(class="form-label") {"Date"}
+                            input(type="datetime-local",class="form-control") {}
+                        }
+                        div(class="mb-3") {
+                            button(class="btn btn-primary", type="submit") { "Add" }
+                        }
+                     }
+                     div(class=(section_classes)) {
+                        div() { "Intentions" }
+                        ul() {
+
+                         }
+                     }
+                     div(class=(section_classes)) {
+                        div() { "Goals" }
+                        ul() {
+
+                         }
+                     }
                 }
             }
         }})
@@ -163,7 +215,7 @@ pub async fn get_build_state(
 ) -> RenderFnResultWithCause<YouPageState> {
     Ok(YouPageState {
         email_address: String::new(),
-        alias: String::new(),
+        alias: String::from("You"),
         new_action: String::new(),
         action_list: Vec::new(),
     })

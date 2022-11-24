@@ -10,7 +10,7 @@ const QUERY: &str = "
     INSERT INTO
         public.person (
             id
-            , email_address 
+            , email_address_id
             , encrypted_password
             , registration_date 
             , alias
@@ -20,7 +20,7 @@ const QUERY: &str = "
     ($1, $2, $3, $4, $5, $6)
     RETURNING
         id
-        , email_address 
+        , email_address_id
         , encrypted_password
         , registration_date 
         , alias
@@ -29,7 +29,7 @@ const QUERY: &str = "
 
 pub async fn create_person_query(
     database_connection: &PgPool,
-    email_address: &str,
+    email_address_id: &Uuid,
     encrypted_password: &str,
     alias: Option<&str>,
     chronicle_id: Option<Uuid>,
@@ -40,7 +40,7 @@ pub async fn create_person_query(
 
     let query_result: Person = query_as::<_, Person>(QUERY)
         .bind(&new_person_id)
-        .bind(&email_address)
+        .bind(&email_address_id)
         .bind(&encrypted_password)
         .bind(&creation_date)
         .bind(&alias)

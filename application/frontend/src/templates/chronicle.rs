@@ -88,13 +88,17 @@ pub fn chronicle_page(
 
                                 h3(class="display-6") { (greeting.get()) }
                                 div() {
-                                    div() { "What do you intend to do today?" }
+                                    label() { "What do you intend to do today?" }
+                                }
+                                div(class="d-flex flex-column") {
+                                    label() { "Notes" }
+                                    textarea(rows="4", cols="50") {}
                                 }
                             }
                             div(class="col-3") {
                                 div(class="card shadow border-0 rounded") {
                                     div(class="card-body") {
-                                        h3(class="card-title") { "Objectives" }
+                                        h3(class="card-title") { "Goals" }
                                         p(class="card-text") {
                                             ul() {
                                                 li() { "-" }
