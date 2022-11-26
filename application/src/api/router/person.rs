@@ -1,8 +1,9 @@
 use axum::{
+    extract::State,
     http::StatusCode,
     response::{IntoResponse, Response},
     routing::{get, post},
-    Extension, Json, Router,
+    Json, Router,
 };
 use axum_extra::extract::Form;
 use log::info;
@@ -21,10 +22,11 @@ use crate::{
         entity::{action::Action, person::PersonMeta},
         postgres_handler::PostgresHandler,
     },
+    ApplicationState,
 };
 
 pub async fn meta(
-    postgres_service: Extension<PostgresHandler>,
+    State(postgres_service): State<PostgresHandler>,
     user: User,
 ) -> Result<Response, ApiError> {
     let result: Option<PersonMeta> =
@@ -45,7 +47,7 @@ pub struct UpdatePersonMetaForm {
 }
 
 pub async fn update_meta(
-    postgres_service: Extension<PostgresHandler>,
+    State(postgres_service): State<PostgresHandler>,
     user: User,
     Form(form): Form<UpdatePersonMetaForm>,
 ) -> Result<Response, ApiError> {
@@ -60,7 +62,7 @@ pub struct UpdatePersonEmailAddressForm {
 }
 
 pub async fn update_email_address(
-    postgres_service: Extension<PostgresHandler>,
+    State(postgres_service): State<PostgresHandler>,
     user: User,
     Form(form): Form<UpdatePersonEmailAddressForm>,
 ) -> Result<Response, ApiError> {
@@ -90,7 +92,7 @@ pub struct NewActionForm {
 }
 
 pub async fn new_action(
-    postgres_service: Extension<PostgresHandler>,
+    State(postgres_service): State<PostgresHandler>,
     user: User,
     Form(form): Form<NewActionForm>,
 ) -> Result<Response, ApiError> {
@@ -108,7 +110,7 @@ pub async fn new_action(
 }
 
 pub async fn get_action_list(
-    postgres_service: Extension<PostgresHandler>,
+    State(postgres_service): State<PostgresHandler>,
     _user: User,
 ) -> Result<Response, ApiError> {
     let result: Vec<Action> = get_action_list_handler(&postgres_service.database_pool).await?;
@@ -121,7 +123,7 @@ pub struct NewGoalForm {
 }
 
 pub async fn new_goal(
-    postgres_service: Extension<PostgresHandler>,
+    State(postgres_service): State<PostgresHandler>,
     user: User,
     Form(form): Form<NewGoalForm>,
 ) -> Result<Response, ApiError> {
@@ -160,16 +162,16 @@ pub async fn compounding_interest_calculator(
     Ok((StatusCode::OK, Json(result)).into_response())
 }
 
-pub fn router() -> Router {
+pub fn router() -> Router<ApplicationState> {
     Router::new()
         .route("/person/meta", get(meta))
-        .route("/person/update/meta", post(update_meta))
-        .route("/person/update/email_address", post(update_email_address))
-        .route("/person/goal/new", post(new_goal))
-        .route("/action/new", post(new_action))
         .route("/action/list", get(get_action_list))
         .route(
             "/person/compounding-interest-calculator",
             get(compounding_interest_calculator),
         )
+        .route("/person/update/meta", post(update_meta))
+        .route("/person/update/email_address", post(update_email_address))
+        .route("/person/goal/new", post(new_goal))
+        .route("/action/new", post(new_action))
 }

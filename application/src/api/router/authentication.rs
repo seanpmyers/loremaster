@@ -2,10 +2,11 @@ use std::str::FromStr;
 
 use anyhow::anyhow;
 use axum::{
+    extract::State,
     http::StatusCode,
     response::{IntoResponse, Response},
     routing::post,
-    Extension, Router,
+    Router,
 };
 use axum_extra::extract::{
     cookie::{Cookie, SameSite},
@@ -31,6 +32,7 @@ use crate::{
         },
         password_encryption::{PasswordEncryption, PasswordEncryptionService},
     },
+    ApplicationState,
 };
 
 #[derive(Deserialize, Debug)]
@@ -40,8 +42,8 @@ struct CredentialsForm {
 }
 
 async fn register(
-    postgres_service: Extension<PostgresHandler>,
-    encryption_service: Extension<PasswordEncryptionService>,
+    State(postgres_service): State<PostgresHandler>,
+    State(encryption_service): State<PasswordEncryptionService>,
     Form(registration_form): Form<CredentialsForm>,
 ) -> Result<Response, ApiError> {
     info!("API CALL: /authentication/register");
@@ -77,8 +79,8 @@ async fn register(
 }
 
 async fn authenticate(
-    postgres_service: Extension<PostgresHandler>,
-    encryption_service: Extension<PasswordEncryptionService>,
+    State(postgres_service): State<PostgresHandler>,
+    State(encryption_service): State<PasswordEncryptionService>,
     cookie_jar: PrivateCookieJar,
     Form(authentication_form): Form<CredentialsForm>,
 ) -> Result<Response, ApiError> {
@@ -134,7 +136,7 @@ async fn logout(cookie_jar: PrivateCookieJar) -> Result<Response, ApiError> {
     Ok((updated_cookie_jar, "Successfully logged out.").into_response())
 }
 
-pub fn router() -> Router {
+pub fn router() -> Router<ApplicationState> {
     Router::new()
         .route("/authentication/authenticate", post(authenticate))
         .route("/authentication/logout", post(logout))

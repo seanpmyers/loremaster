@@ -78,7 +78,7 @@ pub fn chronicle_page(
                 children: view! {
                     div(class="container-fluid d-flex flex-grow-1") {
                         div(class="row flex-grow-1 text-black"){
-                            div(class="col-9 bg-white p-5 shadow border-0 rounded") {
+                            div(class="col-9 bg-white p-5 border-0 rounded") {
                                 div(class="d-flex align-items-baseline") {
                                     h2(class="display-6 flex-grow-1") { (date_display.get()) }
                                     div(class="fw-normal flex-shrink-1 badge fs-5 bg-success") {

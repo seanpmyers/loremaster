@@ -1,5 +1,7 @@
 use anyhow::Result;
-use axum::{http::StatusCode, response::IntoResponse, routing::get_service, Extension, Router};
+use axum::extract::FromRef;
+use axum::routing::MethodRouter;
+use axum::{http::StatusCode, response::IntoResponse, routing::get_service, Router};
 use axum_extra::extract::cookie::Key;
 use env_logger::{Builder, Target};
 use log::{info, LevelFilter};
@@ -22,6 +24,31 @@ use crate::utility::{
     password_encryption::{PasswordEncryption, PasswordEncryptionService},
 };
 
+#[derive(Clone)]
+pub struct ApplicationState {
+    postgres_service: PostgresHandler,
+    encryption_service: PasswordEncryptionService,
+    key: Key,
+}
+
+impl FromRef<ApplicationState> for PostgresHandler {
+    fn from_ref(state: &ApplicationState) -> Self {
+        state.postgres_service.clone()
+    }
+}
+
+impl FromRef<ApplicationState> for Key {
+    fn from_ref(state: &ApplicationState) -> Self {
+        state.key.clone()
+    }
+}
+
+impl FromRef<ApplicationState> for PasswordEncryptionService {
+    fn from_ref(state: &ApplicationState) -> Self {
+        state.encryption_service.clone()
+    }
+}
+
 #[tokio::main]
 async fn main() -> Result<()> {
     let environment: String = std::env::var(ENVIRONMENT)?;
@@ -37,20 +64,27 @@ async fn main() -> Result<()> {
     info!("Connection established.");
 
     info!("Creating encryption service...");
-    let encryption_service = PasswordEncryptionService::new(
+    let encryption_service: PasswordEncryptionService = PasswordEncryptionService::new(
         configuration.hash_iterations,
         configuration.site_secret.clone(),
     );
+
+    let application_state: ApplicationState = ApplicationState {
+        postgres_service: postgres_service,
+        encryption_service: encryption_service,
+        key: Key::from(configuration.site_secret.as_bytes()),
+    };
+
+    let serve_directory: MethodRouter =
+        get_service(ServeDir::new(FRONTEND_DIST_PATH)).handle_error(handle_error);
 
     info!("Configuring routers...");
     let application_router: Router = Router::new()
         .merge(api::router::authentication::router())
         .merge(api::router::chronicle::router())
         .merge(api::router::person::router())
-        .layer(Extension(encryption_service))
-        .layer(Extension(postgres_service))
-        .layer(Extension(Key::from(configuration.site_secret.as_bytes())))
-        .fallback(get_service(ServeDir::new(FRONTEND_DIST_PATH)).handle_error(handle_error));
+        .with_state(application_state)
+        .fallback_service(serve_directory);
 
     let socket_address: SocketAddr =
         SocketAddr::from((configuration.ipv4_address, configuration.port));
