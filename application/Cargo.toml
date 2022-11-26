@@ -22,7 +22,7 @@ axum-extra = { version = "0.4.0", features = [
 # Email adderss validation
 email_address = { version = "0.2.4" }
 # Logging
-env_logger = "0.9.3"
+env_logger = "0.10.0"
 # Provides async programming foundational functionality
 futures = "0.3.25"
 # A library for HTML entity encoding and decoding
