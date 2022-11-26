@@ -2,10 +2,11 @@ use js_sys::{Date, JsString};
 
 use perseus::{RenderFnResultWithCause, Template};
 use sycamore::prelude::{cloned, view, Html, SsrNode, View};
+use uuid::Uuid;
 
 use crate::{
     components::container::{Container, ContainerProperties},
-    data::entity::person_chronicle::PersonChroncile,
+    data::entity::person_chronicle::PersonChronicle,
     utility::{
         constants::API_CHRONICLE_TODAY_URL,
         date_time_helper::{get_day_of_week_from_integer, get_month_from_integer},
@@ -16,7 +17,7 @@ use crate::{
 #[perseus::make_rx(ChroniclePageStateRx)]
 pub struct ChroniclePageState {
     pub user_alias: String,
-    pub chronicle_id: String,
+    pub chronicle_id: Uuid,
     pub date_display: String,
     pub short_date_display: String,
     pub time_display: String,
@@ -47,12 +48,12 @@ pub fn chronicle_page(
                 let time: JsString = Date::to_locale_time_string(&javascript_date, "en-US");
                 time_display.set(time.as_string().unwrap());
                 date_display.set(format!("{day_of_week}, {month} {date}, {year}"));
-                short_date_display.set(format!("{}/{}/{}", javascript_date.get_full_year(), javascript_date.get_month(), javascript_date.get_day()));
+                short_date_display.set(format!("{}/{}/{}", javascript_date.get_full_year(), javascript_date.get_month(), javascript_date.get_date()));
 
                 let query_response = http_service::get_endpoint(API_CHRONICLE_TODAY_URL ,None).await;
                 match query_response {
                     Some(response) => {
-                        let chronicle_data: PersonChroncile = serde_json::from_str(&response).unwrap();
+                        let chronicle_data: PersonChronicle = serde_json::from_str(&response).unwrap();
                         chronicle_id.set(chronicle_data.chronicle_id);
                         if let Some(alias) = chronicle_data.person_alias {
                             user_alias.set(alias);
@@ -77,7 +78,7 @@ pub fn chronicle_page(
                 children: view! {
                     div(class="container-fluid d-flex flex-grow-1") {
                         div(class="row flex-grow-1 text-black"){
-                            div(class="col-9 bg-white p-5 shadow border-0 rounded") {
+                            div(class="col-9 bg-white p-5 border-0 rounded") {
                                 div(class="d-flex align-items-baseline") {
                                     h2(class="display-6 flex-grow-1") { (date_display.get()) }
                                     div(class="fw-normal flex-shrink-1 badge fs-5 bg-success") {
@@ -86,11 +87,18 @@ pub fn chronicle_page(
                                 }
 
                                 h3(class="display-6") { (greeting.get()) }
+                                div() {
+                                    label() { "What do you intend to do today?" }
+                                }
+                                div(class="d-flex flex-column") {
+                                    label() { "Notes" }
+                                    textarea(rows="4", cols="50") {}
+                                }
                             }
                             div(class="col-3") {
                                 div(class="card shadow border-0 rounded") {
                                     div(class="card-body") {
-                                        h3(class="card-title") { "Objectives" }
+                                        h3(class="card-title") { "Goals" }
                                         p(class="card-text") {
                                             ul() {
                                                 li() { "-" }
@@ -113,7 +121,7 @@ pub async fn get_build_state(
 ) -> RenderFnResultWithCause<ChroniclePageState> {
     Ok(ChroniclePageState {
         user_alias: String::from("Stranger"),
-        chronicle_id: String::new(),
+        chronicle_id: Uuid::nil(),
         date_display: String::new(),
         short_date_display: String::new(),
         time_display: String::new(),

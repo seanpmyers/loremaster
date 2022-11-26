@@ -1,196 +1,183 @@
 CREATE TABLE "person"(
-  "id" UUID NOT NULL,
-  "email_address" TEXT NOT NULL,
-  "encrypted_password" TEXT NOT NULL,
-  "registration_date" TIMESTAMP(0) WITH TIME zone NOT NULL,
-  "alias" TEXT NULL,
-  "chronicle_id" UUID NULL
+    "id" UUID NOT NULL,
+    "email_address_id" UUID NOT NULL,
+    "encrypted_password" TEXT NOT NULL,
+    "registration_date" TIMESTAMP(0) WITH
+        TIME zone NOT NULL,
+        "alias" TEXT NULL,
+        "chronicle_id" UUID NULL
 );
+CREATE INDEX "person_alias_index" ON
+    "person"("alias");
+CREATE INDEX "person_registration_date_index" ON
+    "person"("registration_date");
 ALTER TABLE
-  "person"
-ADD
-  PRIMARY KEY("id");
+    "person" ADD PRIMARY KEY("id");
 ALTER TABLE
-  "person"
-ADD
-  CONSTRAINT "person_email_address_unique" UNIQUE("email_address");
+    "person" ADD CONSTRAINT "person_email_address_id_unique" UNIQUE("email_address_id");
 CREATE TABLE "chronicle"(
     "id" UUID NOT NULL,
     "person_id" UUID NOT NULL,
     "date_recorded" DATE NOT NULL,
     "notes" TEXT NULL,
-    "creation_time" TIMESTAMP(0) WITH TIME zone NULL
-  );
+    "creation_time" TIMESTAMP(0) WITH
+        TIME zone NULL
+);
 ALTER TABLE
-  "chronicle"
-ADD
-  PRIMARY KEY("id", "date_recorded");
+    "chronicle" ADD PRIMARY KEY("id", "date_recorded");
 CREATE TABLE "action"(
     "id" UUID NOT NULL,
     "name" TEXT NOT NULL
-  );
+);
+CREATE INDEX "action_name_index" ON
+    "action"("name");
 ALTER TABLE
-  "action"
-ADD
-  PRIMARY KEY("id");
+    "action" ADD PRIMARY KEY("id");
 ALTER TABLE
-  "action"
-ADD
-  CONSTRAINT "action_name_unique" UNIQUE("name");
+    "action" ADD CONSTRAINT "action_name_unique" UNIQUE("name");
 CREATE TABLE "intention"(
     "id" UUID NOT NULL,
     "action_id" UUID NOT NULL,
     "person_id" UUID NOT NULL,
-    "intended_time" TIMESTAMP(0) WITH TIME zone NULL,
-    "chronicle_id" UUID NULL
-  );
+    "intended_time" TIMESTAMP(0) WITH
+        TIME zone NULL
+);
 ALTER TABLE
-  "intention"
-ADD
-  PRIMARY KEY("id", "action_id");
-CREATE TABLE "conviction"(
+    "intention" ADD PRIMARY KEY("id", "action_id");
+CREATE TABLE "goal"(
     "id" UUID NOT NULL,
     "name" TEXT NOT NULL
-  );
+);
+CREATE INDEX "goal_name_index" ON
+    "goal"("name");
 ALTER TABLE
-  "conviction"
-ADD
-  PRIMARY KEY("id");
+    "goal" ADD PRIMARY KEY("id");
 ALTER TABLE
-  "conviction"
-ADD
-  CONSTRAINT "conviction_name_unique" UNIQUE("name");
-CREATE TABLE "person_conviction"(
-    "person_id" UUID NOT NULL,
-    "conviction_id" UUID NOT NULL
-  );
-ALTER TABLE
-  "person_conviction"
-ADD
-  PRIMARY KEY("person_id", "conviction_id");
-CREATE TABLE "objective"(
-    "id" UUID NOT NULL,
-    "name" TEXT NOT NULL
-  );
-ALTER TABLE
-  "objective"
-ADD
-  PRIMARY KEY("id");
-ALTER TABLE
-  "objective"
-ADD
-  CONSTRAINT "objective_name_unique" UNIQUE("name");
+    "goal" ADD CONSTRAINT "goal_name_unique" UNIQUE("name");
 CREATE TABLE "person_action"(
     "action_id" UUID NOT NULL,
     "person_id" UUID NOT NULL
-  );
+);
 ALTER TABLE
-  "person_action"
-ADD
-  PRIMARY KEY("action_id", "person_id");
-CREATE TABLE "achievement"(
-    "id" UUID NOT NULL,
-    "objective_id" UUID NOT NULL,
-    "achieved_time" TIMESTAMP(0) WITH TIME zone NULL,
-    "chronicle_id" UUID NULL
-  );
-ALTER TABLE
-  "achievement"
-ADD
-  PRIMARY KEY("id");
-CREATE TABLE "conviction_objective"(
-    "conviction_id" UUID NOT NULL,
-    "objective_id" UUID NOT NULL
-  );
-ALTER TABLE
-  "conviction_objective"
-ADD
-  PRIMARY KEY("conviction_id", "objective_id");
-CREATE TABLE "objective_action"(
-    "objective_id" UUID NOT NULL,
-    "action_id" UUID NOT NULL,
-    "required" BOOLEAN NOT NULL,
-    "minimum_count" INTEGER NOT NULL,
-    "completion_time" TIMESTAMP(0) WITH TIME zone NULL,
-    "chronicle_id" UUID NULL
-  );
-ALTER TABLE
-  "objective_action"
-ADD
-  PRIMARY KEY("objective_id", "action_id");
+    "person_action" ADD PRIMARY KEY("action_id", "person_id");
 CREATE TABLE "completed_action"(
     "action_id" UUID NOT NULL,
-    "completion_time" TIMESTAMP(0) WITH TIME zone NOT NULL,
-    "person_id" UUID NOT NULL,
-    "chronicle_id" UUID NOT NULL
-  );
+    "completion_time" TIMESTAMP(0) WITH
+        TIME zone NOT NULL,
+        "person_id" UUID NOT NULL,
+        "chronicle_id" UUID NOT NULL
+);
+CREATE INDEX "completed_action_person_id_index" ON
+    "completed_action"("person_id");
+CREATE INDEX "completed_action_chronicle_id_index" ON
+    "completed_action"("chronicle_id");
 ALTER TABLE
-  "completed_action"
-ADD
-  PRIMARY KEY("action_id");
-CREATE TABLE "completed_intention"(
+    "completed_action" ADD PRIMARY KEY("action_id");
+CREATE TABLE "frequency"(
+    "id" UUID NOT NULL,
+    "unit" VARCHAR(255) CHECK
+        ("unit" IN('')) NOT NULL
+);
+CREATE INDEX "frequency_unit_index" ON
+    "frequency"("unit");
+ALTER TABLE
+    "frequency" ADD PRIMARY KEY("id");
+ALTER TABLE
+    "frequency" ADD CONSTRAINT "frequency_unit_unique" UNIQUE("unit");
+CREATE TABLE "intention_frequency"(
     "intention_id" UUID NOT NULL,
-    "completion_timestamp" TIMESTAMP(0) WITH TIME zone NOT NULL,
-    "chronicle_id" UUID NOT NULL
-  );
+    "frequency_id" UUID NOT NULL
+);
 ALTER TABLE
-  "completed_intention"
-ADD
-  PRIMARY KEY("intention_id");
-CREATE TABLE "habit"("id" UUID NOT NULL);
+    "intention_frequency" ADD PRIMARY KEY("intention_id", "frequency_id");
+CREATE TABLE "person_goal"(
+    "person_id" UUID NOT NULL,
+    "goal_id" UUID NOT NULL
+);
 ALTER TABLE
-  "habit"
-ADD
-  PRIMARY KEY("id");
+    "person_goal" ADD PRIMARY KEY("person_id", "goal_id");
+CREATE TABLE "email_address"(
+    "id" UUID NOT NULL,
+    "display" TEXT NOT NULL,
+    "local_part" TEXT NOT NULL,
+    "domain" TEXT NOT NULL,
+    "validated" BOOLEAN NOT NULL DEFAULT '0',
+    "validation_date" TIMESTAMP(0) WITH
+        TIME zone NULL,
+        "creation_date" TIMESTAMP(0)
+    WITH
+        TIME zone NOT NULL
+);
+CREATE INDEX "email_address_domain_index" ON
+    "email_address"("domain");
+CREATE INDEX "email_address_display_index" ON
+    "email_address"("display");
+CREATE INDEX "email_address_validated_index" ON
+    "email_address"("validated");
 ALTER TABLE
-  "chronicle"
-ADD
-  CONSTRAINT "chronicle_person_id_foreign" FOREIGN KEY("person_id") REFERENCES "person"("id");
+    "email_address" ADD PRIMARY KEY("id");
+CREATE TABLE "person_email_address"(
+    "person_id" UUID NOT NULL,
+    "email_address_id" UUID NOT NULL
+);
 ALTER TABLE
-  "intention"
-ADD
-  CONSTRAINT "intention_action_id_foreign" FOREIGN KEY("action_id") REFERENCES "action"("id");
+    "person_email_address" ADD PRIMARY KEY("person_id", "email_address_id");
+CREATE TABLE "principle"(
+    "id" UUID NOT NULL,
+    "name" TEXT NOT NULL
+);
+CREATE INDEX "principle_name_index" ON
+    "principle"("name");
 ALTER TABLE
-  "person_conviction"
-ADD
-  CONSTRAINT "person_conviction_person_id_foreign" FOREIGN KEY("person_id") REFERENCES "person"("id");
+    "principle" ADD PRIMARY KEY("id");
 ALTER TABLE
-  "person_conviction"
-ADD
-  CONSTRAINT "person_conviction_conviction_id_foreign" FOREIGN KEY("conviction_id") REFERENCES "conviction"("id");
+    "principle" ADD CONSTRAINT "principle_name_unique" UNIQUE("name");
+CREATE TABLE "person_principle"(
+    "person_id" UUID NOT NULL,
+    "principle_id" UUID NOT NULL
+);
 ALTER TABLE
-  "person_action"
-ADD
-  CONSTRAINT "person_action_action_id_foreign" FOREIGN KEY("action_id") REFERENCES "action"("id");
+    "person_principle" ADD PRIMARY KEY("person_id", "principle_id");
+CREATE TABLE "chronicle_intention"(
+    "chronicle_id" UUID NOT NULL,
+    "intention_id" UUID NOT NULL,
+    "person_id" UUID NOT NULL,
+    "action_id" UUID NOT NULL
+);
 ALTER TABLE
-  "person_action"
-ADD
-  CONSTRAINT "person_action_person_id_foreign" FOREIGN KEY("person_id") REFERENCES "person"("id");
+    "chronicle_intention" ADD PRIMARY KEY(
+        "chronicle_id",
+        "intention_id",
+        "person_id",
+        "action_id"
+    );
 ALTER TABLE
-  "conviction_objective"
-ADD
-  CONSTRAINT "conviction_objective_conviction_id_foreign" FOREIGN KEY("conviction_id") REFERENCES "conviction"("id");
+    "chronicle_intention" ADD CONSTRAINT "chronicle_intention_action_id_foreign" FOREIGN KEY("action_id") REFERENCES "action"("id");
 ALTER TABLE
-  "conviction_objective"
-ADD
-  CONSTRAINT "conviction_objective_objective_id_foreign" FOREIGN KEY("objective_id") REFERENCES "objective"("id");
+    "chronicle" ADD CONSTRAINT "chronicle_person_id_foreign" FOREIGN KEY("person_id") REFERENCES "person"("id");
 ALTER TABLE
-  "achievement"
-ADD
-  CONSTRAINT "achievement_objective_id_foreign" FOREIGN KEY("objective_id") REFERENCES "objective"("id");
+    "person_goal" ADD CONSTRAINT "person_goal_person_id_foreign" FOREIGN KEY("person_id") REFERENCES "person"("id");
 ALTER TABLE
-  "objective_action"
-ADD
-  CONSTRAINT "objective_action_objective_id_foreign" FOREIGN KEY("objective_id") REFERENCES "objective"("id");
+    "person_email_address" ADD CONSTRAINT "person_email_address_person_id_foreign" FOREIGN KEY("person_id") REFERENCES "person"("id");
 ALTER TABLE
-  "objective_action"
-ADD
-  CONSTRAINT "objective_action_action_id_foreign" FOREIGN KEY("action_id") REFERENCES "action"("id");
+    "person_principle" ADD CONSTRAINT "person_principle_person_id_foreign" FOREIGN KEY("person_id") REFERENCES "person"("id");
 ALTER TABLE
-  "completed_action"
-ADD
-  CONSTRAINT "completed_action_person_id_foreign" FOREIGN KEY("person_id") REFERENCES "person"("id");
+    "chronicle_intention" ADD CONSTRAINT "chronicle_intention_person_id_foreign" FOREIGN KEY("person_id") REFERENCES "person"("id");
 ALTER TABLE
-  "intention"
-ADD
-  CONSTRAINT "intention_id_foreign" FOREIGN KEY("id") REFERENCES "completed_intention"("intention_id");
+    "person" ADD CONSTRAINT "person_email_address_id_foreign" FOREIGN KEY("email_address_id") REFERENCES "email_address"("id");
+ALTER TABLE
+    "intention" ADD CONSTRAINT "intention_action_id_foreign" FOREIGN KEY("action_id") REFERENCES "action"("id");
+ALTER TABLE
+    "person_goal" ADD CONSTRAINT "person_goal_goal_id_foreign" FOREIGN KEY("goal_id") REFERENCES "goal"("id");
+ALTER TABLE
+    "person_action" ADD CONSTRAINT "person_action_action_id_foreign" FOREIGN KEY("action_id") REFERENCES "action"("id");
+ALTER TABLE
+    "person_action" ADD CONSTRAINT "person_action_person_id_foreign" FOREIGN KEY("person_id") REFERENCES "person"("id");
+ALTER TABLE
+    "completed_action" ADD CONSTRAINT "completed_action_person_id_foreign" FOREIGN KEY("person_id") REFERENCES "person"("id");
+ALTER TABLE
+    "intention_frequency" ADD CONSTRAINT "intention_frequency_frequency_id_foreign" FOREIGN KEY("frequency_id") REFERENCES "frequency"("id");
+ALTER TABLE
+    "person_email_address" ADD CONSTRAINT "person_email_address_email_address_id_foreign" FOREIGN KEY("email_address_id") REFERENCES "email_address"("id");
+ALTER TABLE
+    "person_principle" ADD CONSTRAINT "person_principle_principle_id_foreign" FOREIGN KEY("principle_id") REFERENCES "principle"("id");

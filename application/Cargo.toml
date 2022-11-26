@@ -12,17 +12,21 @@ anyhow = "1.0.66"
 # Password Encryption
 argon2 = "0.4.1"
 # A web application framework that focuses on ergonomics and modularity.
-axum = { version = "0.5.17", features = ["headers"] }
-axum-extra = { version = "0.3.7", features = [
+axum = { version = "0.6.0", features = ["headers"] }
+axum-extra = { version = "0.4.0", features = [
 	"cookie",
 	"cookie-private",
 	"cookie-signed",
 	"form",
 ] }
+# Email adderss validation
+email_address = { version = "0.2.4" }
 # Logging
 env_logger = "0.10.0"
 # Provides async programming foundational functionality
 futures = "0.3.25"
+# A library for HTML entity encoding and decoding
+htmlescape = { version = "0.3.1" }
 # Logging
 log = "0.4.17"
 # Random nubmer generation
@@ -42,6 +46,8 @@ sqlx = { version = "0.6.2", features = [
 	"tls",
 	"uuid",
 ] }
+# NewSQL database -- to be used as an alternative to postgresql for this app
+# surrealdb = { version = "1.0.0-beta.8" }
 # Error/exception handling
 thiserror = "1.0.37"
 # Time

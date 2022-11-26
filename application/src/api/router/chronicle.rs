@@ -1,5 +1,5 @@
 use anyhow::anyhow;
-use axum::{routing::get, Extension, Json, Router};
+use axum::{extract::State, routing::get, Json, Router};
 use log::info;
 use time::{format_description::well_known::Rfc3339, OffsetDateTime};
 use uuid::Uuid;
@@ -7,7 +7,7 @@ use uuid::Uuid;
 use crate::{
     api::{guards::user::User, response::ApiError},
     data::{
-        entity::{chronicle::Chronicle, transfer::person_chronicle::PersonChroncile},
+        entity::{chronicle::Chronicle, transfer::person_chronicle::PersonChronicle},
         postgres_handler::PostgresHandler,
         query::{
             self,
@@ -18,13 +18,14 @@ use crate::{
             },
         },
     },
+    ApplicationState,
 };
 
 //TODO: Take in requestor's local UTC time zone
 pub async fn today(
-    postgres_service: Extension<PostgresHandler>,
+    State(postgres_service): State<PostgresHandler>,
     user: User,
-) -> Result<Json<PersonChroncile>, ApiError> {
+) -> Result<Json<PersonChronicle>, ApiError> {
     info!("Querying for today's chronicle.");
     let today: OffsetDateTime = OffsetDateTime::now_utc();
 
@@ -55,7 +56,7 @@ pub async fn today(
         }
     };
 
-    Ok(Json(PersonChroncile {
+    Ok(Json(PersonChronicle {
         chronicle_id: chronicle.id,
         chronicle_date: chronicle.date_recorded,
         person_alias: person_alias,
@@ -63,7 +64,7 @@ pub async fn today(
 }
 
 pub async fn by_date(
-    postgres_service: Extension<PostgresHandler>,
+    State(postgres_service): State<PostgresHandler>,
     user: User,
 ) -> Result<Json<Option<Chronicle>>, ApiError> {
     let chronicle_date: OffsetDateTime = OffsetDateTime::now_utc();
@@ -81,7 +82,7 @@ pub async fn by_date(
 }
 
 pub async fn by_id(
-    postgres_service: Extension<PostgresHandler>,
+    State(postgres_service): State<PostgresHandler>,
 ) -> Result<Json<Option<Chronicle>>, ApiError> {
     let chronicle_id: Uuid = Uuid::new_v4();
 
@@ -113,7 +114,7 @@ pub async fn example() -> Result<Json<Chronicle>, ApiError> {
     Ok(Json(result))
 }
 
-pub fn router() -> Router {
+pub fn router() -> Router<ApplicationState> {
     Router::new()
         .route("/chronicle/server_time", get(server_time))
         .route("/chronicle/example", get(example))

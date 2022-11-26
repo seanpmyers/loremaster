@@ -1,7 +1,7 @@
 use axum::{
     async_trait,
-    extract::{FromRequest, RequestParts},
-    http::StatusCode,
+    extract::{FromRef, FromRequestParts},
+    http::{request::Parts, StatusCode},
 };
 use axum_extra::extract::{cookie::Key, PrivateCookieJar};
 use serde::{Deserialize, Serialize};
@@ -13,13 +13,14 @@ use crate::utility::constants::cookie_fields::USER_ID;
 pub struct User(pub Uuid);
 
 #[async_trait]
-impl<B> FromRequest<B> for User
+impl<S> FromRequestParts<S> for User
 where
-    B: Send,
+    S: Send + Sync,
+    Key: FromRef<S>,
 {
     type Rejection = (StatusCode, &'static str);
-    async fn from_request(req: &mut RequestParts<B>) -> Result<Self, Self::Rejection> {
-        let cookie_result = PrivateCookieJar::<Key>::from_request(req).await;
+    async fn from_request_parts(parts: &mut Parts, state: &S) -> Result<Self, Self::Rejection> {
+        let cookie_result = PrivateCookieJar::<Key>::from_request_parts(parts, state).await;
         match cookie_result {
             Ok(cookie_jar) => match cookie_jar.get(USER_ID) {
                 Some(cookie) => {
@@ -30,7 +31,7 @@ where
             },
             Err(_) => Err((
                 StatusCode::INTERNAL_SERVER_ERROR,
-                "Failed to evalute authorization.",
+                "Failed to evaluate authorization.",
             )),
         }
     }

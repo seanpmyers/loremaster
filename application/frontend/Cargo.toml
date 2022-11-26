@@ -16,6 +16,7 @@ serde_json = { version = "1.0.89" }
 sycamore = { version = "0.7.1" }
 time = { version = "0.3.17", features = ["serde", "std"] }
 ureq = { version = "2.5.0" }
+uuid = { version = "1.2.2", features = ["serde"] }
 wasm-bindgen = { version = "0.2.83" }
 web-sys = { version = "0.3.60", features = [
 	"Event",
