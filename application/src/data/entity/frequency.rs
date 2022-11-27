@@ -7,6 +7,7 @@ pub struct Frequency {
     pub unit: FrequencyUnit,
 }
 
+// These are defined in SQL, this should match what is there
 #[derive(Deserialize, Serialize, Debug, Clone)]
 pub enum FrequencyUnit {
     Day,

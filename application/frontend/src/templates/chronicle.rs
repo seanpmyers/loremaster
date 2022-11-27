@@ -1,11 +1,17 @@
 use js_sys::{Date, JsString};
 
 use perseus::{RenderFnResultWithCause, Template};
-use sycamore::prelude::{cloned, view, Html, SsrNode, View};
+use sycamore::{
+    prelude::{cloned, view, Html, SsrNode, View},
+    reactive::Signal,
+};
 use uuid::Uuid;
 
 use crate::{
-    components::container::{Container, ContainerProperties},
+    components::{
+        container::{Container, ContainerProperties},
+        widget::week_widget::{WeekWidget, WeekWidgetProperties},
+    },
     data::entity::person_chronicle::PersonChronicle,
     utility::{
         constants::API_CHRONICLE_TODAY_URL,
@@ -72,6 +78,9 @@ pub fn chronicle_page(
         );
     }
 
+    let now_utc_date = time::OffsetDateTime::now_utc();
+    let local_date = now_utc_date.to_offset(time::macros::offset!(-5));
+
     view! {
             Container(ContainerProperties {
                 title: String::from("Chronicle"),
@@ -85,8 +94,13 @@ pub fn chronicle_page(
                                         (format!("{} {}", short_date_display.get(), time_display.get()))
                                     }
                                 }
-
                                 h3(class="display-6") { (greeting.get()) }
+                                div() {
+                                    WeekWidget(WeekWidgetProperties{
+                                        days: Signal::new(vec![]),
+                                        selected_date: Signal::new(local_date),
+                                    })
+                                }
                                 div() {
                                     label() { "What do you intend to do today?" }
                                 }

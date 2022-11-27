@@ -24,3 +24,13 @@ pub const SEPTEMBER: &str = "September";
 pub const OCTOBER: &str = "October";
 pub const NOVEMBER: &str = "November";
 pub const DECEMBER: &str = "December";
+
+pub const DAYS_OF_WEEK: &[time::Weekday; 7] = &[
+    time::Weekday::Sunday,
+    time::Weekday::Monday,
+    time::Weekday::Tuesday,
+    time::Weekday::Wednesday,
+    time::Weekday::Thursday,
+    time::Weekday::Friday,
+    time::Weekday::Saturday,
+];

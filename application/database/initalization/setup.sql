@@ -73,10 +73,16 @@ CREATE INDEX "completed_action_chronicle_id_index" ON
     "completed_action"("chronicle_id");
 ALTER TABLE
     "completed_action" ADD PRIMARY KEY("action_id");
+CREATE TYPE frequency_unit AS ENUM (
+  'Day',
+  'Month',
+  'Year',
+  'Hour',
+  'Minute'
+  );
 CREATE TABLE "frequency"(
     "id" UUID NOT NULL,
-    "unit" VARCHAR(255) CHECK
-        ("unit" IN('')) NOT NULL
+    "unit" frequency_unit NOT NULL
 );
 CREATE INDEX "frequency_unit_index" ON
     "frequency"("unit");
