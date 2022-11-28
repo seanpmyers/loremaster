@@ -32,6 +32,7 @@ pub fn week_widget(
                    {
                     let mut classes = String::from("d-flex flex-column m-2 p-2 border rounded shadow-sm");
                     if &day.number == &selected_date.get().day() { classes.push_str(" bg-primary text-white") ;}
+                    else { classes.push_str(" bg-white")}
                     view!{
                         div(class=(classes)) {
                             div(class="m-1") {

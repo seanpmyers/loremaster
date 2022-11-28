@@ -85,12 +85,12 @@ pub fn chronicle_page(
             Container(ContainerProperties {
                 title: String::from("Chronicle"),
                 children: view! {
-                    div(class="container-fluid d-flex flex-grow-1") {
+                    div(class="container-fluid d-flex flex-grow-1 bg-light") {
                         div(class="row flex-grow-1 text-black"){
-                            div(class="col-9 bg-white p-5 border-0 rounded") {
+                            div(class="col-9 bg-light p-5 border-0 rounded") {
                                 div(class="d-flex align-items-baseline") {
                                     h2(class="display-6 flex-grow-1") { (date_display.get()) }
-                                    div(class="fw-normal flex-shrink-1 badge fs-5 bg-success") {
+                                    div(class="fw-normal flex-shrink-1 badge fs-5 bg-primary") {
                                         (format!("{} {}", short_date_display.get(), time_display.get()))
                                     }
                                 }
@@ -106,11 +106,11 @@ pub fn chronicle_page(
                                 }
                                 div(class="d-flex flex-column") {
                                     label() { "Notes" }
-                                    textarea(rows="4", cols="50") {}
+                                    textarea(class="border rounded bg-white", rows="4", cols="50") {}
                                 }
                             }
-                            div(class="col-3") {
-                                div(class="card shadow border-0 rounded") {
+                            div(class="col-3 border-start") {
+                                div(class="card shadow-sm border-0 rounded mt-2") {
                                     div(class="card-body") {
                                         h3(class="card-title") { "Goals" }
                                         p(class="card-text") {

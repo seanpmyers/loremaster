@@ -90,11 +90,11 @@ pub fn you_page(
         }));
     };
 
-    let section_classes: &str = "border rounded bg-white shadow p-2 m-2 ";
+    let section_classes: &str = "border rounded bg-white shadow-sm p-2 m-2 ";
 
     view! {
         Container(ContainerProperties{title: String::from("You"), children: view!{
-            div(class="d-flex flex-column flex-grow-1 p-4 align-items-center") {
+            div(class="d-flex flex-column flex-grow-1 p-4 align-items-center bg-light") {
                 div() {
                     h1(class="display-3") { ( display_alias.get()) }
                     p() { "This is a page dedicated to you." }
