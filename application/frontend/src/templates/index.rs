@@ -1,20 +1,64 @@
 use perseus::{Html, RenderFnResultWithCause, SsrNode, Template};
-use sycamore::prelude::{view, View};
+use serde::{Deserialize, Serialize};
+use sycamore::{
+    prelude::{view, View},
+    reactive::cloned,
+};
+use web_sys::Event;
 
 use crate::components::container::{Container, ContainerProperties};
+
+#[derive(Deserialize, Serialize, Debug, Clone)]
+pub enum Tab {
+    First,
+    Second,
+    Third,
+    Fourth,
+}
 
 #[perseus::make_rx(IndexPageStateRx)]
 pub struct IndexPageState {
     pub greeting: String,
+    pub current_tab: Tab,
 }
 
 #[perseus::template_rx]
-pub fn index_page(state: IndexPageStateRx) -> View<G> {
+pub fn index_page(
+    IndexPageStateRx {
+        greeting,
+        current_tab,
+    }: IndexPageStateRx,
+) -> View<G> {
+    let click_first = cloned!((current_tab) => move |event: Event| {
+        event.prevent_default();
+        current_tab.set(Tab::First);
+    });
+    let click_second = cloned!((current_tab) => move |_| {
+        current_tab.set(Tab::Second);
+    });
+    let click_third = cloned!((current_tab) => move |_| {
+        current_tab.set(Tab::Third);
+    });
+    let click_fourth = cloned!((current_tab) => move |_| {
+        current_tab.set(Tab::Fourth);
+    });
     view! {
         Container(ContainerProperties{title: String::from("Loremaster"), children: view!{
             div(class="d-flex flex-column flex-grow-1 p-4 align-items-center") {
                 h1(class="display-3") { "Loremaster" }
-                p() { "Welcome!" }
+                p() { (greeting.get()) }
+                div(class="d-flex", id="lm-tab-test") {
+                    button(class="p-1 btn btn-primary", on:click=click_first) { "First" }
+                    button(class="p-1 btn btn-primary", on:click=click_second) { "Second" }
+                    button(class="p-1 btn btn-primary", on:click=click_third) { "Third" }
+                    button(class="p-1 btn btn-primary", on:click=click_fourth) { "Fourth" }
+                }
+                (match *current_tab.get() {
+                    Tab::First => view! { div() {"First"}},
+                    Tab::Second => view! { div() {"Second"}},
+                    Tab::Third => view! { div() {"Third"}},
+                    Tab::Fourth => view! { div() {"Fourth"}},
+                })
             }
         }})
     }
@@ -33,7 +77,8 @@ pub async fn get_build_state(
     _locale: String,
 ) -> RenderFnResultWithCause<IndexPageState> {
     Ok(IndexPageState {
-        greeting: String::from(""),
+        greeting: String::from("Welcome!"),
+        current_tab: Tab::First,
     })
 }
 

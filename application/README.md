@@ -1,15 +1,18 @@
 # loremaster - Backend
 
-[![dependency status](https://deps.rs/repo/github/seanpmyers/loremaster/status.svg)](https://deps.rs/repo/github/seanpmyers/loremaster/deps.rs)
-
 The appilcation is primarily written in Rust.
 
 ## Tech Stack
 
-- Programming Languages and Frameworks
+- Programming Languages
   - [Rust](https://www.rust-lang.org/)
-    - [Rocket](https://rocket.rs/)
   - [SQL](https://en.wikipedia.org/wiki/SQL)
+- Frameworks
+  - Rust
+    - [Axum](https://github.com/tokio-rs/axum)
+    - [SQLx](https://github.com/launchbadge/sqlx)
+    - [Sycamore](https://github.com/sycamore-rs/sycamore)
+    - [Perseus](https://github.com/framesurge/perseus)
 - Databases / Datastores
   - [PostgreSQL](https://www.postgresql.org/)
 - Development Operations
@@ -52,4 +55,10 @@ PORT = 8000
 [qa]
 
 [prod]
+```
+
+You can generate a site secret for testing with the following openssl command:
+
+```bash
+openssl rand -base64 64
 ```

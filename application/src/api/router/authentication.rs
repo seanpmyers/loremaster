@@ -1,29 +1,38 @@
+use std::str::FromStr;
+
 use anyhow::anyhow;
-use axum::{http::StatusCode, response::IntoResponse, routing::post, Extension, Router};
+use axum::{
+    extract::State,
+    http::StatusCode,
+    response::{IntoResponse, Response},
+    routing::post,
+    Router,
+};
 use axum_extra::extract::{
     cookie::{Cookie, SameSite},
     Form, PrivateCookieJar,
 };
+use email_address::EmailAddress;
 use log::{info, warn};
 use serde::Deserialize;
 
 use crate::{
-    api::response::ApiError,
+    api::{
+        handler::authentication::{register_handler, RegistrationResult},
+        response::ApiError,
+    },
     data::{
-        entity::person::Credentials,
-        postgres_handler::PostgresHandler,
-        query::person::{
-            create_person::create_person_query,
-            credential_by_email_address::credential_by_email_address_query,
-        },
+        entity::person::Credentials, postgres_handler::PostgresHandler,
+        query::person::credential_by_email_address::credential_by_email_address_query,
     },
     utility::{
         constants::{
-            cookie_fields, FAILED_LOGIN_MESSAGE, REGISTRATION_SUCCESS_MESSAGE,
-            SUCCESSFUL_LOGIN_MESSAGE,
+            cookie_fields, BLOCKED_EMAIL_MESSAGE, FAILED_LOGIN_MESSAGE, INVALID_EMAIL_MESSAGE,
+            INVALID_PASSWORD_MESSAGE, REGISTRATION_SUCCESS_MESSAGE, SUCCESSFUL_LOGIN_MESSAGE,
         },
         password_encryption::{PasswordEncryption, PasswordEncryptionService},
     },
+    ApplicationState,
 };
 
 #[derive(Deserialize, Debug)]
@@ -32,75 +41,59 @@ struct CredentialsForm {
     password: String,
 }
 
-const ALLOWED_EMAIL_ADDRESSES: [&str; 2] = ["person@loremaster.xyz", "mail@seanmyers.xyz"];
-
 async fn register(
-    postgres_service: Extension<PostgresHandler>,
-    encryption_service: Extension<PasswordEncryptionService>,
+    State(postgres_service): State<PostgresHandler>,
+    State(encryption_service): State<PasswordEncryptionService>,
     Form(registration_form): Form<CredentialsForm>,
-) -> Result<impl IntoResponse, ApiError> {
+) -> Result<Response, ApiError> {
     info!("API CALL: /authentication/register");
 
-    let clean_email: &str = registration_form.email_address.trim();
-    let clean_password: &str = registration_form.password.trim();
-
-    if !ALLOWED_EMAIL_ADDRESSES.contains(&clean_email) {
-        return Ok((
-            StatusCode::FORBIDDEN,
-            String::from("Registration is currently closed as the application is not ready for public users yet. Sorry!"),
-        ));
-    }
-
-    info!("Checking for existing users with provided email address.");
-    let existing_credentials: Option<Credentials> =
-        credential_by_email_address_query(&postgres_service.database_pool, &clean_email)
-            .await
-            .map_err(|error| anyhow!("{}", error))?;
-
-    if existing_credentials.is_some() {
-        info!("Existing user found!");
-        //TODO: Send an email to the specified address and indicate someone tried to re-register using that email
-        return Ok((
+    match register_handler(
+        &postgres_service.database_pool,
+        &encryption_service,
+        &registration_form.email_address,
+        &registration_form.password,
+    )
+    .await?
+    {
+        RegistrationResult::Success => Ok((
             StatusCode::ACCEPTED,
             REGISTRATION_SUCCESS_MESSAGE.to_string(),
-        ));
+        )
+            .into_response()),
+        RegistrationResult::InvalidEmailAddress => {
+            Ok((StatusCode::BAD_REQUEST, INVALID_EMAIL_MESSAGE).into_response())
+        }
+        RegistrationResult::BlockedEmailAddress => {
+            Ok((StatusCode::FORBIDDEN, String::from(BLOCKED_EMAIL_MESSAGE)).into_response())
+        }
+        RegistrationResult::EmailAddressInUse => Ok((
+            StatusCode::ACCEPTED,
+            REGISTRATION_SUCCESS_MESSAGE.to_string(),
+        )
+            .into_response()),
+        RegistrationResult::InvalidPassword => {
+            Ok((StatusCode::BAD_REQUEST, INVALID_PASSWORD_MESSAGE).into_response())
+        }
     }
-
-    info!("Email can be registered.");
-    let encrypted_password: String = encryption_service
-        .encrypt_password(&clean_password)
-        .map_err(|error| anyhow!("{}", error))?;
-
-    info!("Adding new user to database.");
-    create_person_query(
-        &postgres_service.database_pool,
-        &clean_email,
-        &encrypted_password,
-        None,
-        None,
-    )
-    .await
-    .map_err(|error| anyhow!("{}", error))?;
-
-    Ok((
-        StatusCode::ACCEPTED,
-        REGISTRATION_SUCCESS_MESSAGE.to_string(),
-    ))
 }
 
 async fn authenticate(
-    postgres_service: Extension<PostgresHandler>,
-    encryption_service: Extension<PasswordEncryptionService>,
+    State(postgres_service): State<PostgresHandler>,
+    State(encryption_service): State<PasswordEncryptionService>,
     cookie_jar: PrivateCookieJar,
     Form(authentication_form): Form<CredentialsForm>,
-) -> Result<impl IntoResponse, ApiError> {
+) -> Result<Response, ApiError> {
     info!("API CALL: /authentication/authenticate");
 
     let clean_email: &str = authentication_form.email_address.trim();
     let clean_password: &str = authentication_form.password.trim();
 
+    let valid_email_address: EmailAddress =
+        EmailAddress::from_str(&clean_email).map_err(|error| anyhow!("{}", error))?;
+
     let query_result: Option<Credentials> =
-        credential_by_email_address_query(&postgres_service.database_pool, clean_email)
+        credential_by_email_address_query(&postgres_service.database_pool, &valid_email_address)
             .await
             .map_err(|error| anyhow!("{}", error))?;
 
@@ -125,7 +118,7 @@ async fn authenticate(
                 .finish(),
         );
 
-        Ok((updated_cookie_jar, SUCCESSFUL_LOGIN_MESSAGE.to_string()))
+        Ok((updated_cookie_jar, SUCCESSFUL_LOGIN_MESSAGE.to_string()).into_response())
         //return Ok(Redirect::to(uri!(index)));
     } else {
         info!("No email found matching user input: {}", clean_email);
@@ -135,15 +128,15 @@ async fn authenticate(
     }
 }
 
-async fn logout(cookie_jar: PrivateCookieJar) -> Result<impl IntoResponse, ApiError> {
+async fn logout(cookie_jar: PrivateCookieJar) -> Result<Response, ApiError> {
     info!("API CALL: /authentication/logout");
     let updated_cookie_jar = cookie_jar
         .remove(Cookie::named(cookie_fields::USER_ID))
         .remove(Cookie::named(cookie_fields::SESSION_ID));
-    Ok((updated_cookie_jar, "Successfully logged out."))
+    Ok((updated_cookie_jar, "Successfully logged out.").into_response())
 }
 
-pub fn router() -> Router {
+pub fn router() -> Router<ApplicationState> {
     Router::new()
         .route("/authentication/authenticate", post(authenticate))
         .route("/authentication/logout", post(logout))

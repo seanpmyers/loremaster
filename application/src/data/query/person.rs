@@ -1,8 +1,10 @@
 pub mod alias_by_id;
 pub mod create_person;
 pub mod credential_by_email_address;
+pub mod meta_by_id;
 pub mod person_by_email_address;
-
+pub mod update_email_address;
+pub mod update_meta_by_id;
 // #[cfg(test)]
 // mod tests {
 //     use anyhow::Result;

@@ -13,8 +13,9 @@ body {
 	margin: 0;
 	padding: 0;
 	font-family: 'Fira Sans', sans-serif;
-	background: #E9F4EBB8;
-	color: rgb(24, 90, 34);
+	background: radial-gradient(circle, rgba(255,255,255,1) 0%, rgba(254,254,255,0.8113446062018558) 100%);
+	/* background-image: linear-gradient(to right, #fff5f0, #fef2ee, #fef0ec, #fdedeb, #fcebea, #fcecec, #fcecef, #fbedf1, #faf1f6, #faf5fa, #fbf8fd, #fcfcff); */
+	color: #4C4C66;
 }
 
 body div {
@@ -29,7 +30,7 @@ body div {
 }
 
 .loremaster-text {
-	color: rgb(24, 90, 34);
+	color: #4C4C66;
 }
 
 .hover-border-bottom {
@@ -38,7 +39,7 @@ body div {
 }
 
 .hover-border-bottom:hover {
-	border-bottom: medium #36e694 solid;
+	border-bottom: medium #4C4C66 solid;
 	border-radius: 4px;
 }
 

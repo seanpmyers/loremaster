@@ -2,6 +2,11 @@ pub const API_BASE_URL: &str = "http://127.0.0.1:8000";
 pub const API_REGISTER_URL: &str = "http://127.0.0.1:8000/authentication/register";
 pub const API_LOGIN_URL: &str = "http://127.0.0.1:8000/authentication/authenticate";
 pub const API_CHRONICLE_TODAY_URL: &str = "http://127.0.0.1:8000/chronicle/today";
+pub const API_PERSON_META_DATA_ROUTE: &str = "person/meta";
+pub const API_PERSON_META_UPDATE_ROUTE: &str = "person/update/meta";
+pub const API_PERSON_EMAIL_ADDRESS_UPDATE_ROUTE: &str = "person/update/email_address";
+pub const API_ACTION_NEW_ROUTE: &str = "action/new";
+pub const API_ACTION_LIST_ROUTE: &str = "action/list";
 pub const HTTP_HEADER_CONTENT_TYPE: &str = "Content-Type";
 pub const HTTP_HEADER_CONTENT_TYPE_FORM: &str = "application/x-www-form-urlencoded";
 pub const EMAIL_ADDRESS_FIELD: &str = "email_address";
@@ -19,3 +24,13 @@ pub const SEPTEMBER: &str = "September";
 pub const OCTOBER: &str = "October";
 pub const NOVEMBER: &str = "November";
 pub const DECEMBER: &str = "December";
+
+pub const DAYS_OF_WEEK: &[time::Weekday; 7] = &[
+    time::Weekday::Sunday,
+    time::Weekday::Monday,
+    time::Weekday::Tuesday,
+    time::Weekday::Wednesday,
+    time::Weekday::Thursday,
+    time::Weekday::Friday,
+    time::Weekday::Saturday,
+];
