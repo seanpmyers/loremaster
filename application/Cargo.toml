@@ -13,7 +13,7 @@ anyhow = "1.0.66"
 argon2 = "0.4.1"
 # A web application framework that focuses on ergonomics and modularity.
 axum = { version = "0.6.1", features = ["headers"] }
-axum-extra = { version = "0.4.0", features = [
+axum-extra = { version = "0.4.1", features = [
 	"cookie",
 	"cookie-private",
 	"cookie-signed",
