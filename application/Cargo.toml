@@ -13,7 +13,7 @@ anyhow = "1.0.66"
 argon2 = "0.4.1"
 # A web application framework that focuses on ergonomics and modularity.
 axum = { version = "0.6.1", features = ["headers"] }
-axum-extra = { version = "0.4.1", features = [
+axum-extra = { version = "0.4.2", features = [
 	"cookie",
 	"cookie-private",
 	"cookie-signed",
@@ -32,7 +32,7 @@ log = "0.4.17"
 # Random nubmer generation
 rand = "0.8.5"
 # Serialization
-serde = { version = "1.0.148", features = ["derive"] }
+serde = { version = "1.0.149", features = ["derive"] }
 serde_json = "1.0.89"
 # Database client/pool/toolkit
 sqlx = { version = "0.6.2", features = [
@@ -53,12 +53,12 @@ thiserror = "1.0.37"
 # Time
 time = { version = "0.3.17", features = ["serde", "std"] }
 # Backend async I/O functionality
-tokio = { version = "1.22.0", features = ["full"] }
+tokio = { version = "1.23.0", features = ["full"] }
 tokio-stream = "0.1.11"
 tokio-test = "0.4.2"
 # Encode/decode TOML content/files
 toml = "0.5.9"
 # Tower middleware and utilities for HTTP clients and servers
-tower-http = { version = "0.3.4", features = ["cors", "fs"] }
+tower-http = { version = "0.3.5", features = ["cors", "fs"] }
 # Implementation of Universally Unique Identifiers (Uuid)
 uuid = { version = "1.2.2", features = ["v4", "serde"] }
