@@ -10,7 +10,7 @@ use uuid::Uuid;
 use crate::{
     components::{
         container::{Container, ContainerProperties},
-        widget::week_widget::{WeekWidget, WeekWidgetProperties},
+        widget::{calendar::week::Week, calendar::week::WeekProperties},
     },
     data::entity::person_chronicle::PersonChronicle,
     utility::{
@@ -96,7 +96,7 @@ pub fn chronicle_page(
                                 }
                                 h3(class="display-6") { (greeting.get()) }
                                 div() {
-                                    WeekWidget(WeekWidgetProperties{
+                                    Week(WeekProperties{
                                         days: Signal::new(vec![]),
                                         selected_date: Signal::new(local_date),
                                     })

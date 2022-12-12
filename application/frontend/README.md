@@ -9,6 +9,10 @@ Current style libraries:
 
 - [Bootstrap 5.1](https://getbootstrap.com/docs/5.1/getting-started/download/)
 
+Icons
+
+- [feather icons](https://feathericons.com/)
+
 ## Perseus CLI
 
 Statically serve
