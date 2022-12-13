@@ -39,6 +39,7 @@ pub async fn update_person_meta_data(
 pub enum UniqueEntryResult {
     Created,
     Exists,
+    Invalid,
 }
 
 pub async fn create_action(
@@ -46,6 +47,9 @@ pub async fn create_action(
     person_id: &Uuid,
     action: &String,
 ) -> Result<UniqueEntryResult> {
+    if action.len() == 0 {
+        return Ok(UniqueEntryResult::Invalid);
+    }
     let potential_action: Option<Action> =
         get_action_by_name_query(&database_pool, &action).await?;
     if potential_action.is_some() {
@@ -64,6 +68,9 @@ pub async fn create_goal(
     person_id: &Uuid,
     goal: &String,
 ) -> Result<UniqueEntryResult> {
+    if goal.len() == 0 {
+        return Ok(UniqueEntryResult::Invalid);
+    }
     let potential_goal: Option<Goal> = get_goal_by_name_query(&database_pool, &goal).await?;
     if potential_goal.is_some() {
         return Ok(UniqueEntryResult::Exists);

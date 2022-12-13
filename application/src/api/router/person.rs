@@ -106,6 +106,9 @@ pub async fn new_action(
         UniqueEntryResult::Exists => {
             Ok((StatusCode::ALREADY_REPORTED, "Action already exists.").into_response())
         }
+        UniqueEntryResult::Invalid => {
+            Ok((StatusCode::BAD_REQUEST, "Invalid input.").into_response())
+        }
     }
 }
 
@@ -136,6 +139,9 @@ pub async fn new_goal(
         }
         UniqueEntryResult::Exists => {
             Ok((StatusCode::ALREADY_REPORTED, "Goal already exists.").into_response())
+        }
+        UniqueEntryResult::Invalid => {
+            Ok((StatusCode::BAD_REQUEST, "Invalid input.").into_response())
         }
     }
 }

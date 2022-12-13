@@ -1,9 +1,13 @@
+use gloo_timers::future::TimeoutFuture;
 use perseus::{RenderFnResultWithCause, Template};
 use sycamore::prelude::{cloned, view, Html, Keyed, KeyedProps, Signal, SsrNode, View};
 use web_sys::Event;
 
 use crate::{
-    components::container::{Container, ContainerProperties},
+    components::{
+        container::{Container, ContainerProperties},
+        widget::notification::alert::{Alert, AlertProperties},
+    },
     data::entity::{action::Action, person_meta::PersonMeta},
     utility::{
         constants::{
@@ -32,6 +36,9 @@ pub fn you_page(
         action_list,
     }: YouPageStateRx,
 ) -> View<G> {
+    let login_success: Signal<Option<bool>> = Signal::new(None);
+    let login_display: Signal<Option<bool>> = login_success.clone();
+
     let email_address_input: Signal<String> = email_address.clone();
     let alias_input: Signal<String> = alias.clone();
     let display_alias: Signal<String> = alias.clone();
@@ -77,16 +84,21 @@ pub fn you_page(
             http_service::post_html_form(&format!("{}/{}",API_BASE_URL,API_PERSON_META_UPDATE_ROUTE), &vec![
                 (String::from("alias"), alias.get().as_ref().to_string()),
             ]).await;
+
         }));
     };
 
     let new_action_handler = move |event: Event| {
         event.prevent_default();
-        perseus::spawn_local(cloned!((new_action) => async move {
+        perseus::spawn_local(cloned!((new_action, login_success) => async move {
             http_service::post_html_form(&format!("{}/{}",API_BASE_URL,API_ACTION_NEW_ROUTE), &vec![
                 (String::from("action"), new_action.get().as_ref().to_string()),
             ]).await;
             new_action.set(String::new());
+
+            login_success.set(Some(true));
+            TimeoutFuture::new(10000_u32).await;
+            login_success.set(None);
         }));
     };
 
@@ -137,6 +149,7 @@ pub fn you_page(
                                 type="text",
                                 class="form-control",
                                 name="action",
+                                minLength="1",
                                 bind:value= new_action_input,
                                 placeholder = "Enter a new action"
                             ) {}
@@ -197,6 +210,18 @@ pub fn you_page(
                      }
                 }
             }
+            (if login_display.get().is_some() {
+                view! {
+                    Alert(AlertProperties{
+                        message_title: Signal::new(String::from("Login Success!")),
+                        message_body: Signal::new(String::from("You have successfully logged in.")),
+                        display_time: Signal::new(None),
+                    })
+                }
+            }
+            else {
+                view!{ div() {""}}
+            })
         }})
     }
 }

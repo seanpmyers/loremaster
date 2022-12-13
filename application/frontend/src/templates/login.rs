@@ -18,6 +18,7 @@ pub struct LoginPageState {
 pub fn login_page(state: LoginPageStateRx) -> View<G> {
     let login_success: Signal<Option<bool>> = Signal::new(None);
     let login_display: Signal<Option<bool>> = login_success.clone();
+
     let email_address: Signal<String> = state.email_address;
     let email_address_input: Signal<String> = email_address.clone();
 

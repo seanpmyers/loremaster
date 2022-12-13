@@ -1,6 +1,8 @@
+use futures_util::{future::ready, stream::StreamExt};
+use gloo_timers::future::IntervalStream;
 use js_sys::{Date, JsString};
 
-use perseus::{RenderFnResultWithCause, Template};
+use perseus::{web_log, RenderFnResultWithCause, Template};
 use sycamore::{
     prelude::{cloned, view, Html, SsrNode, View},
     reactive::Signal,
@@ -73,6 +75,21 @@ pub fn chronicle_page(
                     hour if hour >= 17_u32 || hour < 5_u32 => greeting.set(format!("Good Evening, {}", user_alias.get())),
                     _ => greeting.set(format!("Hello, {}", user_alias.get()))
                 }
+
+                IntervalStream::new(1_000).for_each(|_| {
+                    let javascript_date: Date = Date::new_0();
+
+                    let day_of_week: String = get_day_of_week_from_integer(javascript_date.get_day());
+                    let date: u32 = javascript_date.get_date();
+                    let year: u32 = javascript_date.get_full_year();
+                    let month: String = get_month_from_integer(javascript_date.get_month());
+
+                    let time: JsString = Date::to_locale_time_string(&javascript_date, "en-US");
+                    time_display.set(time.as_string().unwrap());
+                    short_date_display.set(format!("{}/{}/{}", javascript_date.get_full_year(), javascript_date.get_month(), javascript_date.get_date()));
+                    ready(())
+                }).await;
+
 
             }),
         );
