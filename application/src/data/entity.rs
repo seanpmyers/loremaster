@@ -7,4 +7,5 @@ pub mod holiday;
 pub mod intention;
 pub mod person;
 pub mod schedule;
+pub mod sleep_schedule;
 pub mod transfer;

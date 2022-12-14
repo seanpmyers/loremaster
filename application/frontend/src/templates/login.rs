@@ -80,7 +80,7 @@ pub fn login_page(state: LoginPageStateRx) -> View<G> {
                 (if login_display.get().is_some() {
                     view! {
                         Alert(AlertProperties{
-                            message_title: Signal::new(String::from("Login Success!")),
+                            message_title: Signal::new(String::from("Success!")),
                             message_body: Signal::new(String::from("You have successfully logged in.")),
                             display_time: Signal::new(None),
                         })

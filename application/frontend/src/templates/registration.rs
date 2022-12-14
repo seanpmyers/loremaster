@@ -1,8 +1,10 @@
+use gloo_timers::future::TimeoutFuture;
 use perseus::{Html, RenderFnResultWithCause, SsrNode, Template};
 use sycamore::prelude::{cloned, view, Signal, View};
 use web_sys::Event;
 
 use crate::components::container::{Container, ContainerProperties};
+use crate::components::widget::notification::alert::{Alert, AlertProperties};
 use crate::utility::constants::API_REGISTER_URL;
 use crate::utility::http_service;
 
@@ -14,6 +16,8 @@ pub struct RegistrationPageState {
 
 #[perseus::template_rx]
 pub fn registration_page(state: RegistrationPageStateRx) -> View<G> {
+    let registration_success: Signal<Option<bool>> = Signal::new(None);
+    let registration_display: Signal<Option<bool>> = registration_success.clone();
     let email_address: Signal<String> = state.email_address;
     let email_address_input: Signal<String> = email_address.clone();
 
@@ -22,13 +26,19 @@ pub fn registration_page(state: RegistrationPageStateRx) -> View<G> {
 
     let registration_handler = move |event: Event| {
         event.prevent_default();
-        perseus::spawn_local(cloned!((email_address, password) => async move {
+        perseus::spawn_local(
+            cloned!((email_address, password, registration_success) => async move {
 
-            http_service::post_html_form(&String::from(API_REGISTER_URL), &vec![
-                (String::from("email_address"), email_address.get().as_ref().to_string()),
-                (String::from("password"), password.get().as_ref().to_string()),
-            ]).await;
-        }));
+                http_service::post_html_form(&String::from(API_REGISTER_URL), &vec![
+                    (String::from("email_address"), email_address.get().as_ref().to_string()),
+                    (String::from("password"), password.get().as_ref().to_string()),
+                ]).await;
+
+                registration_success.set(Some(true));
+                TimeoutFuture::new(10000_u32).await;
+                registration_success.set(None);
+            }),
+        );
     };
 
     view! {
@@ -66,6 +76,18 @@ pub fn registration_page(state: RegistrationPageStateRx) -> View<G> {
                         }
                     }
                 }
+                (if registration_display.get().is_some() {
+                    view! {
+                        Alert(AlertProperties{
+                            message_title: Signal::new(String::from("Success!")),
+                            message_body: Signal::new(String::from("You have successfully registered.")),
+                            display_time: Signal::new(None),
+                        })
+                    }
+                }
+                else {
+                    view!{ div() {""}}
+                })
             }
         })
     }

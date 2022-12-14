@@ -228,6 +228,34 @@ ADD
         "action_id"
     );
 
+CREATE TABLE
+    "sleep_schedule"(
+        "id" UUID NOT NULl,
+        "start_time" TIME(0) WITHOUT TIME ZONE NOT NULL,
+        "end_time" TIME(0) WITHOUT TIME ZONE NOT NULL
+    );
+
+ALTER TABLE "sleep_schedule" ADD PRIMARY KEY("id");
+
+CREATE TABLE
+    "person_sleep_schedule"(
+        "person_id" UUID NOT NULL,
+        "sleep_schedule_id" UUID NOT NULL
+    );
+
+ALTER TABLE
+    "person_sleep_schedule"
+ADD
+    PRIMARY KEY(
+        "person_id",
+        "sleep_schedule_id"
+    );
+
+ALTER TABLE
+    "person_sleep_schedule"
+ADD
+    CONSTRAINT "person_id_unique" UNIQUE("person_id");
+
 ALTER TABLE
     "chronicle_intention"
 ADD
@@ -292,3 +320,13 @@ ADD
 ALTER TABLE "person_principle"
 ADD
     CONSTRAINT "person_principle_principle_id_foreign" FOREIGN KEY("principle_id") REFERENCES "principle"("id");
+
+ALTER TABLE
+    "person_sleep_schedule"
+ADD
+    CONSTRAINT "person_id_foreign_key" FOREIGN KEY("person_id") REFERENCES "person"("id");
+
+ALTER TABLE
+    "person_sleep_schedule"
+ADD
+    CONSTRAINT "sleep_schedule_id_foreign_key" FOREIGN KEY("sleep_schedule_id") REFERENCES "sleep_schedule"("id");

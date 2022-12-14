@@ -14,12 +14,13 @@ use crate::{
         guards::user::User,
         handler::person::{
             create_action, create_goal, get_action_list_handler, get_person_meta_data,
-            update_email_handler, update_meta_handler, UniqueEntryResult,
+            get_sleep_schedule_handler, update_email_handler, update_meta_handler,
+            update_sleep_schedule_handler, UniqueEntryResult,
         },
         response::ApiError,
     },
     data::{
-        entity::{action::Action, person::PersonMeta},
+        entity::{action::Action, person::PersonMeta, sleep_schedule::SleepSchedule},
         postgres_handler::PostgresHandler,
     },
     ApplicationState,
@@ -146,6 +147,40 @@ pub async fn new_goal(
     }
 }
 
+pub async fn get_sleep_schedule(
+    State(postgres_service): State<PostgresHandler>,
+    user: User,
+) -> Result<Response, ApiError> {
+    let result: Option<SleepSchedule> =
+        get_sleep_schedule_handler(&postgres_service.database_pool, &user.0).await?;
+    match result {
+        Some(schedule) => Ok((StatusCode::OK, Json(schedule)).into_response()),
+        None => todo!(),
+    }
+}
+
+#[derive(Deserialize, Debug)]
+pub struct SleepScheduleForm {
+    start_time: String,
+    end_time: String,
+}
+
+pub async fn update_sleep_schedule(
+    State(postgres_service): State<PostgresHandler>,
+    user: User,
+    Form(form): Form<SleepScheduleForm>,
+) -> Result<Response, ApiError> {
+    let result: SleepSchedule = update_sleep_schedule_handler(
+        &postgres_service.database_pool,
+        &user.0,
+        &form.start_time,
+        &form.end_time,
+    )
+    .await?;
+
+    Ok((StatusCode::ACCEPTED, Json(result)).into_response())
+}
+
 #[derive(Deserialize, Serialize, Debug)]
 pub struct CompoundingInterestInputs {
     pub duration_in_years: u16,
@@ -171,6 +206,7 @@ pub async fn compounding_interest_calculator(
 pub fn router() -> Router<ApplicationState> {
     Router::new()
         .route("/person/meta", get(meta))
+        .route("/person/sleep-schedule", get(get_sleep_schedule))
         .route("/action/list", get(get_action_list))
         .route(
             "/person/compounding-interest-calculator",
@@ -179,5 +215,6 @@ pub fn router() -> Router<ApplicationState> {
         .route("/person/update/meta", post(update_meta))
         .route("/person/update/email_address", post(update_email_address))
         .route("/person/goal/new", post(new_goal))
+        .route("/person/update/sleep-schedule", post(update_sleep_schedule))
         .route("/action/new", post(new_action))
 }
