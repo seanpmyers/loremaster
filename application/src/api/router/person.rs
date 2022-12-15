@@ -153,10 +153,7 @@ pub async fn get_sleep_schedule(
 ) -> Result<Response, ApiError> {
     let result: Option<SleepSchedule> =
         get_sleep_schedule_handler(&postgres_service.database_pool, &user.0).await?;
-    match result {
-        Some(schedule) => Ok((StatusCode::OK, Json(schedule)).into_response()),
-        None => todo!(),
-    }
+    Ok((StatusCode::OK, Json(result)).into_response())
 }
 
 #[derive(Deserialize, Debug)]

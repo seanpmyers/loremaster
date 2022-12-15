@@ -280,6 +280,12 @@ pub fn you_page(
 
                          }
                      }
+                     div(class=(section_classes)) {
+                        div() { "Values" }
+                        ul() {
+
+                         }
+                     }
                 }
             }
             (if login_display.get().is_some() {
