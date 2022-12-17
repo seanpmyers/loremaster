@@ -97,15 +97,17 @@ pub async fn new_action(
     user: User,
     Form(form): Form<NewActionForm>,
 ) -> Result<Response, ApiError> {
-    let sanitized_action: String = form.action.trim().to_ascii_lowercase();
     let result: UniqueEntryResult =
-        create_action(&postgres_service.database_pool, &user.0, &sanitized_action).await?;
+        create_action(&postgres_service.database_pool, &user.0, &form.action).await?;
     match result {
         UniqueEntryResult::Created => {
             Ok((StatusCode::CREATED, "New action successfully created!").into_response())
         }
         UniqueEntryResult::Exists => {
             Ok((StatusCode::ALREADY_REPORTED, "Action already exists.").into_response())
+        }
+        UniqueEntryResult::Added => {
+            Ok((StatusCode::OK, "Action successfully added to your list!").into_response())
         }
         UniqueEntryResult::Invalid => {
             Ok((StatusCode::BAD_REQUEST, "Invalid input.").into_response())
@@ -131,15 +133,17 @@ pub async fn new_goal(
     user: User,
     Form(form): Form<NewGoalForm>,
 ) -> Result<Response, ApiError> {
-    let sanitized_goal: String = form.goal.trim().to_ascii_lowercase();
     let result: UniqueEntryResult =
-        create_goal(&postgres_service.database_pool, &user.0, &sanitized_goal).await?;
+        create_goal(&postgres_service.database_pool, &user.0, &form.goal).await?;
     match result {
         UniqueEntryResult::Created => {
             Ok((StatusCode::CREATED, "New Goal successfully created!").into_response())
         }
         UniqueEntryResult::Exists => {
             Ok((StatusCode::ALREADY_REPORTED, "Goal already exists.").into_response())
+        }
+        UniqueEntryResult::Added => {
+            Ok((StatusCode::OK, "Goal successfully added to your list!").into_response())
         }
         UniqueEntryResult::Invalid => {
             Ok((StatusCode::BAD_REQUEST, "Invalid input.").into_response())

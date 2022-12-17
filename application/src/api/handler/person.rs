@@ -15,9 +15,12 @@ use crate::data::{
         email_address::create_email_address::create_email_address_query,
         goal::{create_goal::create_goal_query, get_goal_by_name::get_goal_by_name_query},
         person::{
+            action_is_related::action_is_related_query, add_action::add_action_query,
+            add_goal::add_goal_query,
             credential_by_email_address::credential_by_email_address_query,
             get_person_sleep_schedule::get_person_sleep_schedule_query,
-            meta_by_id::meta_by_id_query, update_email_address::update_email_address_query,
+            goal_is_related::goal_is_related_query, meta_by_id::meta_by_id_query,
+            update_email_address::update_email_address_query,
             update_meta_by_id::update_meta_by_id_query,
             update_person_sleep_schedule::update_person_sleep_schedule_query,
         },
@@ -27,6 +30,19 @@ use crate::data::{
         },
     },
 };
+
+pub enum UniqueEntryResult {
+    Created,
+    Exists,
+    Added,
+    Invalid,
+}
+
+pub enum EmailAddressUpdateResult {
+    InvalidEmailAddress,
+    EmailInUse,
+    Success,
+}
 
 pub async fn get_person_meta_data(
     database_pool: &Pool<Postgres>,
@@ -43,27 +59,38 @@ pub async fn update_person_meta_data(
     Ok(update_meta_by_id_query(&database_pool, &person_id, &alias).await?)
 }
 
-pub enum UniqueEntryResult {
-    Created,
-    Exists,
-    Invalid,
-}
-
 pub async fn create_action(
     database_pool: &Pool<Postgres>,
     person_id: &Uuid,
     action: &String,
 ) -> Result<UniqueEntryResult> {
+    let sanitized_action: String = action.trim().to_ascii_lowercase();
+
     if action.len() == 0 {
         return Ok(UniqueEntryResult::Invalid);
     }
+
     let potential_action: Option<Action> =
-        get_action_by_name_query(&database_pool, &action).await?;
-    if potential_action.is_some() {
-        return Ok(UniqueEntryResult::Exists);
+        get_action_by_name_query(&database_pool, &sanitized_action).await?;
+
+    match potential_action {
+        Some(action) => {
+            let relation_exists: bool =
+                action_is_related_query(&database_pool, &person_id, &action.id).await?;
+            match relation_exists {
+                true => Ok(UniqueEntryResult::Exists),
+                false => {
+                    add_action_query(&database_pool, &person_id, &action.id).await?;
+                    Ok(UniqueEntryResult::Added)
+                }
+            }
+        }
+        None => {
+            let action: Action = create_action_query(&database_pool, &sanitized_action).await?;
+            add_action_query(&database_pool, &person_id, &action.id).await?;
+            Ok(UniqueEntryResult::Created)
+        }
     }
-    create_action_query(&database_pool, &action).await?;
-    Ok(UniqueEntryResult::Created)
 }
 
 pub async fn get_action_list_handler(database_pool: &Pool<Postgres>) -> Result<Vec<Action>> {
@@ -75,15 +102,33 @@ pub async fn create_goal(
     person_id: &Uuid,
     goal: &String,
 ) -> Result<UniqueEntryResult> {
+    let sanitized_goal: String = goal.trim().to_ascii_lowercase();
+
     if goal.len() == 0 {
         return Ok(UniqueEntryResult::Invalid);
     }
-    let potential_goal: Option<Goal> = get_goal_by_name_query(&database_pool, &goal).await?;
-    if potential_goal.is_some() {
-        return Ok(UniqueEntryResult::Exists);
+
+    let potential_goal: Option<Goal> =
+        get_goal_by_name_query(&database_pool, &sanitized_goal).await?;
+
+    match potential_goal {
+        Some(goal) => {
+            let relation_exists: bool =
+                goal_is_related_query(&database_pool, &person_id, &goal.id).await?;
+            match relation_exists {
+                true => Ok(UniqueEntryResult::Exists),
+                false => {
+                    add_goal_query(&database_pool, &person_id, &goal.id).await?;
+                    Ok(UniqueEntryResult::Added)
+                }
+            }
+        }
+        None => {
+            let goal: Goal = create_goal_query(&database_pool, &goal).await?;
+            add_goal_query(&database_pool, &person_id, &goal.id).await?;
+            Ok(UniqueEntryResult::Created)
+        }
     }
-    create_goal_query(&database_pool, &goal).await?;
-    Ok(UniqueEntryResult::Created)
 }
 
 pub async fn update_meta_handler(
@@ -96,12 +141,6 @@ pub async fn update_meta_handler(
     let result: PersonMeta =
         update_person_meta_data(&database_pool, &person_id, sanitized_alias).await?;
     Ok(result)
-}
-
-pub enum EmailAddressUpdateResult {
-    InvalidEmailAddress,
-    EmailInUse,
-    Success,
 }
 
 pub async fn update_email_handler(

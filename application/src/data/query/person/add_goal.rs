@@ -1,30 +1,38 @@
-use anyhow::Result;
+use anyhow::{anyhow, Result};
 use log::info;
-use sqlx::{query_as, PgPool};
+use sqlx::{query, PgPool};
 
 use uuid::Uuid;
-
-use crate::data::entity::goal::Goal;
 
 const QUERY: &str = "
 	INSERT INTO
 		public.person_goal (
-				person_id
-				, goal_id
+            person_id
+            , goal_id
 		)
 	VALUES 
-    ($1, $2)
+        ($1, $2)
 ;";
 
-pub async fn create_goal_query(database_connection: &PgPool, goal: &String) -> Result<Goal> {
-    info!("QUERY CALL: create_action_query");
-    let new_id: Uuid = Uuid::new_v4();
+pub async fn add_goal_query(
+    database_connection: &PgPool,
+    person_id: &Uuid,
+    goal_id: &Uuid,
+) -> Result<()> {
+    info!("QUERY CALL: add_goal_query");
 
-    let query_result: Goal = query_as::<_, Goal>(QUERY)
-        .bind(&new_id)
-        .bind(&goal)
-        .fetch_one(database_connection)
-        .await?;
+    let updated_row_count: u64 = query(QUERY)
+        .bind(&person_id)
+        .bind(&goal_id)
+        .execute(database_connection)
+        .await?
+        .rows_affected();
 
-    Ok(query_result)
+    if updated_row_count < 1_u64 {
+        return Err(anyhow!(
+            "No rows were updated! query: update_person_sleep_schedule_query"
+        ));
+    }
+
+    Ok(())
 }

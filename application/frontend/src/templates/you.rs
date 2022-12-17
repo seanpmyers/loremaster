@@ -52,6 +52,8 @@ pub fn you_page(
     let sleep_start_input: Signal<String> = sleep_start.clone();
     let sleep_end_input: Signal<String> = sleep_end.clone();
 
+    let new_goal: Signal<String> = Signal::new(String::from(""));
+
     if G::IS_BROWSER {
         perseus::spawn_local(
             cloned!((email_address, alias, action_list, sleep_start, sleep_end) => async move {
@@ -127,6 +129,16 @@ pub fn you_page(
             login_success.set(Some(true));
             TimeoutFuture::new(10000_u32).await;
             login_success.set(None);
+        }));
+    };
+
+    let new_goal_handler = move |event: Event| {
+        event.prevent_default();
+        perseus::spawn_local(cloned!((new_goal) => async move {
+            http_service::post_html_form(&format!("{}/{}",API_BASE_URL,API_ACTION_NEW_ROUTE), &vec![
+                (String::from("action"), new_goal.get().as_ref().to_string()),
+            ]).await;
+            new_goal.set(String::new());
         }));
     };
 
