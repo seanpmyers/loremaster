@@ -135,7 +135,7 @@ pub fn you_page(
     let new_goal_handler = move |event: Event| {
         event.prevent_default();
         perseus::spawn_local(cloned!((new_goal) => async move {
-            http_service::post_html_form(&format!("{}/{}",API_BASE_URL,API_ACTION_NEW_ROUTE), &vec![
+            http_service::post_html_form(&format!("{}/{}", API_BASE_URL, API_ACTION_NEW_ROUTE), &vec![
                 (String::from("action"), new_goal.get().as_ref().to_string()),
             ]).await;
             new_goal.set(String::new());
