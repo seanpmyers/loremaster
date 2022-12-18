@@ -131,6 +131,16 @@ pub async fn create_goal(
     }
 }
 
+pub async fn get_goal_list_handler(
+    database_pool: &Pool<Postgres>,
+    person_id: Option<&Uuid>,
+) -> Result<Vec<Goal>> {
+    match person_id {
+        Some(id) => todo!(),
+        None => todo!(),
+    }
+}
+
 pub async fn update_meta_handler(
     database_pool: &Pool<Postgres>,
     person_id: &Uuid,

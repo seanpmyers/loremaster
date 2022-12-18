@@ -7,6 +7,7 @@ use web_sys::Event;
 use crate::{
     components::{
         container::{Container, ContainerProperties},
+        widget::goal_list::{GoalList, GoalListProperties},
         widget::notification::alert::{Alert, AlertProperties},
     },
     data::entity::{action::Action, person_meta::PersonMeta, sleep_schedule::SleepSchedule},
@@ -53,6 +54,7 @@ pub fn you_page(
     let sleep_end_input: Signal<String> = sleep_end.clone();
 
     let new_goal: Signal<String> = Signal::new(String::from(""));
+    let new_goal_input: Signal<String> = new_goal.clone();
 
     if G::IS_BROWSER {
         perseus::spawn_local(
@@ -201,27 +203,32 @@ pub fn you_page(
                                 class="form-control",
                                 name="action",
                                 minLength="1",
-                                bind:value= new_action_input,
-                                placeholder = "Enter a new action"
+                                bind:value=new_action_input,
+                                placeholder="Enter a new action"
                             ) {}
                         }
                         div(class="mb-3") {
                             button(class="btn btn-primary", type="submit") { "Add" }
                         }
                      }
-                     div(class=(section_classes)) {
-                        div() { "Actions" }
-                        ul() {
-                            Keyed(KeyedProps {
-                                iterable: action_list.handle(),
-                                template: move |action| view! {
-                                    li() { (action.name) }
-                                },
-                                key: |action| action.id
-                            })
-                         }
-                     }
-                     form(class=(section_classes)) {
+                    form(on:submit=new_goal_handler, class=(section_classes)) {
+                        div(class="mb-3") {
+                            label(class="form-label") {"New Goal"}
+                            input(
+                                type="text",
+                                class="form-control",
+                                name="goal",
+                                minLength="1",
+                                bind:value=new_goal_input,
+                                placeholder="Enter a new goal"
+                            ) {}
+                        }
+                    div(class="mb-3") {
+                        button(class="btn btn-primary", type="submit") { "Add" }
+                    }
+                    }
+
+                    form(class=(section_classes)) {
                         div(class="mb-3") {
                             label(class="form-label") {"New Intention"}
 
@@ -246,7 +253,7 @@ pub fn you_page(
                         div(class="mb-3") {
                             button(class="btn btn-primary", type="submit") { "Add" }
                         }
-                     }
+                    }
                     form(
                         class=(section_classes),
                         on:submit=update_sleep_schedule_handler
@@ -279,25 +286,35 @@ pub fn you_page(
                         div(class="mb-3") {
                             button(class="btn btn-primary", type="submit") { "Save" }
                         }
+                    }
+                    div(class=(section_classes)) {
+                        div() { "Actions" }
+                        ul() {
+                            Keyed(KeyedProps {
+                                iterable: action_list.handle(),
+                                template: move |action| view! {
+                                    li() { (action.name) }
+                                },
+                                key: |action| action.id
+                            })
+                         }
                      }
-                     div(class=(section_classes)) {
+                    div(class=(section_classes)) {
                         div() { "Intentions" }
                         ul() {
 
                          }
                      }
-                     div(class=(section_classes)) {
+                    div(class=(section_classes)) {
                         div() { "Goals" }
-                        ul() {
-
-                         }
+                        GoalList(GoalListProperties{goals: Signal::new(Vec::new())})
                      }
-                     div(class=(section_classes)) {
+                    div(class=(section_classes)) {
                         div() { "Values" }
                         ul() {
 
                          }
-                     }
+                    }
                 }
             }
             (if login_display.get().is_some() {
