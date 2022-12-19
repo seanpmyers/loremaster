@@ -36,7 +36,6 @@ pub struct ChroniclePageState {
     pub greeting: String,
     pub sleep_start_time: Option<Time>,
     pub sleep_end_time: Option<Time>,
-    pub hours_remaining: u32,
 }
 
 #[perseus::template_rx]
@@ -50,7 +49,6 @@ pub fn chronicle_page(
         greeting,
         sleep_start_time,
         sleep_end_time,
-        hours_remaining,
     }: ChroniclePageStateRx,
 ) -> View<G> {
     if G::IS_BROWSER {
@@ -199,7 +197,6 @@ pub async fn get_build_state(
         greeting: String::new(),
         sleep_start_time: None,
         sleep_end_time: None,
-        hours_remaining: 24_u32,
     })
 }
 

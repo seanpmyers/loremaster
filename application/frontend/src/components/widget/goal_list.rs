@@ -22,17 +22,27 @@ pub fn goal_list(GoalListProperties { goals }: GoalListProperties) -> View<G> {
         }));
     }
     view! {
-        ul(class=" goal_list", id="") {
-            Keyed( KeyedProps {
-                    iterable: goals.handle(),
-                    template: move |goal: Goal| {
-                        view!{
-                            li() { (goal.name) }
-                        }
-                    },
-                    key: |goal| goal.id
-                })
-        }
+        (if goals.get().len() > 0 {
+            view! {
+                ul(class=" goal_list", id="") {
+                    Keyed( KeyedProps {
+                            iterable: goals.handle(),
+                            template: move |goal: Goal| {
+                                view!{
+                                    li() { (goal.name) }
+                                }
+                            },
+                            key: |goal| goal.id
+                        })
+                }
+            }
+        } else {
+            view! {
+                div() {
+                    "No goals available."
+                }
+            }
+        })
     }
 }
 
