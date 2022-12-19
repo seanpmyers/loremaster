@@ -6,12 +6,12 @@ use crate::data::entity::goal::Goal;
 
 const QUERY: &str = "
     SELECT
-			id
-			, name
-		FROM
-			public.goal
-		WHERE
-			name = $1
+        id
+        , name
+    FROM
+        public.goal
+    WHERE
+        name = $1
     ;";
 
 pub async fn get_goal_by_name_query(

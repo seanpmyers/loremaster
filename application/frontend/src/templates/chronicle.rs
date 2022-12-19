@@ -13,7 +13,10 @@ use uuid::Uuid;
 use crate::{
     components::{
         container::{Container, ContainerProperties},
-        widget::{calendar::week::Week, calendar::week::WeekProperties},
+        widget::{
+            calendar::week::Week, calendar::week::WeekProperties, goal_list::GoalList,
+            goal_list::GoalListProperties,
+        },
     },
     data::entity::{person_chronicle::PersonChronicle, sleep_schedule::SleepSchedule},
     utility::{
@@ -170,9 +173,7 @@ pub fn chronicle_page(
                                     div(class="card-body") {
                                         h3(class="card-title") { "Goals" }
                                         p(class="card-text") {
-                                            ul() {
-                                                li() { "-" }
-                                            }
+                                            GoalList(GoalListProperties{goals: Signal::new(Vec::new())})
                                         }
                                     }
                                 }

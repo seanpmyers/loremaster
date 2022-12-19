@@ -22,12 +22,12 @@ pub fn goal_list(GoalListProperties { goals }: GoalListProperties) -> View<G> {
         }));
     }
     view! {
-        div(class="d-flex flex-row goal_list", id="") {
+        ul(class=" goal_list", id="") {
             Keyed( KeyedProps {
                     iterable: goals.handle(),
                     template: move |goal: Goal| {
                         view!{
-                            div() { (goal.name) }
+                            li() { (goal.name) }
                         }
                     },
                     key: |goal| goal.id

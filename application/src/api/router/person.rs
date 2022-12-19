@@ -13,9 +13,9 @@ use crate::{
     api::{
         guards::user::User,
         handler::person::{
-            create_action, create_goal, get_action_list_handler, get_person_meta_data,
-            get_sleep_schedule_handler, update_email_handler, update_meta_handler,
-            update_sleep_schedule_handler, UniqueEntryResult,
+            create_action, create_goal, get_action_list_handler, get_goal_list_handler,
+            get_person_meta_data, get_sleep_schedule_handler, update_email_handler,
+            update_meta_handler, update_sleep_schedule_handler, UniqueEntryResult,
         },
         response::ApiError,
     },
@@ -151,6 +151,17 @@ pub async fn new_goal(
     }
 }
 
+pub async fn get_goal_list(
+    State(postgres_service): State<PostgresHandler>,
+    user: User,
+) -> Result<Response, ApiError> {
+    Ok((
+        StatusCode::OK,
+        Json(get_goal_list_handler(&postgres_service.database_pool, Some(&user.0)).await?),
+    )
+        .into_response())
+}
+
 pub async fn get_sleep_schedule(
     State(postgres_service): State<PostgresHandler>,
     user: User,
@@ -216,6 +227,7 @@ pub fn router() -> Router<ApplicationState> {
         .route("/person/update/meta", post(update_meta))
         .route("/person/update/email_address", post(update_email_address))
         .route("/person/goal/new", post(new_goal))
+        .route("/person/goal-list", get(get_goal_list))
         .route("/person/update/sleep-schedule", post(update_sleep_schedule))
         .route("/action/new", post(new_action))
 }

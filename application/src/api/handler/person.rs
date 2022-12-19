@@ -13,7 +13,10 @@ use crate::data::{
             get_all_actions::get_all_actions_query,
         },
         email_address::create_email_address::create_email_address_query,
-        goal::{create_goal::create_goal_query, get_goal_by_name::get_goal_by_name_query},
+        goal::{
+            create_goal::create_goal_query, get_goal_by_name::get_goal_by_name_query,
+            get_goal_list::get_goal_list_query,
+        },
         person::{
             action_is_related::action_is_related_query, add_action::add_action_query,
             add_goal::add_goal_query,
@@ -135,10 +138,7 @@ pub async fn get_goal_list_handler(
     database_pool: &Pool<Postgres>,
     person_id: Option<&Uuid>,
 ) -> Result<Vec<Goal>> {
-    match person_id {
-        Some(id) => todo!(),
-        None => todo!(),
-    }
+    Ok(get_goal_list_query(&database_pool, person_id).await?)
 }
 
 pub async fn update_meta_handler(

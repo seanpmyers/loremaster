@@ -13,7 +13,7 @@ use crate::{
     data::entity::{action::Action, person_meta::PersonMeta, sleep_schedule::SleepSchedule},
     utility::{
         constants::{
-            API_ACTION_LIST_ROUTE, API_ACTION_NEW_ROUTE, API_BASE_URL,
+            API_ACTION_LIST_ROUTE, API_ACTION_NEW_ROUTE, API_BASE_URL, API_GOAL_NEW_ROUTE,
             API_PERSON_EMAIL_ADDRESS_UPDATE_ROUTE, API_PERSON_META_DATA_ROUTE,
             API_PERSON_META_UPDATE_ROUTE, API_PERSON_SLEEP_SCHEDULE_ROUTE,
             API_PERSON_SLEEP_SCHEDULE_UPDATE_ROUTE,
@@ -137,8 +137,8 @@ pub fn you_page(
     let new_goal_handler = move |event: Event| {
         event.prevent_default();
         perseus::spawn_local(cloned!((new_goal) => async move {
-            http_service::post_html_form(&format!("{}/{}", API_BASE_URL, API_ACTION_NEW_ROUTE), &vec![
-                (String::from("action"), new_goal.get().as_ref().to_string()),
+            http_service::post_html_form(&format!("{}/{}", API_BASE_URL, API_GOAL_NEW_ROUTE), &vec![
+                (String::from("goal"), new_goal.get().as_ref().to_string()),
             ]).await;
             new_goal.set(String::new());
         }));
