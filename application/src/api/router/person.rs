@@ -13,14 +13,17 @@ use crate::{
     api::{
         guards::user::User,
         handler::person::{
-            create_action, create_goal, get_action_list_handler, get_goal_list_handler,
-            get_person_meta_data, get_sleep_schedule_handler, update_email_handler,
-            update_meta_handler, update_sleep_schedule_handler, UniqueEntryResult,
+            create_action, create_goal, get_action_list_handler, get_frequency_list_handler,
+            get_goal_list_handler, get_person_meta_data, get_sleep_schedule_handler,
+            update_email_handler, update_meta_handler, update_sleep_schedule_handler,
+            UniqueEntryResult,
         },
         response::ApiError,
     },
     data::{
-        entity::{action::Action, person::PersonMeta, sleep_schedule::SleepSchedule},
+        entity::{
+            action::Action, frequency::Frequency, person::PersonMeta, sleep_schedule::SleepSchedule,
+        },
         postgres_handler::PostgresHandler,
     },
     ApplicationState,
@@ -193,6 +196,15 @@ pub async fn update_sleep_schedule(
     Ok((StatusCode::ACCEPTED, Json(result)).into_response())
 }
 
+pub async fn get_frequency_list(
+    State(postgres_service): State<PostgresHandler>,
+    _user: User,
+) -> Result<Response, ApiError> {
+    let frequency_types: Vec<Frequency> =
+        get_frequency_list_handler(&postgres_service.database_pool).await?;
+    Ok((StatusCode::OK, Json(frequency_types)).into_response())
+}
+
 #[derive(Deserialize, Serialize, Debug)]
 pub struct CompoundingInterestInputs {
     pub duration_in_years: u16,
@@ -220,6 +232,7 @@ pub fn router() -> Router<ApplicationState> {
         .route("/person/meta", get(meta))
         .route("/person/sleep-schedule", get(get_sleep_schedule))
         .route("/action/list", get(get_action_list))
+        .route("/frequency/list", get(get_frequency_list))
         .route(
             "/person/compounding-interest-calculator",
             get(compounding_interest_calculator),

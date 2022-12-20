@@ -330,3 +330,13 @@ ALTER TABLE
     "person_sleep_schedule"
 ADD
     CONSTRAINT "sleep_schedule_id_foreign_key" FOREIGN KEY("sleep_schedule_id") REFERENCES "sleep_schedule"("id");
+
+INSERT INTO
+    frequency
+VALUES
+    ((select gen_random_uuid ()), 'Day'),
+    ((select gen_random_uuid ()), 'Month'),
+    ((select gen_random_uuid ()), 'Year'),
+    ((select gen_random_uuid ()), 'Minute'),
+    ((select gen_random_uuid ()), 'Hour')
+;

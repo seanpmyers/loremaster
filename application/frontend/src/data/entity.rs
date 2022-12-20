@@ -1,4 +1,5 @@
 pub mod action;
+pub mod frequency;
 pub mod goal;
 pub mod intention;
 pub mod person_chronicle;

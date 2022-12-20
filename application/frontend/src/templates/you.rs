@@ -7,8 +7,11 @@ use web_sys::Event;
 use crate::{
     components::{
         container::{Container, ContainerProperties},
-        widget::goal_list::{GoalList, GoalListProperties},
         widget::notification::alert::{Alert, AlertProperties},
+        widget::{
+            frequency_options::{FrequencyOptions, FrequencyOptionsProperties},
+            goal_list::{GoalList, GoalListProperties},
+        },
     },
     data::entity::{action::Action, person_meta::PersonMeta, sleep_schedule::SleepSchedule},
     utility::{
@@ -249,6 +252,10 @@ pub fn you_page(
                         div(class="mb-3") {
                             label(class="form-label") {"Date"}
                             input(type="datetime-local",class="form-control") {}
+                        }
+                        div(class="mb-3") {
+                            label(class="form-label") {"Frequency"}
+                            FrequencyOptions(FrequencyOptionsProperties{})
                         }
                         div(class="mb-3") {
                             button(class="btn btn-primary", type="submit") { "Add" }

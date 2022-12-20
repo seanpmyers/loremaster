@@ -6,13 +6,17 @@ use time::{format_description::FormatItem, macros::format_description, Time};
 use uuid::Uuid;
 
 use crate::data::{
-    entity::{self, action::Action, goal::Goal, person::PersonMeta, sleep_schedule::SleepSchedule},
+    entity::{
+        self, action::Action, frequency::Frequency, goal::Goal, person::PersonMeta,
+        sleep_schedule::SleepSchedule,
+    },
     query::{
         action::{
             create_action::create_action_query, get_action_by_name::get_action_by_name_query,
             get_all_actions::get_all_actions_query,
         },
         email_address::create_email_address::create_email_address_query,
+        frequency::get_frequency_list::get_frequency_list_query,
         goal::{
             create_goal::create_goal_query, get_goal_by_name::get_goal_by_name_query,
             get_goal_list::get_goal_list_query,
@@ -219,4 +223,8 @@ pub async fn update_sleep_schedule_handler(
             Ok(new_schedule)
         }
     }
+}
+
+pub async fn get_frequency_list_handler(database_pool: &Pool<Postgres>) -> Result<Vec<Frequency>> {
+    Ok(get_frequency_list_query(&database_pool).await?)
 }
