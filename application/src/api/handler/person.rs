@@ -27,6 +27,7 @@ use crate::data::{
             credential_by_email_address::credential_by_email_address_query,
             get_person_sleep_schedule::get_person_sleep_schedule_query,
             goal_is_related::goal_is_related_query, meta_by_id::meta_by_id_query,
+            remove_one_goal::remove_one_goal_query,
             update_email_address::update_email_address_query,
             update_meta_by_id::update_meta_by_id_query,
             update_person_sleep_schedule::update_person_sleep_schedule_query,
@@ -135,6 +136,21 @@ pub async fn create_goal(
             add_goal_query(&database_pool, &person_id, &goal.id).await?;
             Ok(UniqueEntryResult::Created)
         }
+    }
+}
+
+pub async fn remove_one_goal_handler(
+    database_pool: &Pool<Postgres>,
+    person_id: &Uuid,
+    goal_id: &Uuid,
+) -> Result<bool> {
+    let relation_exists: bool = goal_is_related_query(&database_pool, &person_id, &goal_id).await?;
+    match relation_exists {
+        true => {
+            remove_one_goal_query(&database_pool, &person_id, &goal_id).await?;
+            Ok(true)
+        }
+        false => Ok(false),
     }
 }
 

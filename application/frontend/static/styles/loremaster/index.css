@@ -119,3 +119,20 @@ body div {
 	background-repeat: no-repeat;
 	background-size: 100%;
 }
+
+.timeline-circle {
+	height: 25px;
+  width: 25px;
+  background-color: rgb(0, 170, 243);
+  border-radius: 50%;
+  display: inline-block;
+}
+
+.timeline-circle-empty {
+	height: 25px;
+  width: 25px;
+  background-color: rgba(0, 170, 243, 0);
+	border: 1px solid rgb(0, 170, 243);
+  border-radius: 50%;
+  display: inline-block;
+}

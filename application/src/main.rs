@@ -14,6 +14,7 @@ use utility::loremaster_configuration::LoremasterConfiguration;
 
 mod api;
 mod data;
+mod security;
 mod utility;
 
 use data::postgres_handler::PostgresHandler;

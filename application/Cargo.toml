@@ -19,6 +19,8 @@ axum-extra = { version = "0.4.2", features = [
 	"cookie-signed",
 	"form",
 ] }
+# Fast IDentity Online client to authenticator protocol (FIDO2 CTAP)
+ctap-hid-fido2 = { version = "3.4.2" }
 # Email adderss validation
 email_address = { version = "0.2.4" }
 # Logging

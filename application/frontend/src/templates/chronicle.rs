@@ -128,12 +128,12 @@ pub fn chronicle_page(
                         div(class="row flex-grow-1 text-black"){
                             div(class="col-9 bg-light p-5 border-0 rounded") {
                                 div(class="d-flex align-items-baseline") {
-                                    h2(class="display-6 flex-grow-1") { (date_display.get()) }
+                                    h2(class="fw-normal flex-grow-1") { (date_display.get()) }
                                     div(class="fw-normal flex-shrink-1 badge fs-5 bg-primary") {
                                         (format!("{} {}", short_date_display.get(), time_display.get()))
                                     }
                                 }
-                                h3(class="display-6") { (greeting.get()) }
+                                h3(class="fw-normal") { (greeting.get()) }
                                 div() {
                                     Week(WeekProperties{
                                         days: Signal::new(vec![]),
