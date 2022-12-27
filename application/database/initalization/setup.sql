@@ -251,10 +251,47 @@ ADD
         "sleep_schedule_id"
     );
 
+CREATE TABLE
+    "skill"(
+        "id" UUID NOT NULL,
+        "name" TEXT NOT NULL
+    );
+
+ALTER TABLE
+    "skill"
+ADD
+    PRIMARY KEY("id");
+
+ALTER TABLE
+    "skill"
+ADD 
+    CONSTRAINT "skill_unique" UNIQUE("skill");
+
+CREATE TABLE
+    "person_skill"(
+        "person_id" UUID NOT NULL,
+        "skill_id" UUID NOT NULL
+    );
+
+ALTER TABLE
+    "person_skill"
+ADD
+    PRIMARY KEY("person_id", "skill_id");
+
 ALTER TABLE
     "person_sleep_schedule"
 ADD
     CONSTRAINT "person_id_unique" UNIQUE("person_id");
+
+ALTER TABLE
+    "person_skill"
+ADD
+    CONSTRAINT "person_foreign_key" FOREIGN KEY("person_id") REFERENCES "person"("id");
+
+ALTER TABLE
+    "person_skill"
+ADD
+    CONSTRAINT "skill_foreign_key" FOREIGN KEY("skill_id") REFERENCES "skill"("id");
 
 ALTER TABLE
     "chronicle_intention"
