@@ -21,7 +21,7 @@ time = { version = "0.3.17", features = [
 	"local-offset",
 	"wasm-bindgen",
 ] }
-ureq = { version = "2.5.0" }
+ureq = { version = "2.6.1" }
 uuid = { version = "1.2.2", features = ["serde"] }
 wasm-bindgen = { version = "0.2.83" }
 web-sys = { version = "0.3.60", features = [
