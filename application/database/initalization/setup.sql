@@ -265,7 +265,7 @@ ADD
 ALTER TABLE
     "skill"
 ADD 
-    CONSTRAINT "skill_unique" UNIQUE("skill");
+    CONSTRAINT "skill_unique" UNIQUE("name");
 
 CREATE TABLE
     "person_skill"(
