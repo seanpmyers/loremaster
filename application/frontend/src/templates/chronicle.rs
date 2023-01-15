@@ -1,6 +1,6 @@
 use futures_util::{future::ready, stream::StreamExt};
 use gloo_timers::future::IntervalStream;
-use js_sys::{Date, JsString};
+use js_sys::{Array, Date, JsString, Object};
 
 use perseus::{RenderFnResultWithCause, Template};
 use sycamore::{
@@ -9,6 +9,7 @@ use sycamore::{
 };
 use time::Time;
 use uuid::Uuid;
+use wasm_bindgen::JsValue;
 
 use crate::{
     components::{
@@ -64,9 +65,10 @@ pub fn chronicle_page(
                 let time: JsString = Date::to_locale_time_string(&javascript_date, "en-US");
                 time_display.set(time.as_string().unwrap());
                 date_display.set(format!("{day_of_week}, {month} {date}, {year}"));
-                short_date_display.set(format!("{}/{}/{}", javascript_date.get_full_year(), javascript_date.get_month(), javascript_date.get_date()));
-
-                let mut query_response = http_service::get_endpoint(API_CHRONICLE_TODAY_URL, None).await;
+                short_date_display.set(format!("{}/{}/{}", javascript_date.get_full_year(), javascript_date.get_month() + 1_u32, javascript_date.get_date()));
+                let options = js_sys::Intl::DateTimeFormat::new(&Array::new(), &Object::new()).resolved_options();
+                let timezone = js_sys::Reflect::get(&options, &JsValue::from("timeZone")).unwrap().as_string().unwrap();
+                let mut query_response = http_service::get_endpoint(API_CHRONICLE_TODAY_URL, Some(&vec![(String::from("timezone"), timezone)])).await;
                 match query_response {
                     Some(response) => {
                         let chronicle_data: PersonChronicle = serde_json::from_str(&response).unwrap();
@@ -105,7 +107,7 @@ pub fn chronicle_page(
 
                     let time: JsString = Date::to_locale_time_string(&javascript_date, "en-US");
                     time_display.set(time.as_string().unwrap());
-                    short_date_display.set(format!("{}/{}/{}", javascript_date.get_full_year(), javascript_date.get_month(), javascript_date.get_date()));
+                    short_date_display.set(format!("{}/{}/{}", javascript_date.get_full_year(), javascript_date.get_month() + 1_u32, javascript_date.get_date()));
                     ready(())
                 }).await;
 
