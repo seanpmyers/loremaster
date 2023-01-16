@@ -8,7 +8,8 @@ pub struct Frequency {
 }
 
 // These are defined in SQL, this should match what is there
-#[derive(Deserialize, Serialize, Debug, Clone)]
+#[derive(Deserialize, Serialize, Debug, Clone, sqlx::Type, PartialEq)]
+#[sqlx(type_name = "frequency_unit")]
 pub enum FrequencyUnit {
     Day,
     Month,

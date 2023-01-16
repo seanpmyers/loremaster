@@ -11,21 +11,21 @@ pub struct WeekDayInformation {
     pub week_day: time::Weekday,
 }
 
-pub struct WeekWidgetProperties {
+pub struct WeekProperties {
     pub selected_date: Signal<time::OffsetDateTime>,
     pub days: Signal<Vec<WeekDayInformation>>,
 }
 
-#[component(WeekWidget<G>)]
-pub fn week_widget(
-    WeekWidgetProperties {
+#[component(Week<G>)]
+pub fn week(
+    WeekProperties {
         selected_date,
         days,
-    }: WeekWidgetProperties,
+    }: WeekProperties,
 ) -> View<G> {
     days.set(create_week_list(&selected_date.get()));
     view! {
-        div(class="d-flex flex-row", id="week_widget") {
+        div(class="d-flex flex-row week_widget", id="") {
             Keyed( KeyedProps {
                     iterable: days.handle(),
                     template: move |day: WeekDayInformation|

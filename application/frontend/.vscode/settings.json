@@ -2,6 +2,7 @@
 	"cSpell.words": [
 		"autoserde",
 		"bindgen",
+		"gloo",
 		"reqwasm"
 	]
 }

@@ -28,6 +28,7 @@ pub enum RegistrationResult {
 }
 
 const ALLOWED_EMAIL_ADDRESSES: [&str; 2] = ["person@loremaster.xyz", "mail@seanmyers.xyz"];
+const MINIMUM_PASSWORD_LENGTH: usize = 8;
 
 pub async fn register_handler(
     database_pool: &Pool<Postgres>,
@@ -37,6 +38,10 @@ pub async fn register_handler(
 ) -> Result<RegistrationResult> {
     let clean_email: &str = input_email_address.trim();
     let clean_password: &str = input_password.trim();
+
+    if clean_password.len() < MINIMUM_PASSWORD_LENGTH {
+        return Ok(RegistrationResult::InvalidPassword);
+    }
 
     if !EmailAddress::is_valid(clean_email) {
         return Ok(RegistrationResult::InvalidEmailAddress);

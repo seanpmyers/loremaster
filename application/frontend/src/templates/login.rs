@@ -1,8 +1,10 @@
+use gloo_timers::future::TimeoutFuture;
 use perseus::{Html, RenderFnResultWithCause, SsrNode, Template};
 use sycamore::prelude::{cloned, view, Signal, View};
 use web_sys::Event;
 
 use crate::components::container::{Container, ContainerProperties};
+use crate::components::widget::notification::alert::{Alert, AlertProperties};
 use crate::utility::constants::API_LOGIN_URL;
 use crate::utility::http_service;
 
@@ -14,6 +16,9 @@ pub struct LoginPageState {
 
 #[perseus::template_rx]
 pub fn login_page(state: LoginPageStateRx) -> View<G> {
+    let login_success: Signal<Option<bool>> = Signal::new(None);
+    let login_display: Signal<Option<bool>> = login_success.clone();
+
     let email_address: Signal<String> = state.email_address;
     let email_address_input: Signal<String> = email_address.clone();
 
@@ -22,14 +27,19 @@ pub fn login_page(state: LoginPageStateRx) -> View<G> {
 
     let login_handler = move |event: Event| {
         event.prevent_default();
-        perseus::spawn_local(cloned!((email_address, password) => async move {
+        perseus::spawn_local(
+            cloned!((email_address, password, login_success) => async move {
 
-            http_service::post_html_form(&String::from(API_LOGIN_URL), &vec![
-                (String::from("email_address"), email_address.get().as_ref().to_string()),
-                (String::from("password"), password.get().as_ref().to_string()),
-            ]).await;
+                http_service::post_html_form(&String::from(API_LOGIN_URL), &vec![
+                    (String::from("email_address"), email_address.get().as_ref().to_string()),
+                    (String::from("password"), password.get().as_ref().to_string()),
+                ]).await;
 
-        }));
+                login_success.set(Some(true));
+                TimeoutFuture::new(10000_u32).await;
+                login_success.set(None);
+            }),
+        );
     };
 
     view! {
@@ -67,6 +77,18 @@ pub fn login_page(state: LoginPageStateRx) -> View<G> {
                         }
                     }
                 }
+                (if login_display.get().is_some() {
+                    view! {
+                        Alert(AlertProperties{
+                            message_title: Signal::new(String::from("Success!")),
+                            message_body: Signal::new(String::from("You have successfully logged in.")),
+                            display_time: Signal::new(None),
+                        })
+                    }
+                }
+                else {
+                    view!{ div() {""}}
+                })
             }
         })
     }

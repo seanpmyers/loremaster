@@ -19,6 +19,8 @@ axum-extra = { version = "0.4.2", features = [
 	"cookie-signed",
 	"form",
 ] }
+# Fast IDentity Online client to authenticator protocol (FIDO2 CTAP)
+ctap-hid-fido2 = { version = "3.4.2" }
 # Email adderss validation
 email_address = { version = "0.2.4" }
 # Logging
@@ -52,7 +54,8 @@ sqlx = { version = "0.6.2", features = [
 # Error/exception handling
 thiserror = "1.0.38"
 # Time
-time = { version = "0.3.17", features = ["serde", "std"] }
+time = { version = "0.3.17", features = ["serde", "std", "parsing"] }
+time-tz = { version = "1.0.2" }
 # Backend async I/O functionality
 tokio = { version = "1.24.1", features = ["full"] }
 tokio-stream = "0.1.11"
