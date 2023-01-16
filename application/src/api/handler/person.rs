@@ -241,6 +241,6 @@ pub async fn update_sleep_schedule_handler(
     }
 }
 
-pub async fn get_frequency_list_handler(database_pool: &Pool<Postgres>) -> Result<Vec<Frequency>> {
-    Ok(get_frequency_list_query(&database_pool).await?)
+pub fn get_frequency_list_handler() -> Result<Vec<Frequency>> {
+    Ok(get_frequency_list_query()?)
 }

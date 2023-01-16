@@ -89,34 +89,23 @@ CREATE INDEX "completed_action_chronicle_id_index" ON "completed_action" ("chron
 ALTER TABLE "completed_action"
     ADD PRIMARY KEY ("action_id");
 
-CREATE TYPE frequency_unit AS ENUM (
+CREATE TYPE frequency AS ENUM (
     'Day',
+    'Weekday',
+    'Week',
     'Month',
     'Year',
     'Hour',
     'Minute'
 );
 
-CREATE TABLE "frequency" (
-    "id" uuid NOT NULL,
-    "unit" frequency_unit NOT NULL
-);
-
-CREATE INDEX "frequency_unit_index" ON "frequency" ("unit");
-
-ALTER TABLE "frequency"
-    ADD PRIMARY KEY ("id");
-
-ALTER TABLE "frequency"
-    ADD CONSTRAINT "frequency_unit_unique" UNIQUE ("unit");
-
 CREATE TABLE "intention_frequency" (
     "intention_id" uuid NOT NULL,
-    "frequency_id" uuid NOT NULL
+    "frequency" frequency NOT NULL
 );
 
 ALTER TABLE "intention_frequency"
-    ADD PRIMARY KEY ("intention_id", "frequency_id");
+    ADD PRIMARY KEY ("intention_id", "frequency");
 
 CREATE TABLE "person_goal" (
     "person_id" uuid NOT NULL,
@@ -266,9 +255,6 @@ ALTER TABLE "person_action"
 ALTER TABLE "completed_action"
     ADD CONSTRAINT "completed_action_person_id_foreign" FOREIGN KEY ("person_id") REFERENCES "person" ("id");
 
-ALTER TABLE "intention_frequency"
-    ADD CONSTRAINT "intention_frequency_frequency_id_foreign" FOREIGN KEY ("frequency_id") REFERENCES "frequency" ("id");
-
 ALTER TABLE "person_email_address"
     ADD CONSTRAINT "person_email_address_email_address_id_foreign" FOREIGN KEY ("email_address_id") REFERENCES "email_address" ("id");
 
@@ -280,22 +266,4 @@ ALTER TABLE "person_sleep_schedule"
 
 ALTER TABLE "person_sleep_schedule"
     ADD CONSTRAINT "sleep_schedule_id_foreign_key" FOREIGN KEY ("sleep_schedule_id") REFERENCES "sleep_schedule" ("id");
-
-INSERT INTO frequency
-    VALUES ((
-            SELECT
-                gen_random_uuid ()),
-            'Day'),
-    ((
-        SELECT
-            gen_random_uuid ()), 'Month'),
-    ((
-        SELECT
-            gen_random_uuid ()), 'Year'),
-    ((
-        SELECT
-            gen_random_uuid ()), 'Minute'),
-    ((
-        SELECT
-            gen_random_uuid ()), 'Hour');
 

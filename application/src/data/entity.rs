@@ -9,3 +9,4 @@ pub mod person;
 pub mod schedule;
 pub mod sleep_schedule;
 pub mod transfer;
+pub mod weekday;

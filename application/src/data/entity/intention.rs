@@ -1,5 +1,5 @@
 use serde::{Deserialize, Serialize};
-use time::OffsetDateTime;
+use time::{Duration, OffsetDateTime};
 use uuid::Uuid;
 
 #[derive(Deserialize, Serialize, Debug, Clone, sqlx::FromRow)]
@@ -10,4 +10,5 @@ pub struct Intention {
     pub person_id: Uuid,
     pub chronicle_id: Option<Uuid>,
     pub intended_time: Option<OffsetDateTime>,
+    pub expected_duration: Option<Duration>,
 }

@@ -197,11 +197,10 @@ pub async fn update_sleep_schedule(
 }
 
 pub async fn get_frequency_list(
-    State(postgres_service): State<PostgresHandler>,
+    State(_postgres_service): State<PostgresHandler>,
     _user: User,
 ) -> Result<Response, ApiError> {
-    let frequency_types: Vec<Frequency> =
-        get_frequency_list_handler(&postgres_service.database_pool).await?;
+    let frequency_types: Vec<Frequency> = get_frequency_list_handler()?;
     Ok((StatusCode::OK, Json(frequency_types)).into_response())
 }
 
