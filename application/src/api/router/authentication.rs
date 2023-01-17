@@ -97,35 +97,35 @@ async fn authenticate(
             .await
             .map_err(|error| anyhow!("{}", error))?;
 
-    if let Some(person) = query_result {
-        let valid_password: bool = encryption_service
-            .verify_password(&person.encrypted_password, clean_password)
-            .map_err(|error| anyhow!("{}", error))?;
-
-        if !valid_password {
-            warn!("Invalid password for email: {}", clean_email);
-            return Err(ApiError::Anyhow {
-                source: anyhow!(FAILED_LOGIN_MESSAGE),
-            });
-        }
-
-        let updated_cookie_jar: PrivateCookieJar = cookie_jar.add(
-            Cookie::build(cookie_fields::USER_ID, person.id.to_string())
-                .same_site(SameSite::Strict)
-                .path("/")
-                .http_only(true)
-                .secure(true)
-                .finish(),
-        );
-
-        Ok((updated_cookie_jar, SUCCESSFUL_LOGIN_MESSAGE.to_string()).into_response())
-        //return Ok(Redirect::to(uri!(index)));
-    } else {
+    let Some(person) = query_result else {
         info!("No email found matching user input: {}", clean_email);
-        Err(ApiError::Anyhow {
+        return Err(ApiError::Anyhow {
             source: anyhow!(FAILED_LOGIN_MESSAGE),
         })
+    };
+
+    let valid_password: bool = encryption_service
+        .verify_password(&person.encrypted_password, clean_password)
+        .map_err(|error| anyhow!("{}", error))?;
+
+    if !valid_password {
+        warn!("Invalid password for email: {}", clean_email);
+        return Err(ApiError::Anyhow {
+            source: anyhow!(FAILED_LOGIN_MESSAGE),
+        });
     }
+
+    let updated_cookie_jar: PrivateCookieJar = cookie_jar.add(
+        Cookie::build(cookie_fields::USER_ID, person.id.to_string())
+            .same_site(SameSite::Strict)
+            .path("/")
+            .http_only(true)
+            .secure(true)
+            .finish(),
+    );
+
+    Ok((updated_cookie_jar, SUCCESSFUL_LOGIN_MESSAGE.to_string()).into_response())
+    //return Ok(Redirect::to(uri!(index)));
 }
 
 async fn logout(cookie_jar: PrivateCookieJar) -> Result<Response, ApiError> {
