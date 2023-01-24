@@ -99,6 +99,16 @@ CREATE TYPE frequency AS ENUM (
     'Minute'
 );
 
+CREATE TYPE weekday AS ENUM (
+    'Sunday',
+    'Monday',
+    'Tuesday',
+    'Wednesday',
+    'Thursday',
+    'Friday',
+    'Saturday'
+);
+
 CREATE TABLE "intention_frequency" (
     "intention_id" uuid NOT NULL,
     "frequency" frequency NOT NULL

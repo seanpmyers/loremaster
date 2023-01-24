@@ -20,6 +20,8 @@ Examples:
   - actions can be taken yearly, monthly, daily, hourly, etc.
   - could be every Thursday and Sunday
   - could be the first day of every quarter of the year
+  - could be a desired number of completions within a repeated time-frame
+  - could use a time range since the last completion time
 - `procedure`
   - a series of actions completed in a certain order or manner
 - `routine`
