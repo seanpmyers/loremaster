@@ -12,6 +12,7 @@ services:
     volumes:
       # - db:/var/lib/postgresql/data
       - ../database/initalization/:/docker-entrypoint-initdb.d
+      - ../database:/database
 volumes:
   db:
     driver: local
