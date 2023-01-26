@@ -92,7 +92,7 @@ async fn main() -> Result<()> {
 
     let address_string: String = socket_address.to_string();
     info!(
-        "Loremaster servers are available at:\n\n BACKEND API: > http://{} <\n",
+        "Loremaster server is available at:\n\n [http://{}]\n",
         address_string
     );
 
@@ -120,8 +120,8 @@ fn configure_logging() {
         .format(|buf, record| -> Result<(), std::io::Error> {
             writeln!(
                 buf,
-                "LOREMASTER_{}: {} [{}] - {}",
-                std::env::var(ENVIRONMENT).unwrap(),
+                "[LOREMASTER_{}]: [{}] [{}] - {}",
+                std::env::var(ENVIRONMENT).unwrap().to_ascii_uppercase(),
                 OffsetDateTime::now_utc().format(&Rfc3339).unwrap(),
                 record.level(),
                 record.args()
