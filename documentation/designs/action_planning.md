@@ -28,5 +28,10 @@ Examples:
   - a collection of actions taken on a recurring basis
 - `contingent actions`
   - occurring or existing only if (certain circumstances) are the case; dependent on something else
+- `outcome`
+  - what is the result of an action taken, if there is one
+  - positive/negatives -- pros/cons -- risk/reward
+  - anticipated vs actual outcome (pros/cons)
+  - confidence level in outcome before taking the action
 
 In order to fully implement `action planning`, I think most of these concepts ought to be included.
