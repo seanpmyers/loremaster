@@ -35,4 +35,37 @@ pub fn get_date_from_timezone(
 }
 
 #[cfg(test)]
-mod tests {}
+mod tests {
+    use super::{current_server_time, get_date_from_timezone};
+    use anyhow::Result;
+    use time::{macros::offset, OffsetDateTime};
+
+    const NEW_YORK_TIME_ZONE_STRING: &str = "America/New_York";
+    const MELBOURNE_TIME_ZONE_STRING: &str = "Australia/Melbourne";
+
+    #[test]
+    fn verify_date_from_timezone_new_york() -> Result<()> {
+        let expected_result: time::Date = OffsetDateTime::now_utc().to_offset(offset!(-5)).date();
+        let result: time::Date =
+            get_date_from_timezone(current_server_time()?, NEW_YORK_TIME_ZONE_STRING)?.date();
+        assert_eq!(result, expected_result);
+        Ok(())
+    }
+
+    #[test]
+    fn verify_date_from_timezone_melbourne() -> Result<()> {
+        let expected_result: time::Date = OffsetDateTime::now_utc().to_offset(offset!(+11)).date();
+        let result: time::Date =
+            get_date_from_timezone(current_server_time()?, MELBOURNE_TIME_ZONE_STRING)?.date();
+        assert_eq!(result, expected_result);
+        Ok(())
+    }
+
+    #[test]
+    fn verify_date_from_timezone_bad_input() -> Result<()> {
+        let expected_result: time::Date = OffsetDateTime::now_utc().date();
+        let result: time::Date = get_date_from_timezone(current_server_time()?, "bad")?.date();
+        assert_eq!(result, expected_result);
+        Ok(())
+    }
+}
