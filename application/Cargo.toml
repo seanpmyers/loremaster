@@ -57,11 +57,11 @@ thiserror = "1.0.38"
 time = { version = "0.3.17", features = ["serde", "std", "parsing"] }
 time-tz = { version = "1.0.2" }
 # Backend async I/O functionality
-tokio = { version = "1.24.2", features = ["full"] }
+tokio = { version = "1.25.0", features = ["full"] }
 tokio-stream = "0.1.11"
 tokio-test = "0.4.2"
 # Encode/decode TOML content/files
-toml = "0.6.0"
+toml = "0.7.0"
 # Tower middleware and utilities for HTTP clients and servers
 tower-http = { version = "0.3.5", features = ["cors", "fs"] }
 # Implementation of Universally Unique Identifiers (Uuid)
