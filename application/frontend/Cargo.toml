@@ -7,7 +7,7 @@ authors = ["Sean Myers <spmyers@protonmail.com>"]
 # See more keys and their definitions at https://doc.rust-lang.org/cargo/reference/manifest.html
 
 [dependencies]
-futures-util = { version = "0.3.25" }
+futures-util = { version = "0.3.26" }
 gloo-timers = { version = "0.2.6", features = ["futures"] }
 js-sys = { version = "0.3.60" }
 log = { version = "0.4.17" }
