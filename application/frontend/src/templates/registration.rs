@@ -29,7 +29,7 @@ pub fn registration_page(state: RegistrationPageStateRx) -> View<G> {
         perseus::spawn_local(
             cloned!((email_address, password, registration_success) => async move {
 
-                http_service::post_html_form(&String::from(API_REGISTER_URL), &vec![
+                let potential_response = http_service::post_html_form(&String::from(API_REGISTER_URL), &vec![
                     (String::from("email_address"), email_address.get().as_ref().to_string()),
                     (String::from("password"), password.get().as_ref().to_string()),
                 ]).await;

@@ -1,12 +1,20 @@
 use gloo_timers::future::TimeoutFuture;
 use perseus::{Html, RenderFnResultWithCause, SsrNode, Template};
+use serde::{Deserialize, Serialize};
 use sycamore::prelude::{cloned, view, Signal, View};
 use web_sys::Event;
 
 use crate::components::container::{Container, ContainerProperties};
-use crate::components::widget::notification::alert::{Alert, AlertProperties};
+
 use crate::utility::constants::API_LOGIN_URL;
 use crate::utility::http_service;
+
+#[derive(Deserialize, Serialize, Debug, Clone)]
+pub enum FormMessageState {
+    Hidden,
+    Success,
+    Failure,
+}
 
 #[perseus::make_rx(LoginPageStateRx)]
 pub struct LoginPageState {
@@ -16,28 +24,39 @@ pub struct LoginPageState {
 
 #[perseus::template_rx]
 pub fn login_page(state: LoginPageStateRx) -> View<G> {
-    let login_success: Signal<Option<bool>> = Signal::new(None);
-    let login_display: Signal<Option<bool>> = login_success.clone();
-
     let email_address: Signal<String> = state.email_address;
     let email_address_input: Signal<String> = email_address.clone();
 
     let password: Signal<String> = state.password;
     let password_input: Signal<String> = password.clone();
 
+    let form_message: Signal<FormMessageState> = Signal::new(FormMessageState::Hidden);
+    let form_message_display: Signal<FormMessageState> = form_message.clone();
+
     let login_handler = move |event: Event| {
         event.prevent_default();
         perseus::spawn_local(
-            cloned!((email_address, password, login_success) => async move {
+            cloned!((email_address, password, form_message) => async move {
 
-                http_service::post_html_form(&String::from(API_LOGIN_URL), &vec![
+                let potential_response: Option<reqwasm::http::Response> = http_service::post_html_form(&String::from(API_LOGIN_URL), &vec![
                     (String::from("email_address"), email_address.get().as_ref().to_string()),
                     (String::from("password"), password.get().as_ref().to_string()),
                 ]).await;
 
-                login_success.set(Some(true));
-                TimeoutFuture::new(10000_u32).await;
-                login_success.set(None);
+                match potential_response {
+                    Some(response) => {
+                        match response.status() {
+                            200 => {
+                                form_message.set(FormMessageState::Success);
+                                TimeoutFuture::new(4000_u32).await;
+                                perseus::navigate("/chronicle/");
+                            },
+                            _ => form_message.set(FormMessageState::Failure),
+                        }
+
+                    },
+                    None => form_message.set(FormMessageState::Failure),
+                }
             }),
         );
     };
@@ -75,20 +94,13 @@ pub fn login_page(state: LoginPageStateRx) -> View<G> {
                             }
                             button(class="btn btn-primary", type="submit"){ "Submit"}
                         }
-                    }
-                }
-                (if login_display.get().is_some() {
-                    view! {
-                        Alert(AlertProperties{
-                            message_title: Signal::new(String::from("Success!")),
-                            message_body: Signal::new(String::from("You have successfully logged in.")),
-                            display_time: Signal::new(None),
+                        (match *form_message_display.get() {
+                            FormMessageState::Hidden => view!{ div() {}},
+                            FormMessageState::Success => view!{ div(class="badge bg-success rounded") {"Successfully logged in."}},
+                            FormMessageState::Failure => view!{ div(class="badge bg-danger rounded") {"Unable to login with the provided credentials."}}
                         })
                     }
                 }
-                else {
-                    view!{ div() {""}}
-                })
             }
         })
     }

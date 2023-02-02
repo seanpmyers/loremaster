@@ -6,7 +6,7 @@ use super::constants::{HTTP_HEADER_CONTENT_TYPE, HTTP_HEADER_CONTENT_TYPE_FORM};
 pub async fn post_html_form(
     endpoint_url: &String,
     fields: &Vec<(String, String)>,
-) -> Option<String> {
+) -> Option<reqwasm::http::Response> {
     let mut body_string: String = String::new();
     if fields.len() > 0_usize {
         body_string.push_str(&format!("{}={}", fields[0_usize].0, fields[0_usize].1));
@@ -24,14 +24,7 @@ pub async fn post_html_form(
             .await;
 
     match request_attempt {
-        Ok(response) => {
-            if response.status() != 200 {
-                web_log!("{}", response.status_text());
-                return None;
-            }
-
-            None
-        }
+        Ok(response) => Some(response),
         Err(error) => {
             web_log!("{}", error.to_string());
             None
