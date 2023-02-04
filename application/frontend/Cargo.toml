@@ -27,7 +27,7 @@ time = { version = "0.3.17", features = [
 ] }
 ureq = { version = "2.6.2" }
 uuid = { version = "1.2.2", features = ["serde"] }
-wasm-bindgen = { version = "0.2.83" }
+wasm-bindgen = { version = "0.2.84" }
 web-sys = { version = "0.3.60", features = [
 	"Event",
 	"EventTarget",
