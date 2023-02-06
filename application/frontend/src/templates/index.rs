@@ -59,6 +59,10 @@ pub fn index_page(
                     Tab::Third => view! { div() {"Third"}},
                     Tab::Fourth => view! { div() {"Fourth"}},
                 })
+                div() {
+                    button(class="popup-button") { "Test" }
+                    div(class="test-popup") { "Content" }
+                }
             }
         }})
     }

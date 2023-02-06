@@ -11,7 +11,7 @@ pub struct ContainerProperties<G: Html> {
 pub fn container(properties: ContainerProperties<G>) -> View<G> {
     view! {
         NavigationLinks()
-        div(class="d-flex flex-column", id="loremaster-main") {
+        div(class="", id="loremaster-main") {
             (properties.children.clone())
         }
     }
