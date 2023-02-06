@@ -8,7 +8,7 @@ edition = "2021"
 
 [dependencies]
 # Error handling
-anyhow = "1.0.68"
+anyhow = "1.0.69"
 # Password Encryption
 argon2 = "0.4.1"
 # A web application framework that focuses on ergonomics and modularity.
@@ -35,7 +35,7 @@ log = "0.4.17"
 rand = "0.8.5"
 # Serialization
 serde = { version = "1.0.152", features = ["derive"] }
-serde_json = "1.0.89"
+serde_json = "1.0.92"
 
 # Database client/pool/toolkit
 sqlx = { version = "0.6.2", features = [
