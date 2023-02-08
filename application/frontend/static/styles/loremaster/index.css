@@ -139,6 +139,7 @@ body div {
 .top-nav {
 	display: flex;
 	flex-wrap: wrap;
+	border-bottom: #0866aa5e .1vmin solid;
 }
 
 .top-nav ul {
@@ -151,8 +152,27 @@ body div {
 }
 
 .top-nav ul li {
-	margin: 1rem 1rem;
+	margin: 0;
 	padding: 0 0 0 0;
+	display: inherit;
+}
+
+.top-nav ul li a {
+	margin: 1vmin 1vmin 0vmin 1vmin;
+	padding: 1vmin;
+	text-decoration: none;
+	border: transparent 0.1vmin solid;
+	border-radius: 1vmin;
+}
+
+.top-nav ul li a.active-link {
+	border-bottom: #9fc0ff .3vmin solid;
+	border-radius: 0;
+}
+
+.top-nav ul li a:hover {
+	border: #0866aa5e .1vmin solid;
+	background-color: #0866aa12;
 }
 
 .popup-button + .test-popup:active,
