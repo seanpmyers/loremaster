@@ -42,16 +42,18 @@ pub fn index_page(
     let click_fourth = cloned!((current_tab) => move |_| {
         current_tab.set(Tab::Fourth);
     });
+
+    let button_classes: &str = "glow-button";
     view! {
         Container(ContainerProperties{title: String::from("Loremaster"), children: view!{
             div(class="d-flex flex-column flex-grow-1 p-4 align-items-center") {
                 h1(class="display-3") { "Loremaster" }
                 p() { (greeting.get()) }
                 div(class="d-flex", id="lm-tab-test") {
-                    button(class="p-1 btn btn-primary", on:click=click_first) { "First" }
-                    button(class="p-1 btn btn-primary", on:click=click_second) { "Second" }
-                    button(class="p-1 btn btn-primary", on:click=click_third) { "Third" }
-                    button(class="p-1 btn btn-primary", on:click=click_fourth) { "Fourth" }
+                    button(class=button_classes, on:click=click_first) { "First" }
+                    button(class=button_classes, on:click=click_second) { "Second" }
+                    button(class=button_classes, on:click=click_third) { "Third" }
+                    button(class=button_classes, on:click=click_fourth) { "Fourth" }
                 }
                 (match *current_tab.get() {
                     Tab::First => view! { div() {"First"}},
@@ -60,7 +62,7 @@ pub fn index_page(
                     Tab::Fourth => view! { div() {"Fourth"}},
                 })
                 div() {
-                    button(class="popup-button") { "Test" }
+                    button(class="popup-button glow-button") { "Test" }
                     div(class="test-popup") { "Content" }
                 }
             }
