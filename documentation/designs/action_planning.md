@@ -33,5 +33,56 @@ Examples:
   - positive/negatives -- pros/cons -- risk/reward
   - anticipated vs actual outcome (pros/cons)
   - confidence level in outcome before taking the action
+- `category`
+  - human actions tend to fall under general categories
+    - wellbeing/rest
+      - sleeping
+      - napping
+      - meditation
+      - spa
+    - health/bodily maintenance
+      - strength training
+      - cardio training
+      - stretching
+    - organization/inventory upkeep
+      - keeping inventory
+    - entertainment/enjoyment
+      - gaming
+      - sports
+      - movies
+      - social media
+      - food/beverage
+    - experiential/observational
+      - bird watching
+      - hiking
+      - exploring
+      - touring
+      - traveling
+    - skill work
+      - programming
+      - design
+      - painting
+      - drawing
+      - sports
+      - woodwork
+    - learning
+      - studying
+      - lectures
+      - school
+      - educational content
+        - books
+        - videos
+    - social
+      - party
+      - events
+      - gatherings
+      - holidays
+    - financial
+      - paying taxes
+      - work
+      - side-hustle
+      - investing
+      - real estate
+  - can fall under more than one
 
 In order to fully implement `action planning`, I think most of these concepts ought to be included.

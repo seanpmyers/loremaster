@@ -126,7 +126,7 @@ pub fn chronicle_page(
             Container(ContainerProperties {
                 title: String::from("Chronicle"),
                 children: view! {
-                    div(class="container-fluid d-flex flex-grow-1 bg-light") {
+                    div(class="") {
                         div(class="row flex-grow-1 text-black"){
                             div(class="col-9 bg-light p-5 border-0 rounded") {
                                 div(class="d-flex align-items-baseline") {

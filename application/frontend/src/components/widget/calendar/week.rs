@@ -30,11 +30,11 @@ pub fn week(
                     iterable: days.handle(),
                     template: move |day: WeekDayInformation|
                    {
-                    let mut classes = String::from("card");
-                    if &day.number == &selected_date.get().day() { classes.push_str(" active-card text-light") ;}
-                    else { classes.push_str(" bg-white")}
+                    let mut day_div_classes = String::from("card");
+                    if &day.number == &selected_date.get().day() { day_div_classes.push_str(" active-card text-light") ;}
+                    else { day_div_classes.push_str(" bg-white")}
                     view!{
-                        div(class=(classes)) {
+                        div(class=(day_div_classes)) {
                             div(class="m-1") {
                                 (day.number)
                             }
