@@ -24,6 +24,8 @@ pub struct LoginPageState {
 
 #[perseus::template_rx]
 pub fn login_page(state: LoginPageStateRx) -> View<G> {
+    let loading: Signal<bool> = Signal::new(false);
+    let loading_clone: Signal<bool> = loading.clone();
     let email_address: Signal<String> = state.email_address;
     let email_address_input: Signal<String> = email_address.clone();
 
@@ -36,7 +38,7 @@ pub fn login_page(state: LoginPageStateRx) -> View<G> {
     let login_handler = move |event: Event| {
         event.prevent_default();
         perseus::spawn_local(
-            cloned!((email_address, password, form_message) => async move {
+            cloned!((email_address, password, form_message, loading) => async move {
 
                 let potential_response: Option<reqwasm::http::Response> = http_service::post_html_form(&String::from(API_LOGIN_URL), &vec![
                     (String::from("email_address"), email_address.get().as_ref().to_string()),
