@@ -10,7 +10,7 @@ use crate::utility::constants::API_LOGIN_URL;
 use crate::utility::http_service;
 
 #[derive(Deserialize, Serialize, Debug, Clone)]
-pub enum FormMessageState {
+enum FormMessageState {
     Hidden,
     Success,
     Failure,
@@ -25,7 +25,10 @@ pub struct LoginPageState {
 #[perseus::template_rx]
 pub fn login_page(state: LoginPageStateRx) -> View<G> {
     let loading: Signal<bool> = Signal::new(false);
-    let loading_clone: Signal<bool> = loading.clone();
+    let loading_email: Signal<bool> = loading.clone();
+    let loading_password: Signal<bool> = loading.clone();
+    let loading_submit: Signal<bool> = loading.clone();
+
     let email_address: Signal<String> = state.email_address;
     let email_address_input: Signal<String> = email_address.clone();
 
@@ -39,7 +42,8 @@ pub fn login_page(state: LoginPageStateRx) -> View<G> {
         event.prevent_default();
         perseus::spawn_local(
             cloned!((email_address, password, form_message, loading) => async move {
-
+                if loading.get().as_ref() == &true { return; }
+                loading.set(true);
                 let potential_response: Option<reqwasm::http::Response> = http_service::post_html_form(&String::from(API_LOGIN_URL), &vec![
                     (String::from("email_address"), email_address.get().as_ref().to_string()),
                     (String::from("password"), password.get().as_ref().to_string()),
@@ -50,6 +54,8 @@ pub fn login_page(state: LoginPageStateRx) -> View<G> {
                         match response.status() {
                             200 => {
                                 form_message.set(FormMessageState::Success);
+                                email_address.set(String::new());
+                                password.set(String::new());
                                 TimeoutFuture::new(4000_u32).await;
                                 perseus::navigate("/chronicle/");
                             },
@@ -59,6 +65,7 @@ pub fn login_page(state: LoginPageStateRx) -> View<G> {
                     },
                     None => form_message.set(FormMessageState::Failure),
                 }
+                loading.set(false);
             }),
         );
     };
@@ -79,7 +86,8 @@ pub fn login_page(state: LoginPageStateRx) -> View<G> {
                                     type="email",
                                     class="form-control",
                                     bind:value= email_address_input,
-                                    placeholder = "Enter your email address"
+                                    placeholder = "Enter your email address",
+                                    disabled=loading_email.get().as_ref().to_owned()
                                 ) {}
                             }
                             div(class="mb-3") {
@@ -91,10 +99,17 @@ pub fn login_page(state: LoginPageStateRx) -> View<G> {
                                     type="password",
                                     class="form-control",
                                     bind:value= password_input,
-                                    placeholder = "Enter your password"
+                                    placeholder = "Enter your password",
+                                    disabled=loading_password.get().as_ref().to_owned()
                                 ) {}
                             }
-                            button(class="btn btn-primary", type="submit"){ "Submit"}
+                            button(
+                                class="btn btn-primary",
+                                type="submit",
+                                disabled=loading_submit.get().as_ref().to_owned()
+                            ) {
+                                "Submit"
+                            }
                         }
                         (match *form_message_display.get() {
                             FormMessageState::Hidden => view!{ div() {}},
