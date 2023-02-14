@@ -5,6 +5,7 @@ use sycamore::prelude::{cloned, view, Signal, View};
 use web_sys::Event;
 
 use crate::components::container::{Container, ContainerProperties};
+use crate::components::widget::data::form::security_key_authentication::SecurityKeyAuthentication;
 use crate::utility::constants::API_REGISTER_URL;
 use crate::utility::http_service;
 
@@ -108,6 +109,7 @@ pub fn registration_page(state: RegistrationPageStateRx) -> View<G> {
                             FormMessageState::Success => view!{ div(class="badge bg-success rounded") {"Successfully registered."}},
                             FormMessageState::Failure => view!{ div(class="badge bg-danger rounded") {"Unable to register with the provided credentials."}}
                         })
+                        SecurityKeyAuthentication()
                     }
                 }
             }
