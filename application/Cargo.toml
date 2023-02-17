@@ -54,7 +54,7 @@ sqlx = { version = "0.6.2", features = [
 # Error/exception handling
 thiserror = "1.0.38"
 # Time
-time = { version = "0.3.17", features = ["serde", "std", "parsing"] }
+time = { version = "0.3.19", features = ["serde", "std", "parsing"] }
 time-tz = { version = "1.0.2" }
 # Backend async I/O functionality
 tokio = { version = "1.25.0", features = ["full"] }
