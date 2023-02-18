@@ -1,6 +1,6 @@
 use std::ops::Deref;
 
-use js_sys::{Array, JsString, Object, Uint8Array};
+use js_sys::{JsString, Object, Uint8Array};
 use perseus::web_log;
 use sycamore::prelude::*;
 use wasm_bindgen::JsValue;
@@ -25,7 +25,15 @@ pub fn security_key_authentication() -> View<G> {
             web_sys::console::log_1(&js_test);
             let challenge_object: Object = Uint8Array::new_with_length(32_u32).deref().to_owned();
             let user: PublicKeyCredentialUserEntity = PublicKeyCredentialUserEntity::new("username", "Alias", &user_id);
-            let public_key_credential_creation_options: PublicKeyCredentialCreationOptions = PublicKeyCredentialCreationOptions::new(&challenge_object, &pub_key_cred_params, &relaying_party, &user);
+
+            let mut public_key_credential_creation_options: PublicKeyCredentialCreationOptions = PublicKeyCredentialCreationOptions::new(
+                &challenge_object,
+                &pub_key_cred_params,
+                &relaying_party,
+                &user
+            );
+            public_key_credential_creation_options.attestation(web_sys::AttestationConveyancePreference::Direct);
+
             let window_navigator: Navigator = Window::navigator(&window().unwrap());
             let credentials = JsFuture::from(window_navigator.credentials().create().unwrap()).await;
             web_sys::console::log_1(&pub_key_cred_params);
