@@ -1,8 +1,8 @@
-use std::str::FromStr;
+use std::{net::SocketAddr, str::FromStr};
 
 use anyhow::anyhow;
 use axum::{
-    extract::State,
+    extract::{ConnectInfo, State},
     http::StatusCode,
     response::{IntoResponse, Response},
     routing::post,
@@ -79,12 +79,16 @@ async fn register(
 }
 
 async fn authenticate(
+    ConnectInfo(socket_address): ConnectInfo<SocketAddr>,
     State(postgres_service): State<PostgresHandler>,
     State(encryption_service): State<PasswordEncryptionService>,
     cookie_jar: PrivateCookieJar,
     Form(authentication_form): Form<CredentialsForm>,
 ) -> Result<Response, ApiError> {
-    info!("API CALL: /authentication/authenticate");
+    info!(
+        "API CALL: /authentication/authenticate from {}",
+        socket_address.ip().to_string()
+    );
 
     let clean_email: &str = authentication_form.email_address.trim();
     let clean_password: &str = authentication_form.password.trim();

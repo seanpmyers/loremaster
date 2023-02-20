@@ -30,14 +30,20 @@ uuid = { version = "1.3.0", features = ["serde"] }
 wasm-bindgen = { version = "0.2.84" }
 wasm-bindgen-futures = { version = "0.4.34" }
 web-sys = { version = "0.3.61", features = [
+	"AttestationConveyancePreference",
+	"AuthenticatorSelectionCriteria",
+	"AuthenticatorAttachment",
 	"CredentialsContainer",
+	"CredentialCreationOptions",
 	"Event",
 	"EventTarget",
 	"HtmlDocument",
 	"Navigator",
 	"PublicKeyCredentialCreationOptions",
-	"AttestationConveyancePreference",
+	"PublicKeyCredentialParameters",
+	"PublicKeyCredentialType",
 	"PublicKeyCredentialRpEntity",
 	"PublicKeyCredentialUserEntity",
+	"UserVerificationRequirement",
 	"Window",
 ] }
