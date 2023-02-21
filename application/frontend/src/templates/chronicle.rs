@@ -16,7 +16,7 @@ use crate::{
         container::{Container, ContainerProperties},
         widget::{
             calendar::week::Week, calendar::week::WeekProperties, goal_list::GoalList,
-            goal_list::GoalListProperties,
+            goal_list::GoalListProperties, sleep::SleepWidget,
         },
     },
     data::entity::{person_chronicle::PersonChronicle, sleep_schedule::SleepSchedule},
@@ -163,6 +163,7 @@ pub fn chronicle_page(
                                         }
                                     ) }
                                  }
+                                SleepWidget()
                                 div(class="d-flex flex-column") {
                                     label() { "Notes" }
                                     textarea(class="border rounded bg-white", rows="4", cols="50") {}

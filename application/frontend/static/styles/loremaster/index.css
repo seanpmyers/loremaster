@@ -303,3 +303,42 @@ body div {
 .m-1 {
 	margin: 1vmin;
 }
+
+.sleep-widget {
+	background: #373737;
+	color: white;
+	border-radius: 1vmin;
+	display: inline-flex;
+	padding: 2vmin;
+}
+
+.sleep-widget-section {
+	display: flex;
+	flex-direction: column;
+	margin: 0 1vmin;
+}
+
+.sleep-widget-section-top {
+	display: flex;
+}
+
+.sleep-widget-section-bottom {
+	display: flex;
+	flex-direction: column;
+}
+
+.sleep-widget-number {
+	font-size: 4vmin;
+	margin: .5vmin;
+}
+
+.sleep-widget-icon {
+	margin: .5vmin;
+	display: flex;
+	align-items: center;
+}
+
+.sleep-widget-icon svg {
+	width: 4vmin;
+	height: 4vmin;
+}
