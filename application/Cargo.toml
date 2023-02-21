@@ -58,7 +58,7 @@ time = { version = "0.3.19", features = ["serde", "std", "parsing"] }
 time-tz = { version = "1.0.2" }
 # Backend async I/O functionality
 tokio = { version = "1.25.0", features = ["full"] }
-tokio-stream = "0.1.11"
+tokio-stream = "0.1.12"
 tokio-test = "0.4.2"
 # Encode/decode TOML content/files
 toml = "0.7.2"
