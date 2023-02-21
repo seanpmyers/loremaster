@@ -342,3 +342,22 @@ body div {
 	width: 4vmin;
 	height: 4vmin;
 }
+
+.filled-button {
+	background: #373737;
+	color: white;
+	border-radius: 1vmin;
+	display: flex;
+	padding: .2vmin;
+	cursor: pointer;
+	border: transparent solid;
+	align-items: center;
+}
+
+.filled-button:hover {
+	background: #5a5a5a;
+}
+
+.filled-button-icon svg {
+	fill: white;
+}

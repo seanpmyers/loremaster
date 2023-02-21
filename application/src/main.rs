@@ -59,12 +59,10 @@ async fn main() -> Result<()> {
 
     configure_logging();
     info!("Starting up!");
-    info!("{}", env::current_dir().unwrap().to_str().unwrap());
-    info!("{}", Path::new("application/certs/cert.pem").exists());
 
     let configuration: LoremasterConfiguration = get_configuration_from_file(&environment)?;
 
-    let tls_configuration: RustlsConfig = get_tls_configuration().await?;
+    let transport_layer_security_configuration: RustlsConfig = get_tls_configuration().await?;
 
     info!("Attempting a database connection...");
     let postgres_service: PostgresHandler =
@@ -99,11 +97,16 @@ async fn main() -> Result<()> {
 
     let address_string: String = socket_address.to_string();
     info!(
-        "Loremaster server is available at:\n\n [http://{}]\n",
+        "Loremaster server is available at:\n\n [https://{}]\n",
         address_string
     );
 
-    serve(application_router, socket_address, tls_configuration).await?;
+    serve(
+        application_router,
+        socket_address,
+        transport_layer_security_configuration,
+    )
+    .await?;
 
     info!("Shutting down.");
 
@@ -114,8 +117,12 @@ async fn handle_error(_err: io::Error) -> impl IntoResponse {
     (StatusCode::INTERNAL_SERVER_ERROR, "Something went wrong...")
 }
 
-async fn serve(router: Router, socket_address: SocketAddr, tls_config: RustlsConfig) -> Result<()> {
-    axum_server::bind_rustls(socket_address, tls_config)
+async fn serve(
+    router: Router,
+    socket_address: SocketAddr,
+    transport_layer_security_configuration: RustlsConfig,
+) -> Result<()> {
+    axum_server::bind_rustls(socket_address, transport_layer_security_configuration)
         .serve(router.into_make_service_with_connect_info::<SocketAddr>())
         .await?;
     Ok(())

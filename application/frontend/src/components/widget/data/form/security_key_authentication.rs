@@ -5,10 +5,12 @@ use sycamore::prelude::*;
 use wasm_bindgen::JsValue;
 use wasm_bindgen_futures::JsFuture;
 use web_sys::{
-    window, AuthenticatorSelectionCriteria, CredentialCreationOptions, Event, Navigator,
+    window, AuthenticatorSelectionCriteria, CredentialCreationOptions, Event,
     PublicKeyCredentialCreationOptions, PublicKeyCredentialParameters, PublicKeyCredentialRpEntity,
     PublicKeyCredentialUserEntity, Window,
 };
+
+use crate::components::icon::{FINGERPRINT_SVG_HTML, KEY_2_SVG_HTML};
 
 const SHA_256_SIGNATURE_ALGORITHM: i32 = -7_i32;
 const RELAYING_PARTY_ID: &str = "localhost";
@@ -66,8 +68,13 @@ pub fn security_key_authentication() -> View<G> {
     };
 
     view! {
-        button(on:click=register_handler) {
-            "Register Security Key"
+        button(class="filled-button", on:click=register_handler) {
+            span() { "Register Security Key" }
+            div(class="filled-button-icon", dangerously_set_inner_html=KEY_2_SVG_HTML) {}
+        }
+        button(class="filled-button", disabled=true) {
+            span() { "Register Fingerprint" }
+            div(class="filled-button-icon", dangerously_set_inner_html=FINGERPRINT_SVG_HTML) {}
         }
     }
 }
