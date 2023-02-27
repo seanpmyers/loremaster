@@ -25,14 +25,14 @@ pub fn frequency_options(FrequencyOptionsProperties {}: FrequencyOptionsProperti
     view! {
         select(name="frequency", class="form-select") {
             option(selected=true, disabled=true) { "Select the frequency" }
-            Keyed( KeyedProps {
+            Indexed( IndexedProps {
                     iterable: frequencies.handle(),
                     template: move |frequency: Frequency| {
+                        let display = frequency.to_string();
                         view!{
-                            option(value=(frequency.id)) { (frequency.unit) }
+                            option(value=(frequency)) { (display) }
                         }
                     },
-                    key: |frequency| frequency.id
                 })
         }
     }

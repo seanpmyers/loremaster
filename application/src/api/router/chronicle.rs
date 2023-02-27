@@ -57,11 +57,11 @@ pub async fn by_date(
             .await
             .map_err(|error| anyhow!("{}", error))?;
 
-    if let Some(result) = query_result {
-        Ok(Json(Some(result)))
-    } else {
-        Ok(Json(None))
-    }
+    let Some(result) = query_result  else {
+        return Ok(Json(None))
+    };
+
+    Ok(Json(Some(result)))
 }
 
 pub async fn by_id(

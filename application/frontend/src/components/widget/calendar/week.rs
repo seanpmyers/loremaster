@@ -25,16 +25,16 @@ pub fn week(
 ) -> View<G> {
     days.set(create_week_list(&selected_date.get()));
     view! {
-        div(class="d-flex flex-row week_widget", id="") {
+        div(class="week-widget", id="") {
             Keyed( KeyedProps {
                     iterable: days.handle(),
                     template: move |day: WeekDayInformation|
                    {
-                    let mut classes = String::from("d-flex flex-column m-2 p-2 border rounded shadow-sm");
-                    if &day.number == &selected_date.get().day() { classes.push_str(" bg-primary text-white") ;}
-                    else { classes.push_str(" bg-white")}
+                    let mut day_div_classes = String::from("card");
+                    if &day.number == &selected_date.get().day() { day_div_classes.push_str(" active-card text-light") ;}
+                    else { day_div_classes.push_str(" bg-white")}
                     view!{
-                        div(class=(classes)) {
+                        div(class=(day_div_classes)) {
                             div(class="m-1") {
                                 (day.number)
                             }

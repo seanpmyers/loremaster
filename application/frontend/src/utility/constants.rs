@@ -1,7 +1,7 @@
-pub const API_BASE_URL: &str = "http://127.0.0.1:8000";
-pub const API_REGISTER_URL: &str = "http://127.0.0.1:8000/authentication/register";
-pub const API_LOGIN_URL: &str = "http://127.0.0.1:8000/authentication/authenticate";
-pub const API_CHRONICLE_TODAY_URL: &str = "http://127.0.0.1:8000/chronicle/today";
+pub const API_BASE_URL: &str = "https://localhost:8000";
+pub const API_REGISTER_URL: &str = "https://localhost:8000/authentication/register";
+pub const API_LOGIN_URL: &str = "https://localhost:8000/authentication/authenticate";
+pub const API_CHRONICLE_TODAY_URL: &str = "https://localhost:8000/chronicle/today";
 pub const API_PERSON_META_DATA_ROUTE: &str = "person/meta";
 pub const API_PERSON_META_UPDATE_ROUTE: &str = "person/update/meta";
 pub const API_PERSON_SLEEP_SCHEDULE_UPDATE_ROUTE: &str = "person/update/sleep-schedule";

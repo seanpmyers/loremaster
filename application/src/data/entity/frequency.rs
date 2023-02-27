@@ -1,17 +1,12 @@
 use serde::{Deserialize, Serialize};
-use uuid::Uuid;
-
-#[derive(Deserialize, Serialize, Debug, Clone, sqlx::FromRow)]
-pub struct Frequency {
-    pub id: Uuid,
-    pub unit: FrequencyUnit,
-}
 
 // These are defined in SQL, this should match what is there
 #[derive(Deserialize, Serialize, Debug, Clone, sqlx::Type, PartialEq)]
 #[sqlx(type_name = "frequency_unit")]
-pub enum FrequencyUnit {
+pub enum Frequency {
     Day,
+    Weekday,
+    Week,
     Month,
     Year,
     Hour,

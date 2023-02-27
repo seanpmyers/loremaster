@@ -62,3 +62,11 @@ You can generate a site secret for testing with the following openssl command:
 ```bash
 openssl rand -base64 64
 ```
+
+Generate SSL/TLS certs 
+
+(rename to cert.pem/key.pem)
+
+```bash
+openssl req -x509 -newkey rsa:4096 -keyout server.key -out server.crt -days 365 -sha256 -nodes --subj '/CN=localhost/'
+```

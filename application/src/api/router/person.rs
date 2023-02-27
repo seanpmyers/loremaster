@@ -1,5 +1,5 @@
 use axum::{
-    extract::State,
+    extract::{Query, State},
     http::StatusCode,
     response::{IntoResponse, Response},
     routing::{get, post},
@@ -8,6 +8,7 @@ use axum::{
 use axum_extra::extract::Form;
 use log::info;
 use serde::{Deserialize, Serialize};
+use uuid::Uuid;
 
 use crate::{
     api::{
@@ -15,8 +16,8 @@ use crate::{
         handler::person::{
             create_action, create_goal, get_action_list_handler, get_frequency_list_handler,
             get_goal_list_handler, get_person_meta_data, get_sleep_schedule_handler,
-            update_email_handler, update_meta_handler, update_sleep_schedule_handler,
-            UniqueEntryResult,
+            remove_one_goal_handler, update_email_handler, update_meta_handler,
+            update_sleep_schedule_handler, UniqueEntryResult,
         },
         response::ApiError,
     },
@@ -154,6 +155,33 @@ pub async fn new_goal(
     }
 }
 
+#[derive(Deserialize, Debug)]
+pub struct GoalQueryParameters {
+    goal_id: Uuid,
+}
+
+pub async fn remove_goal(
+    State(postgres_service): State<PostgresHandler>,
+    user: User,
+    Query(parameters): Query<GoalQueryParameters>,
+) -> Result<Response, ApiError> {
+    info!("API Call: remove_goal");
+    let result: bool = remove_one_goal_handler(
+        &postgres_service.database_pool,
+        &user.0,
+        &parameters.goal_id,
+    )
+    .await?;
+    match result {
+        true => Ok((StatusCode::OK, Json("Goal removed!")).into_response()),
+        false => Ok((
+            StatusCode::BAD_REQUEST,
+            Json("Failed to complete the request with the provided input."),
+        )
+            .into_response()),
+    }
+}
+
 pub async fn get_goal_list(
     State(postgres_service): State<PostgresHandler>,
     user: User,
@@ -197,11 +225,10 @@ pub async fn update_sleep_schedule(
 }
 
 pub async fn get_frequency_list(
-    State(postgres_service): State<PostgresHandler>,
+    State(_postgres_service): State<PostgresHandler>,
     _user: User,
 ) -> Result<Response, ApiError> {
-    let frequency_types: Vec<Frequency> =
-        get_frequency_list_handler(&postgres_service.database_pool).await?;
+    let frequency_types: Vec<Frequency> = get_frequency_list_handler()?;
     Ok((StatusCode::OK, Json(frequency_types)).into_response())
 }
 
@@ -240,6 +267,7 @@ pub fn router() -> Router<ApplicationState> {
         .route("/person/update/meta", post(update_meta))
         .route("/person/update/email_address", post(update_email_address))
         .route("/person/goal/new", post(new_goal))
+        .route("/person/goal/remove", post(remove_goal))
         .route("/person/goal-list", get(get_goal_list))
         .route("/person/update/sleep-schedule", post(update_sleep_schedule))
         .route("/action/new", post(new_action))

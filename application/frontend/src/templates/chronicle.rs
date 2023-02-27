@@ -7,7 +7,6 @@ use sycamore::{
     prelude::{cloned, view, Html, SsrNode, View},
     reactive::Signal,
 };
-use time::Time;
 use uuid::Uuid;
 use wasm_bindgen::JsValue;
 
@@ -16,12 +15,12 @@ use crate::{
         container::{Container, ContainerProperties},
         widget::{
             calendar::week::Week, calendar::week::WeekProperties, goal_list::GoalList,
-            goal_list::GoalListProperties,
+            goal_list::GoalListProperties, sleep::SleepWidget,
         },
     },
-    data::entity::{person_chronicle::PersonChronicle, sleep_schedule::SleepSchedule},
+    data::entity::person_chronicle::PersonChronicle,
     utility::{
-        constants::{API_CHRONICLE_TODAY_URL, API_PERSON_SLEEP_SCHEDULE_ROUTE},
+        constants::API_CHRONICLE_TODAY_URL,
         date_time_helper::{get_day_of_week_from_integer, get_month_from_integer},
         http_service,
     },
@@ -35,8 +34,6 @@ pub struct ChroniclePageState {
     pub short_date_display: String,
     pub time_display: String,
     pub greeting: String,
-    pub sleep_start_time: Option<Time>,
-    pub sleep_end_time: Option<Time>,
 }
 
 #[perseus::template_rx]
@@ -48,13 +45,11 @@ pub fn chronicle_page(
         short_date_display,
         time_display,
         greeting,
-        sleep_start_time,
-        sleep_end_time,
     }: ChroniclePageStateRx,
 ) -> View<G> {
     if G::IS_BROWSER {
         perseus::spawn_local(
-            cloned!((date_display, short_date_display, time_display, chronicle_id, greeting, sleep_start_time, sleep_end_time) => async move {
+            cloned!((date_display, short_date_display, time_display, chronicle_id, greeting) => async move {
                 let javascript_date: Date = Date::new_0();
 
                 let day_of_week: String = get_day_of_week_from_integer(javascript_date.get_day());
@@ -68,28 +63,13 @@ pub fn chronicle_page(
                 short_date_display.set(format!("{}/{}/{}", javascript_date.get_full_year(), javascript_date.get_month() + 1_u32, javascript_date.get_date()));
                 let options = js_sys::Intl::DateTimeFormat::new(&Array::new(), &Object::new()).resolved_options();
                 let timezone = js_sys::Reflect::get(&options, &JsValue::from("timeZone")).unwrap().as_string().unwrap();
-                let mut query_response = http_service::get_endpoint(API_CHRONICLE_TODAY_URL, Some(&vec![(String::from("timezone"), timezone)])).await;
+                let query_response = http_service::get_endpoint(API_CHRONICLE_TODAY_URL, Some(&vec![(String::from("timezone"), timezone)])).await;
                 match query_response {
                     Some(response) => {
                         let chronicle_data: PersonChronicle = serde_json::from_str(&response).unwrap();
                         chronicle_id.set(chronicle_data.chronicle_id);
                         if let Some(alias) = chronicle_data.person_alias {
                             user_alias.set(alias);
-                        }
-                    },
-                    None => (),
-                }
-
-                query_response = http_service::get_endpoint(API_PERSON_SLEEP_SCHEDULE_ROUTE, None).await;
-                match query_response {
-                    Some(response) => {
-                        let potential_sleep_schedule: Option<SleepSchedule> = serde_json::from_str(&response).unwrap();
-                        match potential_sleep_schedule {
-                            Some(schedule) => {
-                                sleep_start_time.set(Some(schedule.start_time));
-                                sleep_end_time.set(Some(schedule.end_time));
-                            },
-                            None => (),
                         }
                     },
                     None => (),
@@ -118,15 +98,12 @@ pub fn chronicle_page(
 
     let now_utc_date = time::OffsetDateTime::now_utc();
     let local_date = now_utc_date.to_offset(time::macros::offset!(-5));
-    let current_hour: u8 = local_date.hour();
-    let display_sleep_start = sleep_start_time.clone();
-    let display_sleep_end = sleep_end_time.clone();
 
     view! {
             Container(ContainerProperties {
                 title: String::from("Chronicle"),
                 children: view! {
-                    div(class="container-fluid d-flex flex-grow-1 bg-light") {
+                    div(class="") {
                         div(class="row flex-grow-1 text-black"){
                             div(class="col-9 bg-light p-5 border-0 rounded") {
                                 div(class="d-flex align-items-baseline") {
@@ -145,24 +122,7 @@ pub fn chronicle_page(
                                 div() {
                                     label() { "What do you intend to do today?" }
                                 }
-                                div() {
-                                    label() { "Hours until sleep" }
-                                    div() { (
-                                        match display_sleep_start.get().as_ref() {
-                                            Some(time) => (time.hour() as i8 - current_hour as i8).to_string(),
-                                            None => String::from("")
-                                        }
-                                    ) }
-                                }
-                                div() {
-                                    label() { "Hours awake" }
-                                    div() { (
-                                        match display_sleep_end.get().as_ref() {
-                                            Some(time) => (current_hour as i8 - time.hour() as i8).to_string(),
-                                            None => String::from("")
-                                        }
-                                    ) }
-                                 }
+                                SleepWidget()
                                 div(class="d-flex flex-column") {
                                     label() { "Notes" }
                                     textarea(class="border rounded bg-white", rows="4", cols="50") {}
@@ -197,8 +157,6 @@ pub async fn get_build_state(
         short_date_display: String::new(),
         time_display: String::new(),
         greeting: String::new(),
-        sleep_start_time: None,
-        sleep_end_time: None,
     })
 }
 

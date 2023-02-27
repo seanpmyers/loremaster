@@ -3,11 +3,14 @@ use axum::extract::FromRef;
 use axum::routing::MethodRouter;
 use axum::{http::StatusCode, response::IntoResponse, routing::get_service, Router};
 use axum_extra::extract::cookie::Key;
+use axum_server::tls_rustls::RustlsConfig;
 use env_logger::{Builder, Target};
 use log::{info, LevelFilter};
 use sqlx::types::time::OffsetDateTime;
+use std::env;
 use std::io::{self, Write};
 use std::net::SocketAddr;
+use std::path::Path;
 use time::format_description::well_known::Rfc3339;
 use tower_http::services::ServeDir;
 use utility::loremaster_configuration::LoremasterConfiguration;
@@ -59,6 +62,8 @@ async fn main() -> Result<()> {
 
     let configuration: LoremasterConfiguration = get_configuration_from_file(&environment)?;
 
+    let transport_layer_security_configuration: RustlsConfig = get_tls_configuration().await?;
+
     info!("Attempting a database connection...");
     let postgres_service: PostgresHandler =
         PostgresHandler::new(configuration.postgresql_connection_string).await?;
@@ -92,11 +97,16 @@ async fn main() -> Result<()> {
 
     let address_string: String = socket_address.to_string();
     info!(
-        "Loremaster servers are available at:\n\n BACKEND API: > http://{} <\n",
+        "Loremaster server is available at:\n\n [https://{}]\n",
         address_string
     );
 
-    serve(application_router, socket_address).await?;
+    serve(
+        application_router,
+        socket_address,
+        transport_layer_security_configuration,
+    )
+    .await?;
 
     info!("Shutting down.");
 
@@ -107,9 +117,13 @@ async fn handle_error(_err: io::Error) -> impl IntoResponse {
     (StatusCode::INTERNAL_SERVER_ERROR, "Something went wrong...")
 }
 
-async fn serve(router: Router, socket_address: SocketAddr) -> Result<()> {
-    axum::Server::bind(&socket_address)
-        .serve(router.into_make_service())
+async fn serve(
+    router: Router,
+    socket_address: SocketAddr,
+    transport_layer_security_configuration: RustlsConfig,
+) -> Result<()> {
+    axum_server::bind_rustls(socket_address, transport_layer_security_configuration)
+        .serve(router.into_make_service_with_connect_info::<SocketAddr>())
         .await?;
     Ok(())
 }
@@ -120,8 +134,8 @@ fn configure_logging() {
         .format(|buf, record| -> Result<(), std::io::Error> {
             writeln!(
                 buf,
-                "LOREMASTER_{}: {} [{}] - {}",
-                std::env::var(ENVIRONMENT).unwrap(),
+                "[LOREMASTER_{}]: [{}] [{}] - {}",
+                std::env::var(ENVIRONMENT).unwrap().to_ascii_uppercase(),
                 OffsetDateTime::now_utc().format(&Rfc3339).unwrap(),
                 record.level(),
                 record.args()
@@ -129,4 +143,12 @@ fn configure_logging() {
         })
         .filter(None, LevelFilter::Info)
         .init();
+}
+
+async fn get_tls_configuration() -> Result<RustlsConfig> {
+    Ok(
+        RustlsConfig::from_pem_file("certs/cert.pem", "certs/key.pem")
+            .await
+            .unwrap(),
+    )
 }
