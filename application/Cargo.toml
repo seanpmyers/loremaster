@@ -12,7 +12,7 @@ anyhow = "1.0.69"
 # Password Encryption
 argon2 = "0.4.1"
 # A web application framework that focuses on ergonomics and modularity.
-axum = { version = "0.6.7", features = ["headers", "http2", "ws", "tokio"] }
+axum = { version = "0.6.8", features = ["headers", "http2", "ws", "tokio"] }
 axum-extra = { version = "0.5.0", features = [
 	"cookie",
 	"cookie-private",
@@ -55,7 +55,7 @@ sqlx = { version = "0.6.2", features = [
 # Error/exception handling
 thiserror = "1.0.38"
 # Time
-time = { version = "0.3.19", features = ["serde", "std", "parsing"] }
+time = { version = "0.3.20", features = ["serde", "std", "parsing"] }
 time-tz = { version = "1.0.2" }
 # Backend async I/O functionality
 tokio = { version = "1.25.0", features = ["full"] }
