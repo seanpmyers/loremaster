@@ -66,8 +66,8 @@ pub fn sleep_widget() -> View<G> {
             let display_wake_up: Signal<String> = wake_up.clone();
             let display_bedtime: Signal<String> = bedtime.clone();
             view! {
-               div(class="sleep-widget") {
-                   div(class="sleep-widget-section") {
+               section(class="sleep-widget") {
+                   article(class="sleep-widget-section") {
                        div(class="sleep-widget-section-top") {
                            div(class="sleep-widget-number") { (display_hours_awake.get()) }
                            div(class="sleep-widget-icon", dangerously_set_inner_html=SUN_SVG_HTML) {}
@@ -77,7 +77,7 @@ pub fn sleep_widget() -> View<G> {
                            div() { (display_wake_up.get()) }
                        }
                    }
-                   div(class="sleep-widget-section") {
+                   article(class="sleep-widget-section") {
                        div(class="sleep-widget-section-top") {
                            div(class="sleep-widget-number") { (display_hours_until_sleep.get()) }
                            div(class="sleep-widget-icon", dangerously_set_inner_html=MOON_SVG_HTML) {}
@@ -87,7 +87,7 @@ pub fn sleep_widget() -> View<G> {
                            div() { (display_bedtime.get()) }
                        }
                    }
-                   div(class="sleep-widget-section") {
+                   article(class="sleep-widget-section") {
                        div(class="sleep-widget-section-top") {
                            div(class="sleep-widget-number") { (display_hours_of_sleep.get()) }
                            div(class="sleep-widget-icon", dangerously_set_inner_html=BATTERY_CHARGING_SVG_HTML) {}

@@ -22,7 +22,7 @@
 \i database/table/person_skill.sql
 \i database/table/completed_action.sql
 \i database/table/intention_frequency.sql
-\i database/table/chronicle_intention.sql
+-- \i database/table/chronicle_intention.sql
 
 -- Relations
 
@@ -38,8 +38,8 @@ ALTER TABLE "person_skill"
 ALTER TABLE "person_skill"
     ADD CONSTRAINT "skill_foreign_key" FOREIGN KEY ("skill_id") REFERENCES "skill" ("id");
 
-ALTER TABLE "chronicle_intention"
-    ADD CONSTRAINT "chronicle_intention_action_id_foreign" FOREIGN KEY ("action_id") REFERENCES "action" ("id");
+-- ALTER TABLE "chronicle_intention"
+--     ADD CONSTRAINT "chronicle_intention_action_id_foreign" FOREIGN KEY ("action_id") REFERENCES "action" ("id");
 
 ALTER TABLE "chronicle"
     ADD CONSTRAINT "chronicle_person_id_foreign" FOREIGN KEY ("person_id") REFERENCES "person" ("id");
@@ -53,8 +53,8 @@ ALTER TABLE "person_email_address"
 ALTER TABLE "person_principle"
     ADD CONSTRAINT "person_principle_person_id_foreign" FOREIGN KEY ("person_id") REFERENCES "person" ("id");
 
-ALTER TABLE "chronicle_intention"
-    ADD CONSTRAINT "chronicle_intention_person_id_foreign" FOREIGN KEY ("person_id") REFERENCES "person" ("id");
+-- ALTER TABLE "chronicle_intention"
+--     ADD CONSTRAINT "chronicle_intention_person_id_foreign" FOREIGN KEY ("person_id") REFERENCES "person" ("id");
 
 ALTER TABLE "person"
     ADD CONSTRAINT "person_email_address_id_foreign" FOREIGN KEY ("email_address_id") REFERENCES "email_address" ("id");

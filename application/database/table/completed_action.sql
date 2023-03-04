@@ -1,9 +1,10 @@
 CREATE TABLE "completed_action" (
     "action_id" uuid NOT NULL,
-    "completion_time" timestamp(0) with time zone NOT NULL,
     "person_id" uuid NOT NULL,
     "chronicle_id" uuid NOT NULL,
-    "duration" interval NULL
+    "completion_time" timestamp(0) with time zone NOT NULL,
+    "duration" interval NULL,
+    "intention_id" uuid NULL
 );
 
 CREATE INDEX "completed_action_person_id_index" ON "completed_action" ("person_id");
