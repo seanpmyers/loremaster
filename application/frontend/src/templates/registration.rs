@@ -6,7 +6,7 @@ use web_sys::Event;
 
 use crate::components::container::{Container, ContainerProperties};
 use crate::components::widget::data::form::security_key_authentication::SecurityKeyAuthentication;
-use crate::utility::constants::API_REGISTER_URL;
+use crate::utility::constants::{ACCEPTED_HTTP_STATUS_CODE, API_REGISTER_URL, OK_HTTP_STATUS_CODE};
 use crate::utility::http_service;
 
 #[derive(Deserialize, Serialize, Debug, Clone)]
@@ -51,7 +51,7 @@ pub fn registration_page(state: RegistrationPageStateRx) -> View<G> {
                 match potential_response {
                     Some(response) => {
                         match response.status() {
-                            200 => {
+                            OK_HTTP_STATUS_CODE | ACCEPTED_HTTP_STATUS_CODE => {
                                 form_message.set(FormMessageState::Success);
                                 email_address.set(String::new());
                                 password.set(String::new());
