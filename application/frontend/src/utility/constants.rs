@@ -17,6 +17,9 @@ pub const HTTP_HEADER_CONTENT_TYPE_FORM: &str = "application/x-www-form-urlencod
 pub const EMAIL_ADDRESS_FIELD: &str = "email_address";
 pub const PASSWORD_FIELD: &str = "password";
 
+pub const OK_HTTP_STATUS_CODE: u16 = 200;
+pub const ACCEPTED_HTTP_STATUS_CODE: u16 = 202;
+
 pub const JANUARY: &str = "January";
 pub const FEBRUARY: &str = "February";
 pub const MARCH: &str = "March";

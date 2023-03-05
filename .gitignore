@@ -21,3 +21,4 @@ application/frontend/resources/styles/library/*
 *.gcp-service-account.json
 .terraform/
 *.tfstate
+application/database/.project

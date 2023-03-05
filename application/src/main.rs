@@ -1,16 +1,14 @@
 use anyhow::Result;
 use axum::extract::FromRef;
 use axum::routing::MethodRouter;
-use axum::{http::StatusCode, response::IntoResponse, routing::get_service, Router};
+use axum::{routing::get_service, Router};
 use axum_extra::extract::cookie::Key;
 use axum_server::tls_rustls::RustlsConfig;
 use env_logger::{Builder, Target};
 use log::{info, LevelFilter};
 use sqlx::types::time::OffsetDateTime;
-use std::env;
-use std::io::{self, Write};
+use std::io::Write;
 use std::net::SocketAddr;
-use std::path::Path;
 use time::format_description::well_known::Rfc3339;
 use tower_http::services::ServeDir;
 use utility::loremaster_configuration::LoremasterConfiguration;
@@ -81,8 +79,7 @@ async fn main() -> Result<()> {
         key: Key::from(configuration.site_secret.as_bytes()),
     };
 
-    let serve_directory: MethodRouter =
-        get_service(ServeDir::new(FRONTEND_DIST_PATH)).handle_error(handle_error);
+    let serve_directory: MethodRouter = get_service(ServeDir::new(FRONTEND_DIST_PATH));
 
     info!("Configuring routers...");
     let application_router: Router = Router::new()
@@ -111,10 +108,6 @@ async fn main() -> Result<()> {
     info!("Shutting down.");
 
     Ok(())
-}
-
-async fn handle_error(_err: io::Error) -> impl IntoResponse {
-    (StatusCode::INTERNAL_SERVER_ERROR, "Something went wrong...")
 }
 
 async fn serve(
