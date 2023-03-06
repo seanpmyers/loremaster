@@ -16,8 +16,8 @@ use crate::{
         handler::person::{
             create_action, create_goal, get_action_list_handler, get_frequency_list_handler,
             get_goal_list_handler, get_person_meta_data, get_sleep_schedule_handler,
-            remove_one_goal_handler, update_email_handler, update_meta_handler,
-            update_sleep_schedule_handler, UniqueEntryResult,
+            remove_one_goal_handler, update_email_handler, update_person_meta_handler,
+            update_sleep_schedule_handler, UniqueEntryResult, UserInputValidationOutcome,
         },
         response::ApiError,
     },
@@ -56,9 +56,29 @@ pub async fn update_meta(
     user: User,
     Form(form): Form<UpdatePersonMetaForm>,
 ) -> Result<Response, ApiError> {
-    let result: PersonMeta =
-        update_meta_handler(&postgres_service.database_pool, &user.0, &form.alias).await?;
-    Ok((StatusCode::OK, Json(result)).into_response())
+    let result: (UserInputValidationOutcome, Option<PersonMeta>) =
+        update_person_meta_handler(&postgres_service.database_pool, user.0, form.alias).await?;
+    match result {
+        (UserInputValidationOutcome::Invalid, _) => Ok((
+            StatusCode::BAD_REQUEST,
+            Json("Invalid input. Unable to complete your request"),
+        )
+            .into_response()),
+        // TODO: Log malicious input at some point
+        (UserInputValidationOutcome::Malicious, _) => Ok((
+            StatusCode::BAD_REQUEST,
+            Json("Invalid input. Unable to complete your request"),
+        )
+            .into_response()),
+        (UserInputValidationOutcome::Valid, Some(result)) => {
+            Ok((StatusCode::OK, Json(result)).into_response())
+        }
+        (_, _) => Ok((
+            StatusCode::INTERNAL_SERVER_ERROR,
+            Json("Sorry, something went wrong on our side. Please try again."),
+        )
+            .into_response()),
+    }
 }
 
 #[derive(Deserialize, Debug)]
@@ -258,17 +278,17 @@ pub fn router() -> Router<ApplicationState> {
     Router::new()
         .route("/person/meta", get(meta))
         .route("/person/sleep-schedule", get(get_sleep_schedule))
-        .route("/action/list", get(get_action_list))
-        .route("/frequency/list", get(get_frequency_list))
+        .route("/person/action-list", get(get_action_list))
+        .route("/person/frequency-list", get(get_frequency_list))
         .route(
             "/person/compounding-interest-calculator",
             get(compounding_interest_calculator),
         )
         .route("/person/update/meta", post(update_meta))
         .route("/person/update/email_address", post(update_email_address))
-        .route("/person/goal/new", post(new_goal))
-        .route("/person/goal/remove", post(remove_goal))
+        .route("/person/goal-new", post(new_goal))
+        .route("/person/goal-remove", post(remove_goal))
         .route("/person/goal-list", get(get_goal_list))
         .route("/person/update/sleep-schedule", post(update_sleep_schedule))
-        .route("/action/new", post(new_action))
+        .route("/person/action-new", post(new_action))
 }

@@ -14,6 +14,7 @@ pub async fn get_build_state() -> RenderFnResult<AppState> {
             state: LoginState::Server,
             user_id: String::new(),
         },
+        user_alias: String::from("You"),
     })
 }
 
@@ -22,6 +23,7 @@ pub async fn get_build_state() -> RenderFnResult<AppState> {
 pub struct AppState {
     /// Authentication data accessible to all pages.
     pub authentication: AuthData,
+    pub user_alias: String,
 }
 
 /// The possible login states, including one for the server.

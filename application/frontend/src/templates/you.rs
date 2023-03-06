@@ -77,7 +77,10 @@ pub fn you_page(
                 query_response= http_service::get_endpoint(format!("{}/{}",API_BASE_URL,API_ACTION_LIST_ROUTE).as_str(), None).await;
                 match query_response {
                     Some(response) => {
-                        let action_list_data: Vec<Action> = serde_json::from_str(&response).unwrap();
+                        let mut action_list_data: Vec<Action> = serde_json::from_str(&response).unwrap();
+                        action_list_data.iter_mut().for_each(|action| {
+                            action.name = action.name.remove(0).to_ascii_uppercase().to_string() + &action.name
+                        });
                         action_list.set(action_list_data);
                     },
                     None => {},

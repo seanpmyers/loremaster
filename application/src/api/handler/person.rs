@@ -5,39 +5,49 @@ use sqlx::{Pool, Postgres};
 use time::{format_description::FormatItem, macros::format_description, Time};
 use uuid::Uuid;
 
-use crate::data::{
-    entity::{
-        self, action::Action, frequency::Frequency, goal::Goal, person::PersonMeta,
-        sleep_schedule::SleepSchedule,
+use crate::{
+    data::{
+        entity::{
+            self, action::Action, frequency::Frequency, goal::Goal, person::PersonMeta,
+            sleep_schedule::SleepSchedule,
+        },
+        query::{
+            action::{
+                create_action::create_action_query, get_action_by_name::get_action_by_name_query,
+                get_all_actions::get_all_actions_query,
+            },
+            email_address::create_email_address::create_email_address_query,
+            frequency::get_frequency_list::get_frequency_list_query,
+            goal::{
+                create_goal::create_goal_query, get_goal_by_name::get_goal_by_name_query,
+                get_goal_list::get_goal_list_query,
+            },
+            person::{
+                action_is_related::action_is_related_query, add_action::add_action_query,
+                add_goal::add_goal_query,
+                credential_by_email_address::credential_by_email_address_query,
+                get_person_sleep_schedule::get_person_sleep_schedule_query,
+                goal_is_related::goal_is_related_query, meta_by_id::meta_by_id_query,
+                remove_one_goal::remove_one_goal_query,
+                update_email_address::update_email_address_query,
+                update_meta_by_id::update_meta_by_id_query,
+                update_person_sleep_schedule::update_person_sleep_schedule_query,
+            },
+            sleep_schedule::{
+                create_sleep_schedule::create_sleep_schedule_query,
+                get_sleep_schedule_by_time::get_sleep_schedule_by_time_query,
+            },
+        },
     },
-    query::{
-        action::{
-            create_action::create_action_query, get_action_by_name::get_action_by_name_query,
-            get_all_actions::get_all_actions_query,
-        },
-        email_address::create_email_address::create_email_address_query,
-        frequency::get_frequency_list::get_frequency_list_query,
-        goal::{
-            create_goal::create_goal_query, get_goal_by_name::get_goal_by_name_query,
-            get_goal_list::get_goal_list_query,
-        },
-        person::{
-            action_is_related::action_is_related_query, add_action::add_action_query,
-            add_goal::add_goal_query,
-            credential_by_email_address::credential_by_email_address_query,
-            get_person_sleep_schedule::get_person_sleep_schedule_query,
-            goal_is_related::goal_is_related_query, meta_by_id::meta_by_id_query,
-            remove_one_goal::remove_one_goal_query,
-            update_email_address::update_email_address_query,
-            update_meta_by_id::update_meta_by_id_query,
-            update_person_sleep_schedule::update_person_sleep_schedule_query,
-        },
-        sleep_schedule::{
-            create_sleep_schedule::create_sleep_schedule_query,
-            get_sleep_schedule_by_time::get_sleep_schedule_by_time_query,
-        },
-    },
+    security::sanitization::sanitize_user_input_string,
 };
+
+pub enum UserInputValidationOutcome {
+    Error,
+    Invalid,
+    Malicious,
+    Valid,
+}
 
 pub enum UniqueEntryResult {
     Created,
@@ -57,14 +67,6 @@ pub async fn get_person_meta_data(
     person_id: &Uuid,
 ) -> Result<Option<PersonMeta>> {
     Ok(meta_by_id_query(&database_pool, &person_id).await?)
-}
-
-pub async fn update_person_meta_data(
-    database_pool: &Pool<Postgres>,
-    person_id: &Uuid,
-    alias: &str,
-) -> Result<PersonMeta> {
-    Ok(update_meta_by_id_query(&database_pool, &person_id, &alias).await?)
 }
 
 pub async fn create_action(
@@ -161,16 +163,22 @@ pub async fn get_goal_list_handler(
     Ok(get_goal_list_query(&database_pool, person_id).await?)
 }
 
-pub async fn update_meta_handler(
+pub async fn update_person_meta_handler(
     database_pool: &Pool<Postgres>,
-    person_id: &Uuid,
-    alias: &String,
-) -> Result<PersonMeta> {
-    let sanitized_alias: &str = alias.trim();
+    person_id: Uuid,
+    alias: String,
+) -> Result<(UserInputValidationOutcome, Option<PersonMeta>)> {
+    let sanitized_alias: String = sanitize_user_input_string(alias.clone())?;
 
-    let result: PersonMeta =
-        update_person_meta_data(&database_pool, &person_id, sanitized_alias).await?;
-    Ok(result)
+    // Alias cannot be an empty string
+    if sanitized_alias.is_empty() {
+        return Ok((UserInputValidationOutcome::Invalid, None));
+    }
+
+    Ok((
+        UserInputValidationOutcome::Valid,
+        Some(update_meta_by_id_query(&database_pool, &person_id, &sanitized_alias).await?),
+    ))
 }
 
 pub async fn update_email_handler(
