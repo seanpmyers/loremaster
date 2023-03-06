@@ -29,15 +29,13 @@ impl PasswordEncryption for PasswordEncryptionService {
     fn encrypt_password(&self, credential: &str) -> Result<String> {
         let mut argon2_parameters: ParamsBuilder = argon2::ParamsBuilder::new();
 
-        argon2_parameters
-            .t_cost(self.iterations)
-            .map_err(|error| anyhow!("{}", error))?;
+        argon2_parameters.t_cost(self.iterations);
 
         let argon2 = Argon2::new_with_secret(
             self.site_secret.as_bytes(),
             argon2::Algorithm::Argon2id,
             argon2::Version::V0x13,
-            argon2_parameters.params().unwrap(),
+            argon2_parameters.build().unwrap(),
         )
         .map_err(|error| anyhow!("{}", error))?;
 
@@ -53,13 +51,13 @@ impl PasswordEncryption for PasswordEncryptionService {
 
     fn verify_password(&self, encrypted_password: &str, credential: &str) -> Result<bool> {
         let mut argon2_parameters: ParamsBuilder = argon2::ParamsBuilder::new();
-        argon2_parameters.t_cost(self.iterations).unwrap();
+        argon2_parameters.t_cost(self.iterations);
 
         let argon2 = Argon2::new_with_secret(
             self.site_secret.as_bytes(),
             argon2::Algorithm::Argon2id,
             argon2::Version::V0x13,
-            argon2_parameters.params().unwrap(),
+            argon2_parameters.build().unwrap(),
         )
         .map_err(|error| anyhow!("{}", error))?;
 
