@@ -35,6 +35,8 @@ web-sys = { version = "0.3.61", features = [
 	"AuthenticatorAttachment",
 	"CredentialsContainer",
 	"CredentialCreationOptions",
+	"Document",
+	"Element",
 	"Event",
 	"EventTarget",
 	"HtmlDocument",

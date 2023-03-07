@@ -13,9 +13,7 @@ pub fn remove_invisible_characters(input: String) -> Result<String> {
 
 pub fn sanitize_user_input_string(mut input: String) -> Result<String> {
     input = remove_invisible_characters(input)?;
-    let mut result: String = input.trim().to_string().chars().collect();
-
-    Ok(result)
+    Ok(input.chars().collect())
 }
 
 #[cfg(test)]

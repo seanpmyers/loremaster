@@ -1,9 +1,32 @@
+:root {
+	--default-background-color: black;
+	--default-text-color: white;
+	--default-font-family: 'Fira Sans', sans-serif;
+	color-scheme: dark;
+}
+
+.light {
+	--default-background-color: white;
+	--default-text-color: black;
+	--default-font-family: 'Fira Sans', sans-serif;
+	color-scheme: light;
+}
+
+
+
+@media (prefers-color-scheme: light) {
+	:root {
+		/* --default-background-color: white; */
+		--default-text-color: black;
+	}
+}
+
 html {
 	margin: 0;
 	padding: 0;
-	font-family: 'Fira Sans', sans-serif;
-	background: black;
-	color: white;
+	font-family: var(--default-font-family);
+	background: var(--default-background-color);
+	color: var(--default-text-color);
 	display: flex;
 }
 

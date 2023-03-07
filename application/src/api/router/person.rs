@@ -64,12 +64,6 @@ pub async fn update_meta(
             Json("Invalid input. Unable to complete your request"),
         )
             .into_response()),
-        // TODO: Log malicious input at some point
-        (UserInputValidationOutcome::Malicious, _) => Ok((
-            StatusCode::BAD_REQUEST,
-            Json("Invalid input. Unable to complete your request"),
-        )
-            .into_response()),
         (UserInputValidationOutcome::Valid, Some(result)) => {
             Ok((StatusCode::OK, Json(result)).into_response())
         }

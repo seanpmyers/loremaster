@@ -43,9 +43,7 @@ use crate::{
 };
 
 pub enum UserInputValidationOutcome {
-    Error,
     Invalid,
-    Malicious,
     Valid,
 }
 
@@ -67,6 +65,31 @@ pub async fn get_person_meta_data(
     person_id: &Uuid,
 ) -> Result<Option<PersonMeta>> {
     Ok(meta_by_id_query(&database_pool, &person_id).await?)
+}
+
+pub async fn get_sleep_schedule_handler(
+    database_pool: &Pool<Postgres>,
+    person_id: &Uuid,
+) -> Result<Option<SleepSchedule>> {
+    let potential_sleep_schedule: Option<SleepSchedule> =
+        get_person_sleep_schedule_query(&database_pool, &person_id).await?;
+
+    Ok(potential_sleep_schedule)
+}
+
+pub fn get_frequency_list_handler() -> Result<Vec<Frequency>> {
+    Ok(get_frequency_list_query()?)
+}
+
+pub async fn get_action_list_handler(database_pool: &Pool<Postgres>) -> Result<Vec<Action>> {
+    Ok(get_all_actions_query(&database_pool).await?)
+}
+
+pub async fn get_goal_list_handler(
+    database_pool: &Pool<Postgres>,
+    person_id: Option<&Uuid>,
+) -> Result<Vec<Goal>> {
+    Ok(get_goal_list_query(&database_pool, person_id).await?)
 }
 
 pub async fn create_action(
@@ -103,10 +126,6 @@ pub async fn create_action(
     }
 }
 
-pub async fn get_action_list_handler(database_pool: &Pool<Postgres>) -> Result<Vec<Action>> {
-    Ok(get_all_actions_query(&database_pool).await?)
-}
-
 pub async fn create_goal(
     database_pool: &Pool<Postgres>,
     person_id: &Uuid,
@@ -139,28 +158,6 @@ pub async fn create_goal(
             Ok(UniqueEntryResult::Created)
         }
     }
-}
-
-pub async fn remove_one_goal_handler(
-    database_pool: &Pool<Postgres>,
-    person_id: &Uuid,
-    goal_id: &Uuid,
-) -> Result<bool> {
-    let relation_exists: bool = goal_is_related_query(&database_pool, &person_id, &goal_id).await?;
-    match relation_exists {
-        true => {
-            remove_one_goal_query(&database_pool, &person_id, &goal_id).await?;
-            Ok(true)
-        }
-        false => Ok(false),
-    }
-}
-
-pub async fn get_goal_list_handler(
-    database_pool: &Pool<Postgres>,
-    person_id: Option<&Uuid>,
-) -> Result<Vec<Goal>> {
-    Ok(get_goal_list_query(&database_pool, person_id).await?)
 }
 
 pub async fn update_person_meta_handler(
@@ -211,16 +208,6 @@ pub async fn update_email_handler(
     Ok(EmailAddressUpdateResult::Success)
 }
 
-pub async fn get_sleep_schedule_handler(
-    database_pool: &Pool<Postgres>,
-    person_id: &Uuid,
-) -> Result<Option<SleepSchedule>> {
-    let potential_sleep_schedule: Option<SleepSchedule> =
-        get_person_sleep_schedule_query(&database_pool, &person_id).await?;
-
-    Ok(potential_sleep_schedule)
-}
-
 pub async fn update_sleep_schedule_handler(
     database_pool: &Pool<Postgres>,
     person_id: &Uuid,
@@ -249,6 +236,17 @@ pub async fn update_sleep_schedule_handler(
     }
 }
 
-pub fn get_frequency_list_handler() -> Result<Vec<Frequency>> {
-    Ok(get_frequency_list_query()?)
+pub async fn remove_one_goal_handler(
+    database_pool: &Pool<Postgres>,
+    person_id: &Uuid,
+    goal_id: &Uuid,
+) -> Result<bool> {
+    let relation_exists: bool = goal_is_related_query(&database_pool, &person_id, &goal_id).await?;
+    match relation_exists {
+        true => {
+            remove_one_goal_query(&database_pool, &person_id, &goal_id).await?;
+            Ok(true)
+        }
+        false => Ok(false),
+    }
 }
