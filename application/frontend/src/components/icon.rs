@@ -138,3 +138,47 @@ pub const YUBIKEY_SVG_HTML: &str = r#"
 	</g>
 </svg>
 "#;
+
+pub const LOGIN_SVG_HTML: &str = r#"
+<svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor"
+	stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="feather feather-log-in">
+	<path d="M15 3h4a2 2 0 0 1 2 2v14a2 2 0 0 1-2 2h-4"></path>
+	<polyline points="10 17 15 12 10 7"></polyline>
+	<line x1="15" y1="12" x2="3" y2="12"></line>
+</svg>
+"#;
+
+pub const USER_PLUS_SVG_HTML: &str = r#"
+<svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor"
+	stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="feather feather-user-plus">
+	<path d="M16 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2"></path>
+	<circle cx="8.5" cy="7" r="4"></circle>
+	<line x1="20" y1="8" x2="20" y2="14"></line>
+	<line x1="23" y1="11" x2="17" y2="11"></line>
+</svg>
+"#;
+
+pub const GLOBE_SVG_HTML: &str = r#"
+<svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor"
+	stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="feather feather-globe">
+	<circle cx="12" cy="12" r="10"></circle>
+	<line x1="2" y1="12" x2="22" y2="12"></line>
+	<path d="M12 2a15.3 15.3 0 0 1 4 10 15.3 15.3 0 0 1-4 10 15.3 15.3 0 0 1-4-10 15.3 15.3 0 0 1 4-10z"></path>
+</svg>
+"#;
+
+pub const COPY_SVG_HTML: &str = r#"
+<svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor"
+	stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="feather feather-copy">
+	<rect x="9" y="9" width="13" height="13" rx="2" ry="2"></rect>
+	<path d="M5 15H4a2 2 0 0 1-2-2V4a2 2 0 0 1 2-2h9a2 2 0 0 1 2 2v1"></path>
+</svg>
+"#;
+
+pub const SEARCH_SVG_HTML: &str = r#"
+<svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor"
+	stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="feather feather-search">
+	<circle cx="11" cy="11" r="8"></circle>
+	<line x1="21" y1="21" x2="16.65" y2="16.65"></line>
+</svg>
+"#;

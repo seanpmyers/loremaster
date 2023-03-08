@@ -1,6 +1,6 @@
 use super::icon::{
     ARCHIVE_SVG_HTML, BOOK_SVG_HTML, CLOCK_SVG_HTML, FEATHER_SVG_HTML, HELP_CIRCLE_SVG_HTML,
-    USER_SVG_HTML,
+    LOGIN_SVG_HTML, USER_PLUS_SVG_HTML, USER_SVG_HTML,
 };
 
 pub mod side_nav_bar;
@@ -59,13 +59,13 @@ pub fn get_navigation_links() -> Vec<NavigationLink> {
             html_id: String::from("registration-link"),
             html_href: String::from("/registration/"),
             display_text: String::from("Registration"),
-            svg_html: USER_SVG_HTML,
+            svg_html: USER_PLUS_SVG_HTML,
         },
         NavigationLink {
             html_id: String::from("login-link"),
             html_href: String::from("/login/"),
             display_text: String::from("Login"),
-            svg_html: USER_SVG_HTML,
+            svg_html: LOGIN_SVG_HTML,
         },
         NavigationLink {
             html_id: String::from("about-link"),
