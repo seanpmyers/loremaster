@@ -391,13 +391,11 @@ form {
 }
 
 .filled-button {
-	background: var(--button-background-color);
 	color: var(--default-text-color);
 	border-radius: 1vmin;
 	display: flex;
-	padding: .2vmin;
+	padding: .6vmin;
 	cursor: pointer;
-	border: transparent solid;
 	align-items: center;
 }
 
@@ -407,6 +405,7 @@ form {
 
 .filled-button-icon svg {
 	fill: var(--default-text-color);
+	margin: 0 .4rem;
 }
 
 #chronicle-container {
@@ -426,12 +425,13 @@ form {
 .date-time-widget div:nth-child(1) {
 	font-size: 1rem;
 	color: var(--secondary-text-color);
+	margin: .25vmin 0;
 }
 
 
 .date-time-widget div:nth-child(2) {
 	font-size: 1rem;
-	color: var(--secondary-text-color);
+	margin: .25vmin 0;
 }
 
 .date-time-widget div:nth-child(3) {
@@ -441,6 +441,7 @@ form {
 .date-time-widget div:nth-child(4) {
 	font-size: .8rem;
 	color: var(--secondary-text-color);
+	margin: .2vmin 0;
 }
 
 .quick-functions {
@@ -469,4 +470,9 @@ form {
 	background: inherit;
 	border-radius: 1vmin;
 	background-color: var(--button-hover-background-color);
+}
+
+.registration-form {
+	display: flex;
+	flex-direction: column;
 }

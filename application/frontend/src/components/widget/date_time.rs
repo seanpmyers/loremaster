@@ -15,9 +15,10 @@ pub fn date_time() -> View<G> {
     let time_zone: Signal<String> = Signal::new(String::from(""));
 
     if G::IS_BROWSER {
-        let short_format =
-            format_description!("[year]/[month]/[day] [hour repr:12]:[minute]:[second] [period]");
-        let time_format = format_description!("[hour repr:12]:[minute] [period]");
+        let short_format = format_description!(
+            "[year]/[month]/[day] [hour repr:12 padding:space]:[minute]:[second] [period]"
+        );
+        let time_format = format_description!("[hour repr:12 padding:space]:[minute] [period]");
         let rust_time = time::OffsetDateTime::now_local().unwrap();
         short_date.set(rust_time.format(short_format).unwrap());
         time.set(rust_time.format(time_format).unwrap());

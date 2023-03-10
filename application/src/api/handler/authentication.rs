@@ -16,6 +16,9 @@ use crate::{
             },
         },
     },
+    security::authentication::security_key::{
+        SecurityKeyAuthentication, SecurityKeyChallenge, SecurityKeyService,
+    },
     utility::password_encryption::{PasswordEncryption, PasswordEncryptionService},
 };
 
@@ -86,4 +89,10 @@ pub async fn register_handler(
     .map_err(|error| anyhow!("{}", error))?;
 
     Ok(RegistrationResult::Success)
+}
+
+pub async fn security_key_challenge_handler(
+    security_key_service: &SecurityKeyService,
+) -> Result<SecurityKeyChallenge> {
+    Ok(security_key_service.create_challenge()?)
 }
