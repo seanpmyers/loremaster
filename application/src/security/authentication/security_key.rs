@@ -9,6 +9,7 @@ use ctap_hid_fido2::{
 };
 use log::{info, warn};
 use serde::{Deserialize, Serialize};
+use uuid::Uuid;
 
 //TODO: Where should this live
 pub const RELAYING_PARTY_ID: &str = "chronilore.day";
@@ -23,6 +24,7 @@ pub struct SecurityKeyChallenge {
     pub relaying_party: &'static str,
     // The challenge is a buffer of cryptographically random bytes generated on the server, and is needed to prevent "replay attacks"
     pub challenge: [u8; 32],
+    pub user_id: Uuid,
 }
 
 pub struct PersonSecurityKey {
@@ -54,10 +56,11 @@ impl SecurityKeyAuthentication for SecurityKeyService {
 
     fn create_challenge(&self) -> Result<SecurityKeyChallenge> {
         Ok(SecurityKeyChallenge {
-            relaying_party_id: RELAYING_PARTY,
+            relaying_party_id: LOCAL_HOST_RELAYING_PARTY_ID,
             //TODO: fix for prod
-            relaying_party: LOCAL_HOST_RELAYING_PARTY_ID,
+            relaying_party: RELAYING_PARTY,
             challenge: verifier::create_challenge(),
+            user_id: Uuid::new_v4(),
         })
     }
 

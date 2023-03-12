@@ -19,7 +19,8 @@ use serde::Deserialize;
 use crate::{
     api::{
         handler::authentication::{
-            register_handler, security_key_challenge_handler, RegistrationResult,
+            handle_register_with_security_key, register_handler, security_key_challenge_handler,
+            RegistrationResult,
         },
         response::ApiError,
     },
@@ -146,9 +147,17 @@ async fn logout(cookie_jar: PrivateCookieJar) -> Result<Response, ApiError> {
 async fn security_key_challenge(
     State(security_key_service): State<SecurityKeyService>,
 ) -> Result<Json<SecurityKeyChallenge>, ApiError> {
+    info!("API CALL: /authentication/security-key-challenge");
     let result: SecurityKeyChallenge =
         security_key_challenge_handler(&security_key_service).await?;
     Ok(Json(result))
+}
+
+async fn register_with_security_key(
+    State(security_key_service): State<SecurityKeyService>,
+) -> Result<Response, ApiError> {
+    let result = handle_register_with_security_key(&security_key_service, &String::new()).await?;
+    Ok((StatusCode::CREATED, "Successfully registered security key").into_response())
 }
 
 pub fn router() -> Router<ApplicationState> {

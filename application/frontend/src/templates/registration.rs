@@ -77,7 +77,7 @@ pub fn registration_page(state: RegistrationPageStateRx) -> View<G> {
                     div(class="card-body") {
                         h3(class="card-title display-6") {"Registration"}
                         form(on:submit=registration_handler) {
-                            div(class="mb-3") {
+                            div(class="input-row") {
                                 label(
                                     name="email_address",
                                     class="form-label") { "Email Address" }
@@ -89,7 +89,7 @@ pub fn registration_page(state: RegistrationPageStateRx) -> View<G> {
                                     disabled=loading_email.get().as_ref().to_owned()
                                 ) {}
                             }
-                            div(class="mb-3") {
+                            div(class="input-row") {
                                 label(
                                     name="password",
                                     class="form-label"

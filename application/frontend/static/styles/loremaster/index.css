@@ -87,6 +87,7 @@ button {
 form {
 	display: flex;
 	flex-direction: column;
+	align-items: start;
 }
 
 
@@ -475,4 +476,17 @@ form {
 .registration-form {
 	display: flex;
 	flex-direction: column;
+}
+
+form .input-row {
+	border: 1px solid var(--border-color);
+}
+
+form .input-row label,
+input {
+	padding: .6vmin;
+}
+
+form .input-row label {
+	background-color: var(--primary-background-color);
 }

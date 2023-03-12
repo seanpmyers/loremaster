@@ -1,4 +1,5 @@
 use serde::{Deserialize, Serialize};
+use uuid::Uuid;
 
 #[derive(Deserialize, Serialize, Debug, Clone)]
 pub struct SecurityKeyChallenge {
@@ -8,4 +9,5 @@ pub struct SecurityKeyChallenge {
     pub relaying_party: String,
     // The challenge is a buffer of cryptographically random bytes generated on the server, and is needed to prevent "replay attacks"
     pub challenge: [u8; 32],
+    pub user_id: Uuid,
 }
