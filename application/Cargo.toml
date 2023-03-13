@@ -27,7 +27,7 @@ email_address = { version = "0.2.4" }
 # Logging
 env_logger = "0.10.0"
 # Provides async programming foundational functionality
-futures = "0.3.26"
+futures = "0.3.27"
 # A library for HTML entity encoding and decoding
 htmlescape = { version = "0.3.1" }
 # Logging
@@ -35,7 +35,7 @@ log = "0.4.17"
 # Random nubmer generation
 rand = "0.8.5"
 # Serialization
-serde = { version = "1.0.154", features = ["derive"] }
+serde = { version = "1.0.155", features = ["derive"] }
 serde_json = "1.0.94"
 
 # Database client/pool/toolkit
