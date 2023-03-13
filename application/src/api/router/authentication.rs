@@ -5,8 +5,8 @@ use axum::{
     extract::{ConnectInfo, State},
     http::StatusCode,
     response::{IntoResponse, Response},
-    routing::post,
-    Router,
+    routing::{get, post},
+    Json, Router,
 };
 use axum_extra::extract::{
     cookie::{Cookie, SameSite},
@@ -18,13 +18,17 @@ use serde::Deserialize;
 
 use crate::{
     api::{
-        handler::authentication::{register_handler, RegistrationResult},
+        handler::authentication::{
+            handle_register_with_security_key, register_handler, security_key_challenge_handler,
+            RegistrationResult,
+        },
         response::ApiError,
     },
     data::{
         entity::person::Credentials, postgres_handler::PostgresHandler,
         query::person::credential_by_email_address::credential_by_email_address_query,
     },
+    security::authentication::security_key::{SecurityKeyChallenge, SecurityKeyService},
     utility::{
         constants::{
             cookie_fields, BLOCKED_EMAIL_MESSAGE, FAILED_LOGIN_MESSAGE, INVALID_EMAIL_MESSAGE,
@@ -140,8 +144,28 @@ async fn logout(cookie_jar: PrivateCookieJar) -> Result<Response, ApiError> {
     Ok((updated_cookie_jar, "Successfully logged out.").into_response())
 }
 
+async fn security_key_challenge(
+    State(security_key_service): State<SecurityKeyService>,
+) -> Result<Json<SecurityKeyChallenge>, ApiError> {
+    info!("API CALL: /authentication/security-key-challenge");
+    let result: SecurityKeyChallenge =
+        security_key_challenge_handler(&security_key_service).await?;
+    Ok(Json(result))
+}
+
+async fn register_with_security_key(
+    State(security_key_service): State<SecurityKeyService>,
+) -> Result<Response, ApiError> {
+    let result = handle_register_with_security_key(&security_key_service, &String::new()).await?;
+    Ok((StatusCode::CREATED, "Successfully registered security key").into_response())
+}
+
 pub fn router() -> Router<ApplicationState> {
     Router::new()
+        .route(
+            "/authentication/security-key-challenge",
+            get(security_key_challenge),
+        )
         .route("/authentication/authenticate", post(authenticate))
         .route("/authentication/logout", post(logout))
         .route("/authentication/register", post(register))

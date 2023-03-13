@@ -6,6 +6,7 @@ use axum_extra::extract::cookie::Key;
 use axum_server::tls_rustls::RustlsConfig;
 use env_logger::{Builder, Target};
 use log::{info, LevelFilter};
+use security::authentication::security_key::SecurityKeyService;
 use sqlx::types::time::OffsetDateTime;
 use std::io::Write;
 use std::net::SocketAddr;
@@ -20,6 +21,7 @@ mod utility;
 
 use data::postgres_handler::PostgresHandler;
 
+use crate::security::authentication::security_key::SecurityKeyAuthentication;
 use crate::utility::{
     constants::{files::FRONTEND_DIST_PATH, ENVIRONMENT},
     loremaster_configuration::get_configuration_from_file,
@@ -30,6 +32,7 @@ use crate::utility::{
 pub struct ApplicationState {
     postgres_service: PostgresHandler,
     encryption_service: PasswordEncryptionService,
+    security_key_service: SecurityKeyService,
     key: Key,
 }
 
@@ -48,6 +51,12 @@ impl FromRef<ApplicationState> for Key {
 impl FromRef<ApplicationState> for PasswordEncryptionService {
     fn from_ref(state: &ApplicationState) -> Self {
         state.encryption_service.clone()
+    }
+}
+
+impl FromRef<ApplicationState> for SecurityKeyService {
+    fn from_ref(state: &ApplicationState) -> Self {
+        state.security_key_service.clone()
     }
 }
 
@@ -76,6 +85,7 @@ async fn main() -> Result<()> {
     let application_state: ApplicationState = ApplicationState {
         postgres_service: postgres_service,
         encryption_service: encryption_service,
+        security_key_service: SecurityKeyService::new(),
         key: Key::from(configuration.site_secret.as_bytes()),
     };
 

@@ -6,7 +6,10 @@ use sycamore::{
 };
 use web_sys::Event;
 
-use crate::components::container::{Container, ContainerProperties};
+use crate::{
+    components::container::{Container, ContainerProperties},
+    global_state::AppStateRx,
+};
 
 #[derive(Deserialize, Serialize, Debug, Clone)]
 pub enum Tab {
@@ -28,6 +31,7 @@ pub fn index_page(
         greeting,
         current_tab,
     }: IndexPageStateRx,
+    global_state: AppStateRx,
 ) -> View<G> {
     let click_first = cloned!((current_tab) => move |event: Event| {
         event.prevent_default();
