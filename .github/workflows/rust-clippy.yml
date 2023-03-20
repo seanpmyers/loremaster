@@ -32,10 +32,8 @@ jobs:
       - name: Install Rust toolchain
         uses: dtolnay/rust-toolchain@master
         with:
-          profile: minimal
           toolchain: stable
           components: clippy
-          override: true
 
       - name: Install required cargo
         run: cargo install clippy-sarif sarif-fmt
