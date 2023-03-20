@@ -12,12 +12,10 @@ env:
 jobs:
   build:
 
-    runs-on: ubuntu-latest
+    runs-on: rust
 
     steps:
     - uses: actions/checkout@v3
-    - name: setup
-      run: sudo apt-get update && sudo apt-get install libudev-dev
     - name: Build
       run: cargo build --verbose
       working-directory: application
