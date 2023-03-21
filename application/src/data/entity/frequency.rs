@@ -11,4 +11,6 @@ pub enum Frequency {
     Year,
     Hour,
     Minute,
+    Custom,
+    Subsequent,
 }
