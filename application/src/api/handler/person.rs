@@ -8,8 +8,7 @@ use uuid::Uuid;
 use crate::{
     data::{
         entity::{
-            self, action::Action, frequency::Frequency, goal::Goal, person::PersonMeta,
-            sleep_schedule::SleepSchedule,
+            self, action::Action, goal::Goal, person::PersonMeta, sleep_schedule::SleepSchedule,
         },
         query::{
             action::{
@@ -17,7 +16,6 @@ use crate::{
                 get_all_actions::get_all_actions_query,
             },
             email_address::create_email_address::create_email_address_query,
-            frequency::get_frequency_list::get_frequency_list_query,
             goal::{
                 create_goal::create_goal_query, get_goal_by_name::get_goal_by_name_query,
                 get_goal_list::get_goal_list_query,
@@ -75,10 +73,6 @@ pub async fn get_sleep_schedule_handler(
         get_person_sleep_schedule_query(&database_pool, &person_id).await?;
 
     Ok(potential_sleep_schedule)
-}
-
-pub fn get_frequency_list_handler() -> Result<Vec<Frequency>> {
-    Ok(get_frequency_list_query()?)
 }
 
 pub async fn get_action_list_handler(database_pool: &Pool<Postgres>) -> Result<Vec<Action>> {

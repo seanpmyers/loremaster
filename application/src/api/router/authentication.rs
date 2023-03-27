@@ -19,7 +19,7 @@ use serde::Deserialize;
 use crate::{
     api::{
         handler::authentication::{
-            handle_register_with_security_key, register_handler, security_key_challenge_handler,
+            handle_register_security_key, register_handler, security_key_challenge_handler,
             RegistrationResult,
         },
         response::ApiError,
@@ -153,10 +153,10 @@ async fn security_key_challenge(
     Ok(Json(result))
 }
 
-async fn register_with_security_key(
+async fn register_security_key(
     State(security_key_service): State<SecurityKeyService>,
 ) -> Result<Response, ApiError> {
-    let result = handle_register_with_security_key(&security_key_service, &String::new()).await?;
+    handle_register_security_key(&security_key_service, &String::new()).await?;
     Ok((StatusCode::CREATED, "Successfully registered security key").into_response())
 }
 
@@ -169,4 +169,8 @@ pub fn router() -> Router<ApplicationState> {
         .route("/authentication/authenticate", post(authenticate))
         .route("/authentication/logout", post(logout))
         .route("/authentication/register", post(register))
+        .route(
+            "/authentication/register-security-key",
+            post(register_security_key),
+        )
 }

@@ -7,7 +7,10 @@ use sqlx::{Pool, Postgres};
 
 use crate::{
     data::{
-        entity::{self, person::Credentials},
+        entity::{
+            self,
+            person::{Credentials, Person},
+        },
         query::{
             email_address::create_email_address::create_email_address_query,
             person::{
@@ -17,7 +20,7 @@ use crate::{
         },
     },
     security::authentication::security_key::{
-        SecurityKeyAuthentication, SecurityKeyChallenge, SecurityKeyService,
+        PersonSecurityKey, SecurityKeyAuthentication, SecurityKeyChallenge, SecurityKeyService,
     },
     utility::password_encryption::{PasswordEncryption, PasswordEncryptionService},
 };
@@ -97,10 +100,11 @@ pub async fn security_key_challenge_handler(
     Ok(security_key_service.create_challenge()?)
 }
 
-pub async fn handle_register_with_security_key(
+pub async fn handle_register_security_key(
     security_key_service: &SecurityKeyService,
     personal_identification_number: &String,
-) -> Result<()> {
-    let result = security_key_service.register_key(personal_identification_number.to_string());
-    Ok(())
+) -> Result<PersonSecurityKey> {
+    let result: PersonSecurityKey =
+        security_key_service.register_key(personal_identification_number.to_string())?;
+    Ok(result)
 }

@@ -1,0 +1,1 @@
+CREATE TABLE "schedule" ( "id" uuid NOT NULL UNIQUE PRIMARY KEY);

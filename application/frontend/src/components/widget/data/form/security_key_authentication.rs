@@ -1,7 +1,6 @@
 use std::ops::Deref;
 
 use js_sys::{Array, Object, Uint8Array};
-use perseus::web_log;
 use sycamore::prelude::*;
 use wasm_bindgen::JsValue;
 use wasm_bindgen_futures::JsFuture;

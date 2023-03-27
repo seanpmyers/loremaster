@@ -1,6 +1,5 @@
 -- Enums
 
-\i database/enum/frequency.sql
 \i database/enum/weekday.sql
 
 -- Entity Tables
@@ -23,8 +22,12 @@
 \i database/table/person_principle.sql
 \i database/table/person_sleep_schedule.sql
 \i database/table/person_skill.sql
-\i database/table/intention_frequency.sql
 \i database/table/dictionary_term.sql
+\i database/table/quick_task.sql
+\i database/table/person_quick_task.sql
+\i database/table/schedule.sql
+\i database/table/frequency.sql
+\i database/table/schedule_weekday.sql
 
 
 
