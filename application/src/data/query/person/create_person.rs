@@ -39,12 +39,12 @@ pub async fn create_person_query(
     let creation_date: OffsetDateTime = OffsetDateTime::now_utc();
 
     let query_result: Person = query_as::<_, Person>(QUERY)
-        .bind(&new_person_id)
-        .bind(&email_address_id)
-        .bind(&encrypted_password)
-        .bind(&creation_date)
-        .bind(&alias)
-        .bind(&chronicle_id)
+        .bind(new_person_id)
+        .bind(email_address_id)
+        .bind(encrypted_password)
+        .bind(creation_date)
+        .bind(alias)
+        .bind(chronicle_id)
         .fetch_one(database_connection)
         .await?;
 

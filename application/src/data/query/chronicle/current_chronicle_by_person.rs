@@ -26,8 +26,8 @@ pub async fn get_current_chronicle_by_person_query(
     person_id: &Uuid,
 ) -> Result<Option<Chronicle>> {
     let query_result: Option<Chronicle> = query_as::<_, Chronicle>(QUERY)
-        .bind(&date.date())
-        .bind(&person_id)
+        .bind(date.date())
+        .bind(person_id)
         .fetch_optional(database_connection)
         .await?;
 

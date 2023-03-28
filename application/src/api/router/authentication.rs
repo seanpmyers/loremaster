@@ -98,7 +98,7 @@ async fn authenticate(
     let clean_password: &str = authentication_form.password.trim();
 
     let valid_email_address: EmailAddress =
-        EmailAddress::from_str(&clean_email).map_err(|error| anyhow!("{}", error))?;
+        EmailAddress::from_str(clean_email).map_err(|error| anyhow!("{}", error))?;
 
     let query_result: Option<Credentials> =
         credential_by_email_address_query(&postgres_service.database_pool, &valid_email_address)

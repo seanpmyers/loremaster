@@ -27,11 +27,11 @@ mod tests {
     #[test]
     fn verify_whitespace() -> Result<()> {
         assert!(
-            sanitize_user_input_string(String::from(unicode::invisible::LEFT_TO_RIGHT_MARK))?
+            sanitize_user_input_string(String::from(unicode::invisible::_LEFT_TO_RIGHT_MARK))?
                 .is_empty()
         );
         assert!(sanitize_user_input_string(String::from(
-            unicode::invisible::CHARACTER_TABULATION
+            unicode::invisible::_CHARACTER_TABULATION
         ))?
         .is_empty());
         Ok(())

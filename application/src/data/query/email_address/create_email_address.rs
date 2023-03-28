@@ -55,7 +55,7 @@ pub async fn create_email_address_query(
 
     let potential_address: Option<EmailAddress> =
         query_as::<_, EmailAddress>(EXISTING_ADDRESS_QUERY)
-            .bind(&email_address.as_str())
+            .bind(email_address.as_str())
             .fetch_optional(database_connection)
             .await?;
 
@@ -64,11 +64,11 @@ pub async fn create_email_address_query(
     }
 
     let query_result: EmailAddress = query_as::<_, EmailAddress>(QUERY)
-        .bind(&new_id)
-        .bind(&email_address.as_str())
-        .bind(&email_address.local_part())
-        .bind(&email_address.domain())
-        .bind(&creation_date)
+        .bind(new_id)
+        .bind(email_address.as_str())
+        .bind(email_address.local_part())
+        .bind(email_address.domain())
+        .bind(creation_date)
         .fetch_one(database_connection)
         .await?;
 

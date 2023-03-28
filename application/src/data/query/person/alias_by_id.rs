@@ -23,7 +23,7 @@ pub async fn alias_by_id_query(
     person_id: &Uuid,
 ) -> Result<Option<String>> {
     let query_result: Option<PersonAlias> = query_as::<_, PersonAlias>(QUERY)
-        .bind(&person_id)
+        .bind(person_id)
         .fetch_optional(database_connection)
         .await?;
     match query_result {

@@ -30,9 +30,9 @@ pub async fn create_sleep_schedule_query(
     let new_id: Uuid = Uuid::new_v4();
 
     let query_result: SleepSchedule = query_as::<_, SleepSchedule>(QUERY)
-        .bind(&new_id)
-        .bind(&start_time)
-        .bind(&end_time)
+        .bind(new_id)
+        .bind(start_time)
+        .bind(end_time)
         .fetch_one(database_connection)
         .await?;
 

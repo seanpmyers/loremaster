@@ -24,8 +24,8 @@ pub async fn create_action_query(database_connection: &PgPool, action: &String) 
     let new_id: Uuid = Uuid::new_v4();
 
     let query_result: Action = query_as::<_, Action>(QUERY)
-        .bind(&new_id)
-        .bind(&action)
+        .bind(new_id)
+        .bind(action)
         .fetch_one(database_connection)
         .await?;
 

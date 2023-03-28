@@ -25,7 +25,7 @@ pub async fn meta_by_id_query(
     person_id: &Uuid,
 ) -> Result<Option<PersonMeta>> {
     let query_result: Option<PersonMeta> = query_as::<_, PersonMeta>(QUERY)
-        .bind(&person_id)
+        .bind(person_id)
         .fetch_optional(database_connection)
         .await?;
     Ok(query_result)

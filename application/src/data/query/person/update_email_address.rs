@@ -26,8 +26,8 @@ pub async fn update_email_address_query(
     email_address_id: &Uuid,
 ) -> Result<Person> {
     let query_result: Person = query_as::<_, Person>(QUERY)
-        .bind(&person_id)
-        .bind(&email_address_id)
+        .bind(person_id)
+        .bind(email_address_id)
         .fetch_one(database_connection)
         .await?;
     Ok(query_result)

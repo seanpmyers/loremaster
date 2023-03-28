@@ -22,8 +22,8 @@ pub async fn add_goal_query(
     info!("QUERY CALL: add_goal_query");
 
     let updated_row_count: u64 = query(QUERY)
-        .bind(&person_id)
-        .bind(&goal_id)
+        .bind(person_id)
+        .bind(goal_id)
         .execute(database_connection)
         .await?
         .rows_affected();

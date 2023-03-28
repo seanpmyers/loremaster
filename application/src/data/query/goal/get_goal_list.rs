@@ -33,7 +33,7 @@ pub async fn get_goal_list_query(
 
     match person_id {
         Some(id) => Ok(query_as::<_, Goal>(PERSON_QUERY)
-            .bind(&id)
+            .bind(id)
             .fetch_all(database_connection)
             .await?),
         None => Ok(query_as::<_, Goal>(QUERY)

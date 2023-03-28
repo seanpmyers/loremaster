@@ -21,7 +21,7 @@ pub async fn get_goal_by_name_query(
     info!("QUERY CALL: get_goal_by_name_query");
 
     let query_result: Option<Goal> = query_as::<_, Goal>(QUERY)
-        .bind(&goal)
+        .bind(goal)
         .fetch_optional(database_connection)
         .await?;
 

@@ -34,7 +34,7 @@ pub async fn create_database_pool(connection_string: &str) -> Result<PgPool> {
         .acquire_timeout(Duration::from_secs(DB_POOL_TIMEOUT_SECONDS));
 
     let result: PgPool = options
-        .connect(&connection_string)
+        .connect(connection_string)
         .await
         .map_err(|error| anyhow!("{}", error))?;
 

@@ -24,8 +24,8 @@ pub async fn goal_is_related_query(
     info!("QUERY CALL: goal_is_related_query");
 
     let query_result = query(QUERY)
-        .bind(&person_id)
-        .bind(&goal_id)
+        .bind(person_id)
+        .bind(goal_id)
         .fetch_optional(database_connection)
         .await?;
 

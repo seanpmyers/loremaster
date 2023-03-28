@@ -2,7 +2,6 @@ pub mod chronicle_by_date;
 pub mod chronicle_by_id;
 pub mod create_chronicle;
 pub mod current_chronicle_by_person;
-pub mod update_chronicle;
 
 // //TODO: Change test date to be in the past
 // #[cfg(test)]

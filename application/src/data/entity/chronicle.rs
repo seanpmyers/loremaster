@@ -1,7 +1,7 @@
 use anyhow::{anyhow, Ok, Result};
 use serde::{Deserialize, Serialize};
 use time::{format_description::well_known::Rfc3339, Date, Duration, OffsetDateTime};
-use time_tz::{Offset, OffsetDateTimeExt};
+use time_tz::OffsetDateTimeExt;
 use uuid::Uuid;
 
 #[derive(Deserialize, Serialize, Debug, Clone, sqlx::FromRow)]
@@ -28,13 +28,13 @@ pub fn get_date_from_timezone(
     date_time: OffsetDateTime,
     timezone_string: &str,
 ) -> Result<OffsetDateTime> {
-    match time_tz::timezones::get_by_name(&timezone_string) {
+    match time_tz::timezones::get_by_name(timezone_string) {
         Some(timezone) => Ok(date_time.to_timezone(timezone)),
         None => Ok(date_time),
     }
 }
 
-pub fn is_overdue(
+pub fn _is_overdue(
     start_date: OffsetDateTime,
     duration: Duration,
     end_date: Option<OffsetDateTime>,
@@ -45,7 +45,7 @@ pub fn is_overdue(
     }
 }
 
-pub fn calculate_next_occurrence(
+pub fn _calculate_next_occurrence(
     start_date: OffsetDateTime,
     duration: Duration,
 ) -> Result<OffsetDateTime> {
@@ -54,7 +54,7 @@ pub fn calculate_next_occurrence(
 
 #[cfg(test)]
 mod tests {
-    use crate::data::entity::chronicle::{calculate_next_occurrence, is_overdue};
+    use crate::data::entity::chronicle::{_calculate_next_occurrence, _is_overdue};
 
     use super::{current_server_time, get_date_from_timezone};
     use anyhow::Result;
@@ -97,7 +97,7 @@ mod tests {
         let expected_result: OffsetDateTime = datetime!(2023-01-02 0:00 UTC);
         let start_date: OffsetDateTime = datetime!(2023-01-01 0:00 UTC);
         let duration: time::Duration = time::Duration::days(1);
-        let result: OffsetDateTime = calculate_next_occurrence(start_date, duration)?;
+        let result: OffsetDateTime = _calculate_next_occurrence(start_date, duration)?;
         assert_eq!(result, expected_result);
         Ok(())
     }
@@ -108,7 +108,7 @@ mod tests {
         let end_date: OffsetDateTime = datetime!(2023-01-03 0:00 UTC);
         let start_date: OffsetDateTime = datetime!(2023-01-01 0:00 UTC);
         let duration: time::Duration = time::Duration::days(1);
-        let result: bool = is_overdue(start_date, duration, Some(end_date))?;
+        let result: bool = _is_overdue(start_date, duration, Some(end_date))?;
         assert_eq!(result, EXPECTED_RESULT);
         Ok(())
     }
@@ -119,7 +119,7 @@ mod tests {
         let end_date: OffsetDateTime = datetime!(2023-01-02 0:00 UTC);
         let start_date: OffsetDateTime = datetime!(2023-01-01 0:00 UTC);
         let duration: time::Duration = time::Duration::days(1);
-        let result: bool = is_overdue(start_date, duration, Some(end_date))?;
+        let result: bool = _is_overdue(start_date, duration, Some(end_date))?;
         assert_eq!(result, EXPECTED_RESULT);
         Ok(())
     }

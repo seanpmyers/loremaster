@@ -83,8 +83,8 @@ async fn main() -> Result<()> {
     );
 
     let application_state: ApplicationState = ApplicationState {
-        postgres_service: postgres_service,
-        encryption_service: encryption_service,
+        postgres_service,
+        encryption_service,
         security_key_service: SecurityKeyService::new(),
         key: Key::from(configuration.site_secret.as_bytes()),
     };

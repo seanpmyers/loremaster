@@ -90,7 +90,7 @@ mod tests {
         let verify_result: bool = encryption_service.verify_password(&encrypted_key, "input")?;
         assert_ne!(encrypted_key, encrypted_key2);
         assert_ne!("input", encrypted_key);
-        assert_eq!(verify_result, true);
+        assert!(verify_result);
         Ok(())
     }
 
@@ -107,7 +107,7 @@ mod tests {
             &encryption_service.encrypt_password("pancakes123!")?,
             "blueberries325&",
         )?;
-        assert_eq!(verify_result, false);
+        assert!(verify_result);
         Ok(())
     }
 

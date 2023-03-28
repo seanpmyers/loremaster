@@ -7,10 +7,7 @@ use sqlx::{Pool, Postgres};
 
 use crate::{
     data::{
-        entity::{
-            self,
-            person::{Credentials, Person},
-        },
+        entity::{self, person::Credentials},
         query::{
             email_address::create_email_address::create_email_address_query,
             person::{
@@ -39,8 +36,8 @@ const MINIMUM_PASSWORD_LENGTH: usize = 8;
 pub async fn register_handler(
     database_pool: &Pool<Postgres>,
     encryption_service: &PasswordEncryptionService,
-    input_email_address: &String,
-    input_password: &String,
+    input_email_address: &str,
+    input_password: &str,
 ) -> Result<RegistrationResult> {
     let clean_email: &str = input_email_address.trim();
     let clean_password: &str = input_password.trim();
@@ -62,7 +59,7 @@ pub async fn register_handler(
 
     info!("Checking for existing users with provided email address.");
     let existing_credentials: Option<Credentials> =
-        credential_by_email_address_query(&database_pool, &valid_email_address)
+        credential_by_email_address_query(database_pool, &valid_email_address)
             .await
             .map_err(|error| anyhow!("{}", error))?;
 
@@ -74,15 +71,15 @@ pub async fn register_handler(
 
     info!("Email can be registered.");
     let encrypted_password: String = encryption_service
-        .encrypt_password(&clean_password)
+        .encrypt_password(clean_password)
         .map_err(|error| anyhow!("{}", error))?;
 
     let new_email_address: entity::email_address::EmailAddress =
-        create_email_address_query(&database_pool, &valid_email_address).await?;
+        create_email_address_query(database_pool, &valid_email_address).await?;
 
     info!("Adding new user to database.");
     create_person_query(
-        &database_pool,
+        database_pool,
         &new_email_address.id,
         &encrypted_password,
         None,
@@ -97,7 +94,7 @@ pub async fn register_handler(
 pub async fn security_key_challenge_handler(
     security_key_service: &SecurityKeyService,
 ) -> Result<SecurityKeyChallenge> {
-    Ok(security_key_service.create_challenge()?)
+    security_key_service.create_challenge()
 }
 
 pub async fn handle_register_security_key(

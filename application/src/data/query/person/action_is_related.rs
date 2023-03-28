@@ -24,8 +24,8 @@ pub async fn action_is_related_query(
     info!("QUERY CALL: action_is_related_query");
 
     let query_result: Option<PgRow> = query(QUERY)
-        .bind(&person_id)
-        .bind(&action_id)
+        .bind(person_id)
+        .bind(action_id)
         .fetch_optional(database_connection)
         .await?;
 

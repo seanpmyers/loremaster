@@ -21,7 +21,7 @@ pub async fn get_action_by_name_query(
     info!("QUERY CALL: get_action_by_name_query");
 
     let query_result: Option<Action> = query_as::<_, Action>(QUERY)
-        .bind(&action)
+        .bind(action)
         .fetch_optional(database_connection)
         .await?;
 

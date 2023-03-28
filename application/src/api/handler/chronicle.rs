@@ -31,12 +31,12 @@ pub async fn handle_get_today(
     };
 
     let person_alias: Option<String> =
-        query::person::alias_by_id::alias_by_id_query(&database_pool, &person_id)
+        query::person::alias_by_id::alias_by_id_query(database_pool, person_id)
             .await
             .map_err(|error| anyhow!("{}", error))?;
 
     let chronicle_query_result: Option<Chronicle> =
-        get_current_chronicle_by_person_query(&database_pool, &requested_date, &person_id)
+        get_current_chronicle_by_person_query(database_pool, &requested_date, person_id)
             .await
             .map_err(|error| anyhow!("{}", error))?;
 
@@ -46,10 +46,10 @@ pub async fn handle_get_today(
             info!("No chronicle exits for the current date. Creating one.");
             let new_chronicle_id: Uuid = Uuid::new_v4();
             create_chronicle_query(
-                &database_pool,
+                database_pool,
                 &requested_date.date(),
                 &requested_date,
-                &person_id,
+                person_id,
                 &Some(new_chronicle_id),
             )
             .await
@@ -60,6 +60,6 @@ pub async fn handle_get_today(
     Ok(PersonChronicle {
         chronicle_id: chronicle.id,
         chronicle_date: chronicle.date_recorded,
-        person_alias: person_alias,
+        person_alias,
     })
 }
