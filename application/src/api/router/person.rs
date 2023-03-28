@@ -15,14 +15,17 @@ use crate::{
         guards::user::User,
         handler::person::{
             create_action, create_goal, get_action_list_handler, get_goal_list_handler,
-            get_person_meta_data, get_sleep_schedule_handler, remove_one_goal_handler,
-            update_email_handler, update_person_meta_handler, update_sleep_schedule_handler,
-            UniqueEntryResult, UserInputValidationOutcome,
+            get_person_meta_data, get_quick_tasks_handler, get_sleep_schedule_handler,
+            remove_one_goal_handler, update_email_handler, update_person_meta_handler,
+            update_sleep_schedule_handler, UniqueEntryResult, UserInputValidationOutcome,
         },
         response::ApiError,
     },
     data::{
-        entity::{action::Action, person::PersonMeta, sleep_schedule::SleepSchedule},
+        entity::{
+            action::Action, person::PersonMeta, quick_task::PersonQuickTask,
+            sleep_schedule::SleepSchedule,
+        },
         postgres_handler::PostgresHandler,
     },
     ApplicationState,
@@ -236,6 +239,32 @@ pub async fn update_sleep_schedule(
     Ok((StatusCode::ACCEPTED, Json(result)).into_response())
 }
 
+pub async fn get_quick_tasks(
+    State(postgres_service): State<PostgresHandler>,
+    user: User,
+) -> Result<Response, ApiError> {
+    let result: Vec<PersonQuickTask> =
+        get_quick_tasks_handler(&postgres_service.database_pool, &user.0).await?;
+    Ok((StatusCode::OK, Json(result)).into_response())
+}
+
+pub async fn add_quick_task(
+    State(postgres_service): State<PostgresHandler>,
+    user: User,
+) -> Result<Response, ApiError> {
+    let result: Option<PersonQuickTask> = None;
+    Ok((StatusCode::CREATED, Json(result)).into_response())
+}
+
+pub async fn update_quick_task() -> Result<Response, ApiError> {
+    let result: Option<PersonQuickTask> = None;
+    Ok((StatusCode::ACCEPTED, Json(result)).into_response())
+}
+
+pub async fn delete_quick_task() -> Result<Response, ApiError> {
+    Ok((StatusCode::OK, "Successfully deleted.").into_response())
+}
+
 #[derive(Deserialize, Serialize, Debug)]
 pub struct CompoundingInterestInputs {
     pub duration_in_years: u16,
@@ -274,4 +303,8 @@ pub fn router() -> Router<ApplicationState> {
         .route("/person/goal-list", get(get_goal_list))
         .route("/person/update/sleep-schedule", post(update_sleep_schedule))
         .route("/person/action-new", post(new_action))
+        .route("/person/quick-task-list", get(get_quick_tasks))
+        .route("/person/add-quick-task", post(add_quick_task))
+        .route("/person/update-quick-task", post(update_quick_task))
+        .route("/person/delete-quick-task", post(delete_quick_task))
 }

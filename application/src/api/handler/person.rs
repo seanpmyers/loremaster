@@ -8,7 +8,8 @@ use uuid::Uuid;
 use crate::{
     data::{
         entity::{
-            self, action::Action, goal::Goal, person::PersonMeta, sleep_schedule::SleepSchedule,
+            self, action::Action, goal::Goal, person::PersonMeta, quick_task::PersonQuickTask,
+            sleep_schedule::SleepSchedule,
         },
         query::{
             action::{
@@ -31,6 +32,7 @@ use crate::{
                 update_meta_by_id::update_meta_by_id_query,
                 update_person_sleep_schedule::update_person_sleep_schedule_query,
             },
+            quick_task::get_quick_task_list_by_person_id::get_quick_task_list_by_person_id,
             sleep_schedule::{
                 create_sleep_schedule::create_sleep_schedule_query,
                 get_sleep_schedule_by_time::get_sleep_schedule_by_time_query,
@@ -242,4 +244,11 @@ pub async fn remove_one_goal_handler(
         }
         false => Ok(false),
     }
+}
+
+pub async fn get_quick_tasks_handler(
+    database_pool: &Pool<Postgres>,
+    person_id: &Uuid,
+) -> Result<Vec<PersonQuickTask>> {
+    get_quick_task_list_by_person_id(database_pool, person_id).await
 }
