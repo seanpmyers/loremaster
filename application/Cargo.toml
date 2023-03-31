@@ -35,8 +35,8 @@ log = "0.4.17"
 # Random nubmer generation
 rand = "0.8.5"
 # Serialization
-serde = { version = "1.0.158", features = ["derive"] }
-serde_json = "1.0.94"
+serde = { version = "1.0.159", features = ["derive"] }
+serde_json = "1.0.95"
 
 # Database client/pool/toolkit
 sqlx = { version = "0.6.3", features = [
@@ -58,7 +58,7 @@ thiserror = "1.0.40"
 time = { version = "0.3.20", features = ["serde", "std", "parsing"] }
 time-tz = { version = "1.0.2" }
 # Backend async I/O functionality
-tokio = { version = "1.26.0", features = ["full"] }
+tokio = { version = "1.27.0", features = ["full"] }
 tokio-stream = "0.1.12"
 tokio-test = "0.4.2"
 # Encode/decode TOML content/files

@@ -13,8 +13,8 @@ js-sys = { version = "0.3.61" }
 log = { version = "0.4.17" }
 perseus = { version = "0.3.6" }
 reqwasm = { version = "0.5.0" }
-serde = { version = "1.0.158", features = ["derive"] }
-serde_json = { version = "1.0.94" }
+serde = { version = "1.0.159", features = ["derive"] }
+serde_json = { version = "1.0.95" }
 sycamore = { version = "0.7.1" }
 time = { version = "0.3.20", features = [
 	"macros",
