@@ -23,6 +23,7 @@ use crate::{
             RegistrationResult,
         },
         response::ApiError,
+        web_server::ApplicationState,
     },
     data::{
         entity::person::Credentials, postgres_handler::PostgresHandler,
@@ -36,7 +37,6 @@ use crate::{
         },
         password_encryption::{PasswordEncryption, PasswordEncryptionService},
     },
-    ApplicationState,
 };
 
 #[derive(Deserialize, Debug)]
