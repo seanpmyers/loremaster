@@ -107,9 +107,7 @@ async fn authenticate(
 
     let Some(person) = query_result else {
         info!("No email found matching user input: {}", clean_email);
-        return Err(ApiError::Anyhow {
-            source: anyhow!(FAILED_LOGIN_MESSAGE),
-        })
+        return Ok((StatusCode::BAD_REQUEST, FAILED_LOGIN_MESSAGE).into_response());
     };
 
     let valid_password: bool = encryption_service
@@ -118,9 +116,7 @@ async fn authenticate(
 
     if !valid_password {
         warn!("Invalid password for email: {}", clean_email);
-        return Err(ApiError::Anyhow {
-            source: anyhow!(FAILED_LOGIN_MESSAGE),
-        });
+        return Ok((StatusCode::BAD_REQUEST, FAILED_LOGIN_MESSAGE).into_response());
     }
 
     let updated_cookie_jar: PrivateCookieJar = cookie_jar.add(

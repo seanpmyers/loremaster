@@ -1,8 +1,11 @@
+use std::time::Instant;
+
 use anyhow::{anyhow, Result};
 use argon2::{
     password_hash::{rand_core::OsRng, PasswordHash, PasswordHasher, SaltString},
     Argon2, ParamsBuilder, PasswordVerifier,
 };
+use log::info;
 
 #[derive(Clone)]
 pub struct PasswordEncryptionService {
@@ -27,9 +30,10 @@ impl PasswordEncryption for PasswordEncryptionService {
     }
 
     fn encrypt_password(&self, credential: &str) -> Result<String> {
+        let now: Instant = Instant::now();
         let mut argon2_parameters: ParamsBuilder = argon2::ParamsBuilder::new();
 
-        argon2_parameters.t_cost(self.iterations);
+        argon2_parameters.t_cost(self.iterations).p_cost(2);
 
         let argon2 = Argon2::new_with_secret(
             self.site_secret.as_bytes(),
@@ -45,13 +49,17 @@ impl PasswordEncryption for PasswordEncryptionService {
             .hash_password(credential.as_bytes(), &salt)
             .map_err(|error| anyhow!("{}", error))?
             .to_string();
-
+        info!(
+            "Encrypted password: elapsed: {}ms",
+            now.elapsed().as_millis().to_string()
+        );
         Ok(result)
     }
 
     fn verify_password(&self, encrypted_password: &str, credential: &str) -> Result<bool> {
+        let now: Instant = Instant::now();
         let mut argon2_parameters: ParamsBuilder = argon2::ParamsBuilder::new();
-        argon2_parameters.t_cost(self.iterations);
+        argon2_parameters.t_cost(self.iterations).p_cost(2);
 
         let argon2 = Argon2::new_with_secret(
             self.site_secret.as_bytes(),
@@ -62,7 +70,10 @@ impl PasswordEncryption for PasswordEncryptionService {
         .map_err(|error| anyhow!("{}", error))?;
 
         let parsed_hash = PasswordHash::new(encrypted_password).unwrap();
-
+        info!(
+            "Verify password: elapsed: {}ms",
+            now.elapsed().as_millis().to_string()
+        );
         Ok(argon2
             .verify_password(credential.as_bytes(), &parsed_hash)
             .is_ok())
@@ -107,7 +118,7 @@ mod tests {
             &encryption_service.encrypt_password("pancakes123!")?,
             "blueberries325&",
         )?;
-        assert!(verify_result);
+        assert!(!verify_result);
         Ok(())
     }
 
