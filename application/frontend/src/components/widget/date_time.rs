@@ -24,9 +24,9 @@ pub fn date_time() -> View<G> {
         time.set(rust_time.format(time_format).unwrap());
         day_month.set(format!(
             "{}, {} {}",
-            rust_time.weekday().to_string(),
-            rust_time.month().to_string(),
-            rust_time.date().day().to_string()
+            rust_time.weekday(),
+            rust_time.month(),
+            rust_time.date().day()
         ));
         perseus::spawn_local(
             cloned!((short_date, day_month, time, time_zone) => async move {
@@ -39,9 +39,9 @@ pub fn date_time() -> View<G> {
                     time.set(rust_time.format(time_format).unwrap());
                     day_month.set(format!(
                         "{}, {} {}",
-                        rust_time.weekday().to_string(),
-                        rust_time.month().to_string(),
-                        rust_time.date().day().to_string()
+                        rust_time.weekday(),
+                        rust_time.month(),
+                        rust_time.date().day()
                     ));
                     ready(())
                 }).await;

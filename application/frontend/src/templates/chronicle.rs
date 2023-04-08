@@ -26,6 +26,9 @@ use crate::{
     },
 };
 
+const PAGE_TITLE: &str = "Chronicle | Loremaster";
+const PAGE_ROUTE: &str = "chronicle";
+
 #[perseus::make_rx(ChroniclePageStateRx)]
 pub struct ChroniclePageState {
     pub user_alias: String,
@@ -76,9 +79,9 @@ pub fn chronicle_page(
                 }
 
                 match javascript_date.get_hours() {
-                    hour if hour < 11_u32 && hour >= 5_u32 => greeting.set(format!("Good Morning, {}", user_alias.get())),
-                    hour if hour >= 12_u32 && hour < 17_u32 => greeting.set(format!("Good Afternoon, {}", user_alias.get())),
-                    hour if hour >= 17_u32 || hour < 5_u32 => greeting.set(format!("Good Evening, {}", user_alias.get())),
+                    hour if (5_u32..11_u32).contains(&hour) => greeting.set(format!("Good Morning, {}", user_alias.get())),
+                    hour if (12_u32..17_u32).contains(&hour) => greeting.set(format!("Good Afternoon, {}", user_alias.get())),
+                    hour if !(5_u32..17_u32).contains(&hour) => greeting.set(format!("Good Evening, {}", user_alias.get())),
                     _ => greeting.set(format!("Hello, {}", user_alias.get()))
                 }
 
@@ -160,12 +163,12 @@ pub async fn get_build_state(
 #[perseus::head]
 pub fn head(_props: ChroniclePageState) -> View<SsrNode> {
     view! {
-        title { "Chronicle | Loremaster" }
+        title { (PAGE_TITLE) }
     }
 }
 
 pub fn get_template<G: Html>() -> Template<G> {
-    Template::new("chronicle")
+    Template::new(PAGE_ROUTE)
         .build_state_fn(get_build_state)
         .template(chronicle_page)
         .head(head)

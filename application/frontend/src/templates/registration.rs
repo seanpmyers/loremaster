@@ -9,6 +9,9 @@ use crate::components::widget::data::form::security_key_authentication::Security
 use crate::utility::constants::{ACCEPTED_HTTP_STATUS_CODE, API_REGISTER_URL, OK_HTTP_STATUS_CODE};
 use crate::utility::http_service;
 
+const ROUTE_PATH: &str = "registration";
+const PAGE_TITLE: &str = "Registration - Loremaster";
+
 #[derive(Deserialize, Serialize, Debug, Clone)]
 pub enum FormMessageState {
     Hidden,
@@ -118,7 +121,7 @@ pub fn registration_page(state: RegistrationPageStateRx) -> View<G> {
 }
 
 pub fn get_template<G: Html>() -> Template<G> {
-    Template::new("registration")
+    Template::new(ROUTE_PATH)
         .build_state_fn(get_build_state)
         .template(registration_page)
         .head(head)
@@ -138,6 +141,6 @@ pub async fn get_build_state(
 #[perseus::head]
 pub fn head(_props: RegistrationPageState) -> View<SsrNode> {
     view! {
-        title { "Registration - Loremaster " }
+        title { (PAGE_TITLE) }
     }
 }

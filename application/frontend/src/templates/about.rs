@@ -3,6 +3,9 @@ use sycamore::prelude::{view, Html, SsrNode, View};
 
 use crate::components::container::{Container, ContainerProperties};
 
+const PAGE_TITLE: &str = "About | Loremaster";
+const PAGE_ROUTE: &str = "about";
+
 #[perseus::template_rx]
 pub fn about_page() -> View<G> {
     view! {
@@ -18,10 +21,10 @@ pub fn about_page() -> View<G> {
 #[perseus::head]
 pub fn head() -> View<SsrNode> {
     view! {
-        title { "About | Loremaster" }
+        title { (PAGE_TITLE) }
     }
 }
 
 pub fn get_template<G: Html>() -> Template<G> {
-    Template::new("about").template(about_page).head(head)
+    Template::new(PAGE_ROUTE).template(about_page).head(head)
 }

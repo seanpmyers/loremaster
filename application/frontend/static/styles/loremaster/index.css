@@ -12,6 +12,7 @@
 	--default-text-color: #fefefe;
 	--secondary-text-color: #a0aab7;
 	--default-font-family: 'Fira Sans', sans-serif;
+	--default-border-radius: 8px;
 	color-scheme: dark;
 }
 
@@ -29,6 +30,7 @@
 	--default-text-color: #222a41;
 	--secondary-text-color: #8b909f;
 	--default-font-family: 'Fira Sans', sans-serif;
+	--default-border-radius: 8px;
 	color-scheme: light;
 }
 
@@ -72,7 +74,7 @@ body {
 	transition: 0.6s linear;
 }
 
-body div {
+body:first-child {
 	margin: 0;
 	padding: 0;
 	flex-grow: 1;
@@ -148,53 +150,6 @@ form {
 	background: rgba(226, 229, 230, 0.8);
 	-webkit-backdrop-filter: blur(10px);
 	backdrop-filter: blur(10px);
-}
-
-.notification-toast-alert {
-	position: absolute;
-	display: flex;
-	border: transparent 1px solid;
-	border-left: 4px solid rgb(31, 240, 31);
-	background: white;
-	margin: 8px;
-	padding: 16px;
-	box-shadow: 0 0.5rem 1rem rgba(0, 0, 0, 0.15);
-	width: 20vw;
-	z-index: 99;
-}
-
-.notification-toast-alert image {
-	width: inherit;
-	height: inherit;
-	display: block;
-}
-
-.notification-toast-alert div {
-	display: flex;
-	flex-direction: column;
-}
-
-.notification-toast-alert h5 {
-	font-size: medium;
-	font-weight: 500;
-	margin: 0;
-	padding: 0;
-	align-self: flex-start;
-}
-
-.notification-toast-alert p {
-	margin: 0;
-	padding: 0;
-}
-
-.notification-toast-alert button {
-	margin: 0;
-	padding: 0;
-	align-self: center;
-	background: inherit;
-	border: none;
-	width: 50px;
-	height: 50px;
 }
 
 .timeline-circle {
@@ -303,14 +258,35 @@ form {
 	margin: .25vmin;
 }
 
-.popup-button+.test-popup:active,
-.popup-button:focus+.test-popup {
+.popover-button+.popover:active,
+.popover-button:focus+.popover {
 	visibility: visible;
 }
 
-.test-popup {
+.popover {
 	border: solid 1px var(--border-color);
 	visibility: hidden;
+	position: relative;
+	background: #fff3;
+	width: 123px;
+	height: 100px;
+	text-align: center;
+	padding: .4rem;
+	border-radius: 8px;
+	top: 10px;
+	backdrop-filter: blur(8px);
+	left: -10px;
+}
+
+.popover-arrow {
+	position: absolute;
+	top: -19px;
+	left: 45px;
+	border-left: 20px solid transparent;
+	border-right: 20px solid transparent;
+	border-bottom: 20px solid #fff3;
+	width: 0;
+	height: 0;
 }
 
 .glow-button {
@@ -478,15 +454,121 @@ form {
 	flex-direction: column;
 }
 
-form .input-row {
-	border: 1px solid var(--border-color);
-}
+form .input-row {}
 
 form .input-row label,
 input {
-	padding: .6vmin;
+	display: flex;
+	flex-direction: column;
+	margin: .4vmin 0;
 }
 
-form .input-row label {
-	background-color: var(--primary-background-color);
+form .input-row label {}
+
+.toast {
+	display: flex;
+	color: var(--default-text-color);
+	background-color: var(--fourth-background-color);
+	border-radius: 6px;
+	box-shadow: inset 0 0 0 1px var(--color-border-default), var(--color-shadow-large);
+	width: max-content;
+	max-width: 450px;
+	margin: 16px;
+}
+
+.toast .toast-icon {
+	background-color: rgb(0, 118, 253);
+}
+
+.toast--success .toast-icon {
+	background-color: rgb(31, 136, 61);
+}
+
+.toast--error .toast-icon {
+	background-color: red;
+}
+
+.toast--warning .toast-icon {
+	background-color: rgb(227, 166, 46);
+}
+
+.toast-icon {
+	color: white;
+	display: flex;
+	align-items: center;
+	justify-content: center;
+	width: 50px;
+	flex-shrink: 0;
+	border: 1px solid transparent;
+	border-right-color: transparent;
+	border-right-style: solid;
+	border-right-width: 1px;
+	border-right-color: transparent;
+	border-right-style: solid;
+	border-right-width: 1px;
+	border-right: 0;
+	border-top-left-radius: inherit;
+	border-bottom-left-radius: inherit;
+}
+
+.toast-content {
+	padding: 16px;
+	background: var(--fourth-background-color);
+	border-left: 0;
+	border-top-right-radius: inherit;
+	border-bottom-right-radius: inherit;
+}
+
+
+.input-validation {
+	display: flex;
+	color: var(--default-text-color);
+	background-color: inherit;
+	border-radius: 6px;
+	box-shadow: inset 0 0 0 1px var(--color-border-default), var(--color-shadow-large);
+	width: max-content;
+	max-width: 450px;
+	margin: 16px;
+}
+
+.input-validation.input-validation--information {
+	color: rgb(0, 118, 253);
+}
+
+.input-validation.input-validation--warning {
+	color: rgb(227, 166, 46);
+}
+
+.input-validation.input-validation--error {
+	color: red;
+}
+
+.input-validation.input-validation--success {
+	color: rgb(31, 136, 61);
+}
+
+.input-validation-content {
+	padding: 16px;
+	background: inherit;
+	border-left: 0;
+	border-top-right-radius: inherit;
+	border-bottom-right-radius: inherit;
+}
+
+.input-validation-icon {
+	display: flex;
+	align-items: center;
+	justify-content: center;
+	width: 50px;
+	flex-shrink: 0;
+	border: 1px solid transparent;
+	border-right-color: transparent;
+	border-right-style: solid;
+	border-right-width: 1px;
+	border-right-color: transparent;
+	border-right-style: solid;
+	border-right-width: 1px;
+	border-right: 0;
+	border-top-left-radius: inherit;
+	border-bottom-left-radius: inherit;
 }

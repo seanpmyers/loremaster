@@ -25,6 +25,9 @@ use crate::{
     },
 };
 
+const ROUTE_PATH: &str = "you";
+const PAGE_TITLE: &str = "You | Loremaster";
+
 #[perseus::make_rx(YouPageStateRx)]
 pub struct YouPageState {
     pub email_address: String,
@@ -344,7 +347,7 @@ pub fn you_page(
 }
 
 pub fn get_template<G: Html>() -> Template<G> {
-    Template::new("you")
+    Template::new(ROUTE_PATH)
         .build_state_fn(get_build_state)
         .template(you_page)
         .head(head)
@@ -368,6 +371,6 @@ pub async fn get_build_state(
 #[perseus::head]
 pub fn head(_props: YouPageState) -> View<SsrNode> {
     view! {
-        title { "You | Loremaster" }
+        title { (PAGE_TITLE) }
     }
 }
