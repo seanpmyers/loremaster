@@ -1,6 +1,13 @@
 use gloo_timers::future::TimeoutFuture;
-use perseus::{RenderFnResultWithCause, Template};
-use sycamore::prelude::{cloned, view, Html, Keyed, KeyedProps, Signal, SsrNode, View};
+use perseus::{
+    engine_only_fn, prelude::spawn_local_scoped, state::StateGeneratorInfo, template::Template,
+    ReactiveState,
+};
+use serde::{Deserialize, Serialize};
+use sycamore::{
+    prelude::{view, Html, Keyed, KeyedProps, Signal, SsrNode, View},
+    reactive::{create_signal, BoundedScope, Scope},
+};
 use time::{format_description::FormatItem, macros::format_description};
 use web_sys::Event;
 
@@ -25,10 +32,11 @@ use crate::{
     },
 };
 
-const ROUTE_PATH: &str = "you";
+const PAGE_ROUTE_PATH: &str = "you";
 const PAGE_TITLE: &str = "You | Loremaster";
 
-#[perseus::make_rx(YouPageStateRx)]
+#[derive(Serialize, Deserialize, ReactiveState, Clone)]
+#[rx(alias = "YouPageStateRx")]
 pub struct YouPageState {
     pub email_address: String,
     pub alias: String,
@@ -39,7 +47,8 @@ pub struct YouPageState {
 }
 
 #[perseus::template_rx]
-pub fn you_page(
+pub fn you_page<'page, G: Html>(
+    context: BoundedScope<'_, 'page>,
     YouPageStateRx {
         email_address,
         alias,
@@ -47,7 +56,7 @@ pub fn you_page(
         action_list,
         sleep_start,
         sleep_end,
-    }: YouPageStateRx,
+    }: &'page YouPageStateRx,
 ) -> View<G> {
     let login_success: Signal<Option<bool>> = Signal::new(None);
     let login_display: Signal<Option<bool>> = login_success.clone();
@@ -145,17 +154,18 @@ pub fn you_page(
 
     let new_goal_handler = move |event: Event| {
         event.prevent_default();
-        perseus::spawn_local(cloned!((new_goal) => async move {
-            http_service::post_html_form(&format!("{}/{}", API_BASE_URL, API_GOAL_NEW_ROUTE), &vec![
-                (String::from("goal"), new_goal.get().as_ref().to_string()),
-            ]).await;
-            new_goal.set(String::new());
-        }));
-    };
+        spawn_local_scoped(context, async move {
+            context, async move {
+                http_service::post_html_form(&format!("{}/{}", API_BASE_URL, API_GOAL_NEW_ROUTE), &vec![
+                    (String::from("goal"), new_goal.get().as_ref().to_string()),
+                ]).await;
+                new_goal.set(String::new());
+            }
+        });
 
     let update_sleep_schedule_handler = move |event: Event| {
         event.prevent_default();
-        perseus::spawn_local(cloned!((sleep_start, sleep_end) => async move {
+        spawn_local_scoped(cloned!((sleep_start, sleep_end) => async move {
             http_service::post_html_form(&format!("{}/{}",API_BASE_URL,API_PERSON_SLEEP_SCHEDULE_UPDATE_ROUTE), &vec![
                 (String::from("start_time"), sleep_start.get().as_ref().to_string()),
                 (String::from("end_time"), sleep_end.get().as_ref().to_string()),
@@ -166,8 +176,8 @@ pub fn you_page(
 
     let section_classes: &str = "border rounded bg-white shadow-sm p-2 m-2 ";
 
-    view! {
-        Container(ContainerProperties{title: String::from("You"), children: view!{
+    view! {context,
+        Container(ContainerProperties{title: String::from("You"), children: view!{context,
             div(class="d-flex flex-column flex-grow-1 p-4 align-items-center bg-light") {
                 div() {
                     h1(class="display-3") { ( display_alias.get()) }
@@ -247,8 +257,8 @@ pub fn you_page(
                             select(name="action", class="form-select") {
                                 option(selected=true, disabled=true) { "Select an action" }
                                 Keyed(KeyedProps {
-                                    iterable: action_list.handle(),
-                                    template: move |action| view! {
+                                    iterable: action_list,
+                                    view: |context, action| view! {context,
                                         option(value=(action.id)) { (action.name) }
                                     },
                                     key: |action| action.id
@@ -304,8 +314,8 @@ pub fn you_page(
                         div() { "Actions" }
                         ul() {
                             Keyed(KeyedProps {
-                                iterable: action_list.handle(),
-                                template: move |action| view! {
+                                iterable: action_list,
+                                view: |context, action| view! {context,
                                     li() { (action.name) }
                                 },
                                 key: |action| action.id
@@ -320,7 +330,7 @@ pub fn you_page(
                      }
                     div(class=(section_classes)) {
                         div() { "Goals" }
-                        GoalList(GoalListProperties{goals: Signal::new(Vec::new())})
+                        GoalList(GoalListProperties{goals: create_signal(context, Vec::new())})
                      }
                     div(class=(section_classes)) {
                         div() { "Values" }
@@ -331,46 +341,44 @@ pub fn you_page(
                 }
             }
             (if login_display.get().is_some() {
-                view! {
+                view! {context,
                     Alert(AlertProperties{
-                        message_title: Signal::new(String::from("Success!")),
-                        message_body: Signal::new(String::from("You have successfully updated your information.")),
-                        display_time: Signal::new(None),
+                        message_title: create_signal(context, String::from("Success!")),
+                        message_body:create_signal(context, String::from("You have successfully updated your information.")),
+                        display_time: create_signal(context, None),
                     })
                 }
             }
             else {
-                view!{ div() {""}}
+                view!{context, div() {""}}
             })
         }})
     }
 }
 
 pub fn get_template<G: Html>() -> Template<G> {
-    Template::new(ROUTE_PATH)
+    Template::build(PAGE_ROUTE_PATH)
         .build_state_fn(get_build_state)
-        .template(you_page)
-        .head(head)
+        .view_with_state(you_page)
+        .head_with_state(head)
+        .build()
 }
 
-#[perseus::autoserde(build_state)]
-pub async fn get_build_state(
-    _path: String,
-    _locale: String,
-) -> RenderFnResultWithCause<YouPageState> {
-    Ok(YouPageState {
+#[engine_only_fn]
+async fn get_build_state(_info: StateGeneratorInfo<()>) -> YouPageState {
+    YouPageState {
         email_address: String::new(),
         alias: String::from("You"),
         new_action: String::new(),
         action_list: Vec::new(),
         sleep_start: String::new(),
         sleep_end: String::new(),
-    })
+    }
 }
 
-#[perseus::head]
-pub fn head(_props: YouPageState) -> View<SsrNode> {
-    view! {
+#[engine_only_fn]
+fn head(context: Scope, _props: YouPageState) -> View<SsrNode> {
+    view! { context,
         title { (PAGE_TITLE) }
     }
 }

@@ -6,23 +6,24 @@ use crate::components::state::{
     visibility::Visibility,
 };
 
-pub struct InputValidationProperties {
-    pub content: Signal<String>,
-    pub visibility: Signal<Visibility>,
-    pub validity: Signal<Validation>,
-    pub message_type: Signal<MessageType>,
+#[derive(Prop)]
+pub struct InputValidationProperties<'a> {
+    pub content: &'a ReadSignal<String>,
+    pub visibility: &'a ReadSignal<Visibility>,
+    pub validity: &'a ReadSignal<Validation>,
+    pub message_type: &'a ReadSignal<MessageType>,
 }
 
-#[component(InputValidation<G>)]
-pub fn input_validation(properties: InputValidationProperties) -> View<G> {
-    let visibility: Signal<Visibility> = properties.visibility.clone();
-    view! {
+#[component]
+pub fn InputValidation<G: Html>(context: Scope, properties: InputValidationProperties) -> View<G> {
+    let visibility: &ReadSignal<Visibility> = properties.visibility.clone();
+    view! {context,
         (match *visibility.get(){
             Visibility::Visible => {
                 let icon = properties.message_type.clone();
                 let message_type = properties.message_type.clone();
                 let content = properties.content.clone();
-                view!{
+                view!{ context,
                     div(
                         class=(match *message_type.get() {
                             MessageType::Information => "input-validation",
@@ -41,7 +42,7 @@ pub fn input_validation(properties: InputValidationProperties) -> View<G> {
                     }
                 }
             },
-            Visibility::Hidden => view!{},
+            Visibility::Hidden => view!{context,},
         })
     }
 }

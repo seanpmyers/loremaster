@@ -11,29 +11,31 @@ pub struct WeekDayInformation {
     pub week_day: time::Weekday,
 }
 
-pub struct WeekProperties {
-    pub selected_date: Signal<time::OffsetDateTime>,
-    pub days: Signal<Vec<WeekDayInformation>>,
+#[derive(Prop)]
+pub struct WeekProperties<'a> {
+    pub selected_date: &'a Signal<time::OffsetDateTime>,
+    pub days: &'a Signal<Vec<WeekDayInformation>>,
 }
 
-#[component(Week<G>)]
-pub fn week(
+#[component]
+pub fn Week<G: Html>(
+    context: Scope,
     WeekProperties {
         selected_date,
         days,
     }: WeekProperties,
 ) -> View<G> {
     days.set(create_week_list(&selected_date.get()));
-    view! {
+    view! {context,
         div(class="week-widget", id="") {
             Keyed( KeyedProps {
-                    iterable: days.handle(),
-                    template: move |day: WeekDayInformation|
+                    iterable: days,
+                    view: |context, day: WeekDayInformation|
                    {
                     let mut day_div_classes = String::from("card");
                     if &day.number == &selected_date.get().day() { day_div_classes.push_str(" active-card text-light") ;}
                     else { day_div_classes.push_str(" bg-white")}
-                    view!{
+                    view!{ context,
                         div(class=(day_div_classes)) {
                             div(class="m-1") {
                                 (day.number)
@@ -62,7 +64,7 @@ pub fn create_week_list(selected_date: &time::OffsetDateTime) -> Vec<WeekDayInfo
             .day();
 
         result.push(WeekDayInformation {
-            number: number,
+            number,
             week_day: day.clone(),
         })
     }

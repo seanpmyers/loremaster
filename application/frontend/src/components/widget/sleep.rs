@@ -1,4 +1,5 @@
 use js_sys::Date;
+use perseus::prelude::spawn_local_scoped;
 use sycamore::prelude::*;
 use time::{macros::format_description, Time};
 
@@ -13,59 +14,68 @@ use crate::{
 
 const HOURS_IN_A_DAY: u8 = 24;
 
-#[component(SleepWidget<G>)]
-pub fn sleep_widget() -> View<G> {
-    let state: Signal<ComponentState> = Signal::new(ComponentState::Loading);
-    let loading: Signal<ComponentState> = state.clone();
+#[component]
+pub fn SleepWidget<G: Html>(context: Scope) -> View<G> {
+    let state: &Signal<ComponentState> = create_signal(context, ComponentState::Loading);
+    let loading: &Signal<ComponentState> = state.clone();
 
-    let sleep_start_time: Signal<Option<Time>> = Signal::new(None);
-    let sleep_end_time: Signal<Option<Time>> = Signal::new(None);
+    let sleep_start_time: &Signal<Option<Time>> = create_signal(context, None);
+    let sleep_end_time: &Signal<Option<Time>> = create_signal(context, None);
 
-    let hours_awake: Signal<String> = Signal::new(String::from(""));
-    let hours_until_sleep: Signal<String> = Signal::new(String::from(""));
-    let hours_of_sleep: Signal<String> = Signal::new(String::from(""));
-    let wake_up: Signal<String> = Signal::new(String::from(""));
-    let bedtime: Signal<String> = Signal::new(String::from(""));
+    let hours_awake: &Signal<String> = create_signal(context, String::new());
+    let hours_until_sleep: &Signal<String> = create_signal(context, String::new());
+    let hours_of_sleep: &Signal<String> = create_signal(context, String::new());
+    let wake_up: &Signal<String> = create_signal(context, String::new());
+    let bedtime: &Signal<String> = create_signal(context, String::new());
 
     if G::IS_BROWSER {
-        perseus::spawn_local(
-            cloned!(loading, sleep_start_time, sleep_end_time, hours_awake, hours_until_sleep, hours_of_sleep, wake_up, bedtime  => async move {
-            let query_response = http_service::get_endpoint(API_PERSON_SLEEP_SCHEDULE_ROUTE, None).await;
+        spawn_local_scoped(context, async move {
+            let query_response =
+                http_service::get_endpoint(API_PERSON_SLEEP_SCHEDULE_ROUTE, None).await;
             let current_date = Date::new_0();
             match query_response {
                 Some(response) => {
                     let potential_sleep_schedule: Option<SleepSchedule> =
                         serde_json::from_str(&response).unwrap();
-                        match potential_sleep_schedule {
-                            Some(schedule) => {
-                                sleep_start_time.set(Some(schedule.start_time));
-                                sleep_end_time.set(Some(schedule.end_time));
-                                let format = format_description!("[hour]:[minute] [period]");
-                                wake_up.set(schedule.end_time.format(format).unwrap());
-                                bedtime.set(schedule.start_time.format(format).unwrap());
-                                hours_until_sleep.set((schedule.start_time.hour() - current_date.get_hours() as u8).to_string());
-                                hours_awake.set((current_date.get_hours() as u8 - schedule.end_time.hour()).to_string());
-                                hours_of_sleep.set((HOURS_IN_A_DAY - (schedule.start_time.hour() - schedule.end_time.hour())).to_string());
-                                loading.set(ComponentState::Visible);
-                            },
-                            None => loading.set(ComponentState::Error),
+                    match potential_sleep_schedule {
+                        Some(schedule) => {
+                            sleep_start_time.set(Some(schedule.start_time));
+                            sleep_end_time.set(Some(schedule.end_time));
+                            let format = format_description!("[hour]:[minute] [period]");
+                            wake_up.set(schedule.end_time.format(format).unwrap());
+                            bedtime.set(schedule.start_time.format(format).unwrap());
+                            hours_until_sleep.set(
+                                (schedule.start_time.hour() - current_date.get_hours() as u8)
+                                    .to_string(),
+                            );
+                            hours_awake.set(
+                                (current_date.get_hours() as u8 - schedule.end_time.hour())
+                                    .to_string(),
+                            );
+                            hours_of_sleep.set(
+                                (HOURS_IN_A_DAY
+                                    - (schedule.start_time.hour() - schedule.end_time.hour()))
+                                .to_string(),
+                            );
+                            loading.set(ComponentState::Visible);
                         }
+                        None => loading.set(ComponentState::Error),
+                    }
                 }
                 None => loading.set(ComponentState::Hidden),
             }
-            }),
-        );
+        });
     }
 
-    view! {
+    view! { context,
        (match state.get().as_ref() {
            ComponentState::Visible => {
-            let display_hours_awake: Signal<String> = hours_awake.clone();
-            let display_hours_until_sleep: Signal<String> = hours_until_sleep.clone();
-            let display_hours_of_sleep: Signal<String> = hours_of_sleep.clone();
-            let display_wake_up: Signal<String> = wake_up.clone();
-            let display_bedtime: Signal<String> = bedtime.clone();
-            view! {
+            let display_hours_awake: &Signal<String> = hours_awake.clone();
+            let display_hours_until_sleep: &Signal<String> = hours_until_sleep.clone();
+            let display_hours_of_sleep: &Signal<String> = hours_of_sleep.clone();
+            let display_wake_up: &Signal<String> = wake_up.clone();
+            let display_bedtime: &Signal<String> = bedtime.clone();
+            view! { context,
                section(class="sleep-widget") {
                    article(class="sleep-widget-section") {
                        div(class="sleep-widget-section-top") {
@@ -98,13 +108,13 @@ pub fn sleep_widget() -> View<G> {
                    }
                }
            }},
-           ComponentState::Hidden => view! {
+           ComponentState::Hidden => view! { context,
                div(class="sleep-widget") { "No sleep schedule found." }
            },
-           ComponentState::Error => view! {
+           ComponentState::Error => view! { context,
                div(class="sleep-widget") { "No sleep schedule found." }
            },
-           ComponentState::Loading => view! {
+           ComponentState::Loading => view! { context,
                div(class="sleep-widget") { "Loading..." }
            },
        })

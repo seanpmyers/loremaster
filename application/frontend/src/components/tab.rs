@@ -9,8 +9,9 @@ pub struct TabProperties<G: Html> {
     pub children: View<G>,
 }
 
-#[component(Tab<G>)]
-pub fn tab(
+#[component]
+pub fn Tab<G: Html>(
+    context: Scope,
     TabProperties {
         title,
         id,
@@ -19,11 +20,11 @@ pub fn tab(
         children,
     }: TabProperties<G>,
 ) -> View<G> {
-    let clicked = cloned!((classes, parent_id) => move |event: Event| {
-            event.prevent_default();
-            // classes.set(format!("{classes} active"));
-    });
-    view! {
+    let clicked = |context: Scope, event: Event| {
+        event.prevent_default();
+        // classes.set(format!("{classes} active"));
+    };
+    view! {context,
         div(class=(classes), id=(id)) {
             (children.clone())
         }

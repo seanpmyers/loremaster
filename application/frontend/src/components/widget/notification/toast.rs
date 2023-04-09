@@ -5,9 +5,10 @@ use crate::components::icon::{
     ALERT_OCTAGON_SVG_HTML, ALERT_TRIANGLE_SVG_HTML, CHECK_SVG_HTML, INFO_SVG_HTML,
 };
 
-pub struct ToastProperties {
-    pub content: Signal<String>,
-    pub variant: Signal<ToastVariant>,
+#[derive(Prop)]
+pub struct ToastProperties<'a> {
+    pub content: &'a ReadSignal<String>,
+    pub variant: &'a ReadSignal<ToastVariant>,
 }
 
 #[derive(Deserialize, Serialize, Debug, Clone)]
@@ -18,10 +19,10 @@ pub enum ToastVariant {
     Warning,
 }
 
-#[component(Toast<G>)]
-pub fn toast(properties: ToastProperties) -> View<G> {
+#[component]
+pub fn Toast<G: Html>(context: Scope, properties: ToastProperties) -> View<G> {
     let icon = properties.variant.clone();
-    view! {
+    view! { context,
         div(
             class=(match *properties.variant.get() {
                 ToastVariant::Default => "toast",

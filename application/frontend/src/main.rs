@@ -1,3 +1,5 @@
+use perseus::prelude::{Html, PerseusApp, PerseusRoot};
+
 pub mod components;
 pub mod error_pages;
 pub mod data;
@@ -5,22 +7,21 @@ pub mod templates;
 pub mod utility;
 pub mod global_state;
 
-use perseus::{Html, PerseusApp, PerseusRoot};
 
-#[perseus::main]
+#[perseus::main(perseus_axum::dflt_server)] 
 pub fn main<G: Html>() -> PerseusApp<G> {
     PerseusApp::new()
-        .template(crate::templates::index::get_template)
-        .template(crate::templates::about::get_template)
-        .template(crate::templates::login::get_template)
-        .template(crate::templates::chronicle::get_template)
-        .template(crate::templates::registration::get_template)
-        .template(crate::templates::you::get_template)
-        .template(crate::templates::timeline::get_template)
-        .template(crate::templates::design_system::get_template)
-        .error_pages(crate::error_pages::get_error_pages)
-        .index_view(|| {
-            sycamore::view! {
+        .template(crate::templates::index::get_template())
+        .template(crate::templates::about::get_template())
+        .template(crate::templates::login::get_template())
+        .template(crate::templates::chronicle::get_template())
+        .template(crate::templates::registration::get_template())
+        .template(crate::templates::you::get_template())
+        .template(crate::templates::timeline::get_template())
+        .template(crate::templates::design_system::get_template())
+        .error_views(crate::error_pages::get_error_pages())
+        .index_view(|context| {
+            sycamore::view! { context,
                 // We don't need a `<!DOCTYPE html>`, that's added automatically by Perseus (though that can be overriden if you really want by using `.index_view_str()`)
                 // We need a `<head>` and a `<body>` at the absolute minimum for Perseus to work properly (otherwise certain script injections will fail)
                 link(rel="icon", type="image/x-icon", href="/.perseus/static/favicon_io/favicon.ico") {}

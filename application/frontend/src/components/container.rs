@@ -7,9 +7,9 @@ pub struct ContainerProperties<G: Html> {
     pub children: View<G>,
 }
 
-#[component(Container<G>)]
-pub fn container(properties: ContainerProperties<G>) -> View<G> {
-    view! {
+#[component]
+pub fn Container<G: Html>(context: Scope, properties: ContainerProperties<G>) -> View<G> {
+    view! {context,
         TopNavBar()
         div(class="", id="loremaster-main") {
             SideNavBar()

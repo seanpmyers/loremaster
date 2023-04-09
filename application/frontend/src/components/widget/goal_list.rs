@@ -1,3 +1,4 @@
+use perseus::prelude::spawn_local_scoped;
 use sycamore::prelude::*;
 
 use crate::{
@@ -8,27 +9,31 @@ use crate::{
     },
 };
 
-pub struct GoalListProperties {
-    pub goals: Signal<Vec<Goal>>,
+#[derive(Prop)]
+pub struct GoalListProperties<'a> {
+    pub goals: &'a Signal<Vec<Goal>>,
 }
 
-#[component(GoalList<G>)]
-pub fn goal_list(GoalListProperties { goals }: GoalListProperties) -> View<G> {
+#[component]
+pub fn GoalList<G: Html>(
+    context: Scope,
+    GoalListProperties { goals }: GoalListProperties,
+) -> View<G> {
     if G::IS_BROWSER {
-        perseus::spawn_local(cloned!((goals) => async move {
+        spawn_local_scoped(context, async move {
             if let Some(goal_list) = get_goals().await {
                 goals.set(goal_list);
             }
-        }));
+        });
     }
-    view! {
+    view! { context,
         (if goals.get().len() > 0 {
-            view! {
+            view! { context,
                 ul(class=" goal_list", id="") {
                     Keyed( KeyedProps {
-                            iterable: goals.handle(),
-                            template: move |goal: Goal| {
-                                view!{
+                            iterable: goals,
+                            view : |context, goal: Goal| {
+                                view!{ context,
                                     li() { (goal.name) }
                                 }
                             },
@@ -37,7 +42,7 @@ pub fn goal_list(GoalListProperties { goals }: GoalListProperties) -> View<G> {
                 }
             }
         } else {
-            view! {
+            view! { context,
                 div() {
                     "No goals available."
                 }

@@ -1,13 +1,15 @@
-use perseus::Template;
-use sycamore::prelude::{view, Html, SsrNode, View};
+use perseus::{engine_only_fn, template::Template};
+use sycamore::{
+    prelude::{view, Html, SsrNode, View},
+    reactive::{BoundedScope, Scope},
+};
 
-const ROUTE_PATH: &str = "design-system";
+const PAGE_ROUTE_PATH: &str = "design-system";
 const PAGE_TITLE: &str = "Design System | Chronilore";
 const MAIN_HEADER: &str = "Chronilore Design System";
 
-#[perseus::template_rx]
-pub fn design_system_page() -> View<G> {
-    view! {
+pub fn design_system_page<'page, G: Html>(context: BoundedScope<'_, 'page>) -> View<G> {
+    view! {context,
         div(class="") {
             h1(class="") { (MAIN_HEADER) }
             p() {
@@ -15,19 +17,21 @@ pub fn design_system_page() -> View<G> {
                 br() {}
                 "Test"
              }
+
         }
     }
 }
 
-#[perseus::head]
-pub fn head() -> View<SsrNode> {
-    view! {
+#[engine_only_fn]
+fn head(context: Scope) -> View<SsrNode> {
+    view! { context,
         title { (PAGE_TITLE) }
     }
 }
 
 pub fn get_template<G: Html>() -> Template<G> {
-    Template::new(ROUTE_PATH)
-        .template(design_system_page)
+    Template::build(PAGE_ROUTE_PATH)
+        .view(design_system_page)
         .head(head)
+        .build()
 }

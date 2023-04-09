@@ -1,3 +1,4 @@
+use perseus::prelude::spawn_local_scoped;
 use sycamore::prelude::*;
 
 use crate::{
@@ -10,26 +11,29 @@ use crate::{
 
 pub struct FrequencyOptionsProperties {}
 
-#[component(FrequencyOptions<G>)]
-pub fn frequency_options(FrequencyOptionsProperties {}: FrequencyOptionsProperties) -> View<G> {
-    let frequencies: Signal<Vec<Frequency>> = Signal::new(Vec::new());
+#[component]
+pub fn FrequencyOptions<G: Html>(
+    context: Scope,
+    FrequencyOptionsProperties {}: FrequencyOptionsProperties,
+) -> View<G> {
+    let frequencies: &Signal<Vec<Frequency>> = create_signal(context, Vec::new());
 
     if G::IS_BROWSER {
-        perseus::spawn_local(cloned!((frequencies) => async move {
+        spawn_local_scoped(context, async move {
             if let Some(data) = get_frequencies().await {
                 frequencies.set(data);
             }
-        }));
+        });
     }
 
-    view! {
+    view! {context,
         select(name="frequency", class="form-select") {
             option(selected=true, disabled=true) { "Select the frequency" }
             Indexed( IndexedProps {
-                    iterable: frequencies.handle(),
-                    template: move |frequency: Frequency| {
+                    iterable: frequencies,
+                    view: |context, frequency: Frequency| {
                         let display = frequency.to_string();
-                        view!{
+                        view!{ context,
                             option(value=(frequency)) { (display) }
                         }
                     },

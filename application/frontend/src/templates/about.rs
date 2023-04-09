@@ -1,15 +1,17 @@
-use perseus::Template;
-use sycamore::prelude::{view, Html, SsrNode, View};
+use perseus::{engine_only_fn, template::Template};
+use sycamore::{
+    prelude::{view, Html, SsrNode, View},
+    reactive::{BoundedScope, Scope},
+};
 
 use crate::components::container::{Container, ContainerProperties};
 
 const PAGE_TITLE: &str = "About | Loremaster";
-const PAGE_ROUTE: &str = "about";
+const PAGE_ROUTE_PATH: &str = "about";
 
-#[perseus::template_rx]
-pub fn about_page() -> View<G> {
-    view! {
-        Container(ContainerProperties{title: String::from("About"), children: view!{
+pub fn about_page<'page, G: Html>(context: BoundedScope<'_, 'page>) -> View<G> {
+    view! {context,
+        Container(ContainerProperties{title: String::from("About"), children: view!{ context,
             div(class="d-flex flex-column flex-grow-1 p-4 align-items-center") {
                 h1(class="display-3") { "About" }
                 p() { "This is a website." }
@@ -18,13 +20,16 @@ pub fn about_page() -> View<G> {
     }
 }
 
-#[perseus::head]
-pub fn head() -> View<SsrNode> {
-    view! {
+#[engine_only_fn]
+pub fn head(context: Scope) -> View<SsrNode> {
+    view! {context,
         title { (PAGE_TITLE) }
     }
 }
 
 pub fn get_template<G: Html>() -> Template<G> {
-    Template::new(PAGE_ROUTE).template(about_page).head(head)
+    Template::build(PAGE_ROUTE_PATH)
+        .view(about_page)
+        .head(head)
+        .build()
 }

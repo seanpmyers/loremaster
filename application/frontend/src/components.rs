@@ -1,3 +1,4 @@
+pub mod accordion;
 pub mod container;
 pub mod form;
 pub mod icon;
