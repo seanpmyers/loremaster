@@ -46,7 +46,6 @@ pub struct YouPageState {
     pub sleep_end: String,
 }
 
-#[perseus::template_rx]
 pub fn you_page<'page, G: Html>(
     context: BoundedScope<'_, 'page>,
     YouPageStateRx {
@@ -58,120 +57,151 @@ pub fn you_page<'page, G: Html>(
         sleep_end,
     }: &'page YouPageStateRx,
 ) -> View<G> {
-    let login_success: Signal<Option<bool>> = Signal::new(None);
-    let login_display: Signal<Option<bool>> = login_success.clone();
+    let login_success: &Signal<Option<bool>> = create_signal(context, None);
+    let login_display: &Signal<Option<bool>> = login_success.clone();
 
-    let email_address_input: Signal<String> = email_address.clone();
-    let alias_input: Signal<String> = alias.clone();
-    let display_alias: Signal<String> = alias.clone();
-    let new_action_input: Signal<String> = new_action.clone();
-    let sleep_start_input: Signal<String> = sleep_start.clone();
-    let sleep_end_input: Signal<String> = sleep_end.clone();
+    let email_address_input: &Signal<String> = &email_address.clone();
+    let alias_input: &Signal<String> = &alias.clone();
+    let display_alias: &Signal<String> = &alias.clone();
+    let new_action_input: &Signal<String> = &new_action.clone();
+    let sleep_start_input: &Signal<String> = &sleep_start.clone();
+    let sleep_end_input: &Signal<String> = &sleep_end.clone();
 
-    let new_goal: Signal<String> = Signal::new(String::from(""));
-    let new_goal_input: Signal<String> = new_goal.clone();
+    let new_goal: &Signal<String> = create_signal(context, String::new());
+    let new_goal_input: &Signal<String> = &new_goal.clone();
 
     if G::IS_BROWSER {
-        perseus::spawn_local(
-            cloned!((email_address, alias, action_list, sleep_start, sleep_end) => async move {
+        spawn_local_scoped(context, async move {
+            let mut query_response: Option<String> = http_service::get_endpoint(
+                format!("{}/{}", API_BASE_URL, API_PERSON_META_DATA_ROUTE).as_str(),
+                None,
+            )
+            .await;
+            match query_response {
+                Some(response) => {
+                    let person_meta_data: PersonMeta = serde_json::from_str(&response).unwrap();
+                    email_address.set(person_meta_data.email_address);
+                    if let Some(existing_alias) = person_meta_data.alias {
+                        alias.set(existing_alias);
+                    }
+                }
+                None => {}
+            }
+            query_response = http_service::get_endpoint(
+                format!("{}/{}", API_BASE_URL, API_ACTION_LIST_ROUTE).as_str(),
+                None,
+            )
+            .await;
+            match query_response {
+                Some(response) => {
+                    let mut action_list_data: Vec<Action> =
+                        serde_json::from_str(&response).unwrap();
+                    action_list_data.iter_mut().for_each(|action| {
+                        action.name =
+                            action.name.remove(0).to_ascii_uppercase().to_string() + &action.name
+                    });
+                    action_list.set(action_list_data);
+                }
+                None => {}
+            }
 
-                let mut query_response: Option<String> = http_service::get_endpoint(format!("{}/{}",API_BASE_URL,API_PERSON_META_DATA_ROUTE).as_str(), None).await;
-                match query_response {
-                    Some(response) => {
-                        let person_meta_data: PersonMeta = serde_json::from_str(&response).unwrap();
-                        email_address.set(person_meta_data.email_address);
-                        if let Some(existing_alias) = person_meta_data.alias {
-                            alias.set(existing_alias);
+            query_response =
+                http_service::get_endpoint(API_PERSON_SLEEP_SCHEDULE_ROUTE, None).await;
+            match query_response {
+                Some(response) => {
+                    let potential_sleep_schedule: Option<SleepSchedule> =
+                        serde_json::from_str(&response).unwrap();
+                    match potential_sleep_schedule {
+                        Some(schedule) => {
+                            let format: &[FormatItem] = format_description!("[hour]:[minute]");
+                            sleep_start.set(schedule.start_time.format(&format).unwrap());
+                            sleep_end.set(schedule.end_time.format(&format).unwrap());
                         }
-                    },
-                    None => {},
-                }
-                query_response= http_service::get_endpoint(format!("{}/{}",API_BASE_URL,API_ACTION_LIST_ROUTE).as_str(), None).await;
-                match query_response {
-                    Some(response) => {
-                        let mut action_list_data: Vec<Action> = serde_json::from_str(&response).unwrap();
-                        action_list_data.iter_mut().for_each(|action| {
-                            action.name = action.name.remove(0).to_ascii_uppercase().to_string() + &action.name
-                        });
-                        action_list.set(action_list_data);
-                    },
-                    None => {},
-                }
-
-                query_response = http_service::get_endpoint(API_PERSON_SLEEP_SCHEDULE_ROUTE, None).await;
-                    match query_response {
-                        Some(response) => {
-                            let potential_sleep_schedule: Option<SleepSchedule> = serde_json::from_str(&response).unwrap();
-                            match potential_sleep_schedule {
-                                Some(schedule) => {
-                                    let format: &[FormatItem] = format_description!("[hour]:[minute]");
-                                    sleep_start.set(schedule.start_time.format(&format).unwrap());
-                                    sleep_end.set(schedule.end_time.format(&format).unwrap());
-                                },
-                                None => (),
-                            }
-                        },
                         None => (),
                     }
-
-            }),
-        );
+                }
+                None => (),
+            }
+        });
     }
 
     let update_email_address_handler = move |event: Event| {
         event.prevent_default();
-        perseus::spawn_local(cloned!((email_address) => async move {
-            http_service::post_html_form(&format!("{}/{}",API_BASE_URL,API_PERSON_EMAIL_ADDRESS_UPDATE_ROUTE), &vec![
-                (String::from("email_address"), email_address.get().as_ref().to_string()),
-            ]).await;
-
-        }));
+        spawn_local_scoped(context, async move {
+            http_service::post_html_form(
+                &format!("{}/{}", API_BASE_URL, API_PERSON_EMAIL_ADDRESS_UPDATE_ROUTE),
+                &vec![(
+                    String::from("email_address"),
+                    email_address.get().as_ref().to_string(),
+                )],
+            )
+            .await;
+        });
     };
 
     let update_meta_handler = move |event: Event| {
         event.prevent_default();
-        perseus::spawn_local(cloned!((alias) => async move {
-            http_service::post_html_form(&format!("{}/{}",API_BASE_URL,API_PERSON_META_UPDATE_ROUTE), &vec![
-                (String::from("alias"), alias.get().as_ref().to_string()),
-            ]).await;
-
-        }));
+        spawn_local_scoped(context, async move {
+            http_service::post_html_form(
+                &format!("{}/{}", API_BASE_URL, API_PERSON_META_UPDATE_ROUTE),
+                &vec![(String::from("alias"), alias.get().as_ref().to_string())],
+            )
+            .await;
+        });
     };
 
     let new_action_handler = move |event: Event| {
         event.prevent_default();
-        perseus::spawn_local(cloned!((new_action, login_success) => async move {
-            http_service::post_html_form(&format!("{}/{}",API_BASE_URL,API_ACTION_NEW_ROUTE), &vec![
-                (String::from("action"), new_action.get().as_ref().to_string()),
-            ]).await;
+        spawn_local_scoped(context, async move {
+            http_service::post_html_form(
+                &format!("{}/{}", API_BASE_URL, API_ACTION_NEW_ROUTE),
+                &vec![(
+                    String::from("action"),
+                    new_action.get().as_ref().to_string(),
+                )],
+            )
+            .await;
             new_action.set(String::new());
 
             login_success.set(Some(true));
             TimeoutFuture::new(10000_u32).await;
             login_success.set(None);
-        }));
+        });
     };
 
     let new_goal_handler = move |event: Event| {
         event.prevent_default();
         spawn_local_scoped(context, async move {
-            context, async move {
-                http_service::post_html_form(&format!("{}/{}", API_BASE_URL, API_GOAL_NEW_ROUTE), &vec![
-                    (String::from("goal"), new_goal.get().as_ref().to_string()),
-                ]).await;
-                new_goal.set(String::new());
-            }
-        });
+            http_service::post_html_form(
+                &format!("{}/{}", API_BASE_URL, API_GOAL_NEW_ROUTE),
+                &vec![(String::from("goal"), new_goal.get().as_ref().to_string())],
+            )
+            .await;
+            new_goal.set(String::new());
+        })
+    };
 
     let update_sleep_schedule_handler = move |event: Event| {
         event.prevent_default();
-        spawn_local_scoped(cloned!((sleep_start, sleep_end) => async move {
-            http_service::post_html_form(&format!("{}/{}",API_BASE_URL,API_PERSON_SLEEP_SCHEDULE_UPDATE_ROUTE), &vec![
-                (String::from("start_time"), sleep_start.get().as_ref().to_string()),
-                (String::from("end_time"), sleep_end.get().as_ref().to_string()),
-            ]).await;
-
-        }));
+        spawn_local_scoped(context, async move {
+            http_service::post_html_form(
+                &format!(
+                    "{}/{}",
+                    API_BASE_URL, API_PERSON_SLEEP_SCHEDULE_UPDATE_ROUTE
+                ),
+                &vec![
+                    (
+                        String::from("start_time"),
+                        sleep_start.get().as_ref().to_string(),
+                    ),
+                    (
+                        String::from("end_time"),
+                        sleep_end.get().as_ref().to_string(),
+                    ),
+                ],
+            )
+            .await;
+        });
     };
 
     let section_classes: &str = "border rounded bg-white shadow-sm p-2 m-2 ";

@@ -28,21 +28,22 @@ pub fn index_page<'page, G: Html>(
     context: BoundedScope<'_, 'page>,
     state: &'page IndexPageStateRx,
 ) -> View<G> {
-    let click_first = |current_tab, event: Event| {
+    let current_tab: &Signal<ToastVariant> = create_signal(context, ToastVariant::Default);
+    let click_first = |event: Event| {
         event.prevent_default();
         current_tab.set(ToastVariant::Default);
     };
-    let click_second = |current_tab| {
+    let click_second = |event: Event| {
         current_tab.set(ToastVariant::Success);
     };
-    let click_third = |current_tab| {
+    let click_third = |event: Event| {
         current_tab.set(ToastVariant::Error);
     };
-    let click_fourth = |current_tab| {
+    let click_fourth = |event: Event| {
         current_tab.set(ToastVariant::Warning);
     };
 
-    let content_input: Signal<String> = create_signal(context, String::new());
+    let content_input: &Signal<String> = create_signal(context, String::new());
     let content = content_input.clone();
 
     let button_classes: &str = "glow-button";
@@ -72,10 +73,7 @@ pub fn index_page<'page, G: Html>(
                      }
                 }
                 input(bind:value=content_input) {}
-                Toast(ToastProperties {
-                    content,
-                    variant: state.current_tab
-                })
+
             }
         }})
     }
