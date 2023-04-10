@@ -36,17 +36,9 @@ pub fn registration_page<'page, G: Html>(
     state: &'page RegistrationPageStateRx,
 ) -> View<G> {
     let loading: &Signal<bool> = create_signal(context, false);
-    let loading_email: &Signal<bool> = loading.clone();
-    let loading_password: &Signal<bool> = loading.clone();
-    let loading_submit: &Signal<bool> = loading.clone();
     let email_address: &Signal<String> = &state.email_address;
-    let email_address_input: &Signal<String> = email_address.clone();
-
     let password: &Signal<String> = &state.password;
-    let password_input: &Signal<String> = password.clone();
-
     let form_message: &Signal<FormMessageState> = create_signal(context, FormMessageState::Hidden);
-    let form_message_display: &Signal<FormMessageState> = form_message.clone();
 
     let registration_handler = move |event: Event| {
         event.prevent_default();
@@ -102,9 +94,9 @@ pub fn registration_page<'page, G: Html>(
                                 input(
                                     type="email",
                                     class="form-control",
-                                    bind:value= email_address_input,
+                                    bind:value= email_address,
                                     placeholder = "Enter your email address",
-                                    disabled=loading_email.get().as_ref().to_owned()
+                                    disabled=*loading.get()
                                 ) {}
                             }
                             div(class="input-row") {
@@ -115,14 +107,14 @@ pub fn registration_page<'page, G: Html>(
                                 input(
                                     type="password",
                                     class="form-control",
-                                    bind:value= password_input,
+                                    bind:value= password,
                                     placeholder = "Enter your password",
-                                    disabled=loading_password.get().as_ref().to_owned()
+                                    disabled=*loading.get()
                                 ) {}
                             }
-                            button(class="btn btn-primary", type="submit", disabled=loading_submit.get().as_ref().to_owned()){ "Submit"}
+                            button(class="btn btn-primary", type="submit", disabled=*loading.get()){ "Submit"}
                         }
-                        (match *form_message_display.get() {
+                        (match *form_message.get() {
                             FormMessageState::Hidden => view!{context,  div() {}},
                             FormMessageState::Success => view!{context, div(class="badge bg-success rounded") {"Successfully registered."}},
                             FormMessageState::Failure => view!{context, div(class="badge bg-danger rounded") {"Unable to register with the provided credentials."}}

@@ -15,9 +15,9 @@ pub struct GoalListProperties<'a> {
 }
 
 #[component]
-pub fn GoalList<G: Html>(
-    context: Scope,
-    GoalListProperties { goals }: GoalListProperties,
+pub fn GoalList<'a, 'b: 'a, G: Html>(
+    context: Scope<'a>,
+    GoalListProperties { goals }: GoalListProperties<'b>,
 ) -> View<G> {
     if G::IS_BROWSER {
         spawn_local_scoped(context, async move {
@@ -27,7 +27,7 @@ pub fn GoalList<G: Html>(
         });
     }
     view! { context,
-        (if goals.get().len() > 0 {
+        (if *create_selector(context, || !goals.get().is_empty()).get() {
             view! { context,
                 ul(class=" goal_list", id="") {
                     Keyed( KeyedProps {

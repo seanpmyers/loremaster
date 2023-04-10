@@ -60,13 +60,6 @@ pub fn you_page<'page, G: Html>(
     let login_success: &Signal<Option<bool>> = create_signal(context, None);
     let login_display: &Signal<Option<bool>> = login_success.clone();
 
-    let email_address_input: &Signal<String> = &email_address.clone();
-    let alias_input: &Signal<String> = &alias.clone();
-    let display_alias: &Signal<String> = &alias.clone();
-    let new_action_input: &Signal<String> = &new_action.clone();
-    let sleep_start_input: &Signal<String> = &sleep_start.clone();
-    let sleep_end_input: &Signal<String> = &sleep_end.clone();
-
     let new_goal: &Signal<String> = create_signal(context, String::new());
     let new_goal_input: &Signal<String> = &new_goal.clone();
 
@@ -210,7 +203,7 @@ pub fn you_page<'page, G: Html>(
         Container(ContainerProperties{title: String::from("You"), children: view!{context,
             div(class="d-flex flex-column flex-grow-1 p-4 align-items-center bg-light") {
                 div() {
-                    h1(class="display-3") { ( display_alias.get()) }
+                    h1(class="display-3") { ( alias.get()) }
                     p() { "This is a page dedicated to you." }
                 }
                 div(class="d-flex flex-wrap") {
@@ -221,7 +214,7 @@ pub fn you_page<'page, G: Html>(
                                 type="email",
                                 class="form-control",
                                 name="email_address",
-                                bind:value= email_address_input,
+                                bind:value=email_address,
                                 placeholder = "Enter your email address"
                             ) {}
                         }
@@ -236,7 +229,7 @@ pub fn you_page<'page, G: Html>(
                                 type="text",
                                 name="alias",
                                 class="form-control",
-                                bind:value= alias_input,
+                                bind:value=alias,
                                 placeholder = "Enter an alias"
                             ) {}
                         }
@@ -252,7 +245,7 @@ pub fn you_page<'page, G: Html>(
                                 class="form-control",
                                 name="action",
                                 minLength="1",
-                                bind:value=new_action_input,
+                                bind:value=new_action,
                                 placeholder="Enter a new action"
                             ) {}
                         }
@@ -320,7 +313,7 @@ pub fn you_page<'page, G: Html>(
                                 type="time",
                                 class="form-control",
                                 name="start_time",
-                                bind:value=sleep_start_input
+                                bind:value=sleep_start
                             ) {}
                         }
                         div(class="mb-3") {
@@ -329,7 +322,7 @@ pub fn you_page<'page, G: Html>(
                                 type="time",
                                 class="form-control",
                                 name="end_time",
-                                bind:value=sleep_end_input
+                                bind:value=sleep_end
                             ) {}
                         }
                         div(class="mb-3") {

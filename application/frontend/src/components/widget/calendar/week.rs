@@ -18,12 +18,12 @@ pub struct WeekProperties<'a> {
 }
 
 #[component]
-pub fn Week<G: Html>(
-    context: Scope,
+pub fn Week<'a, 'b: 'a, G: Html>(
+    context: Scope<'a>,
     WeekProperties {
         selected_date,
         days,
-    }: WeekProperties,
+    }: WeekProperties<'b>,
 ) -> View<G> {
     days.set(create_week_list(&selected_date.get()));
     view! {context,
@@ -58,14 +58,14 @@ pub fn create_week_list(selected_date: &time::OffsetDateTime) -> Vec<WeekDayInfo
     for (index, day) in DAYS_OF_WEEK.iter().enumerate() {
         let number: u8 = selected_date
             .add(time::Duration::days(
-                -1 * selected_weekday.number_days_from_sunday() as i64,
+                -(selected_weekday.number_days_from_sunday() as i64),
             ))
             .add(time::Duration::days(index as i64))
             .day();
 
         result.push(WeekDayInformation {
             number,
-            week_day: day.clone(),
+            week_day: *day,
         })
     }
 

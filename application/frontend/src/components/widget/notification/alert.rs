@@ -9,13 +9,13 @@ pub struct AlertProperties<'a> {
 }
 
 #[component]
-pub fn Alert<G: Html>(
-    context: Scope,
+pub fn Alert<'a, 'b: 'a, G: Html>(
+    context: Scope<'a>,
     AlertProperties {
         message_title,
         message_body,
         display_time,
-    }: AlertProperties,
+    }: AlertProperties<'b>,
 ) -> View<G> {
     view! { context,
         div(class="notification-toast-alert", id="") {

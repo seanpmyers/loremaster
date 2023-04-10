@@ -23,7 +23,7 @@ pub fn SideNavBar<G: Html>(context: Scope) -> View<G> {
             ul(class=nav_ul_classes) {
                 Indexed(IndexedProps{
                     iterable: links,
-                    view: |context, link| view! { context,
+                    view: move |context, link| view! { context,
                         li(class=nav_li_classes) {
                             a(
                                 class=a_class,

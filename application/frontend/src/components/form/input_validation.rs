@@ -15,14 +15,18 @@ pub struct InputValidationProperties<'a> {
 }
 
 #[component]
-pub fn InputValidation<G: Html>(context: Scope, properties: InputValidationProperties) -> View<G> {
-    let visibility: &ReadSignal<Visibility> = properties.visibility.clone();
+pub fn InputValidation<'a, 'b: 'a, G: Html>(
+    context: Scope<'a>,
+    InputValidationProperties {
+        content,
+        visibility,
+        validity,
+        message_type,
+    }: InputValidationProperties<'b>,
+) -> View<G> {
     view! {context,
         (match *visibility.get(){
             Visibility::Visible => {
-                let icon = properties.message_type.clone();
-                let message_type = properties.message_type.clone();
-                let content = properties.content.clone();
                 view!{ context,
                     div(
                         class=(match *message_type.get() {
@@ -34,7 +38,7 @@ pub fn InputValidation<G: Html>(context: Scope, properties: InputValidationPrope
                     ) {
                         span(
                             class="input-validation-icon",
-                            dangerously_set_inner_html=get_message_type_icon(&icon.get())
+                            dangerously_set_inner_html=get_message_type_icon(&message_type.get())
                         ) {
 
                         }

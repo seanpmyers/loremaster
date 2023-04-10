@@ -15,7 +15,7 @@ use crate::components::form::input_validation::{InputValidation, InputValidation
 use crate::components::state::message_type::MessageType;
 use crate::components::state::validation::Validation;
 use crate::components::state::visibility::Visibility;
-use crate::components::widget::notification::toast::{Toast, ToastProperties, ToastVariant};
+use crate::components::widget::notification::toast::{Toast, ToastProperties};
 use crate::utility::constants::API_LOGIN_URL;
 use crate::utility::http_service;
 
@@ -39,11 +39,8 @@ pub fn login_page<'page, G: Html>(
     context: BoundedScope<'_, 'page>,
     state: &'page LoginPageStateRx,
 ) -> View<G> {
-    let toast_variant: &Signal<ToastVariant> = create_signal(context, ToastVariant::Default);
+    let message_type: &Signal<MessageType> = create_signal(context, MessageType::Information);
     let toast_content: &Signal<String> = create_signal(context, String::new());
-
-    let variant = toast_variant.clone();
-    let content = toast_content.clone();
 
     let email_address_validation_content: &Signal<String> = create_signal(context, String::new());
     let email_address_validation_visibility: &Signal<Visibility> =
@@ -52,32 +49,16 @@ pub fn login_page<'page, G: Html>(
     let email_address_message_type: &Signal<MessageType> =
         create_signal(context, MessageType::Information);
 
-    let display_email_address_validation_content: &Signal<String> =
-        email_address_validation_content.clone();
-    let display_email_address_validation_visibility: &Signal<Visibility> =
-        email_address_validation_visibility.clone();
-    let display_email_address_validity: &Signal<Validation> = email_address_validity.clone();
-    let display_email_address_message_type: &Signal<MessageType> =
-        email_address_message_type.clone();
-
     let loading: &Signal<bool> = create_signal(context, false);
-    let loading_email: &Signal<bool> = loading.clone();
-    let loading_password: &Signal<bool> = loading.clone();
-    let loading_submit: &Signal<bool> = loading.clone();
-
     let email_address: &Signal<String> = &state.email_address;
-    let email_address_input: &Signal<String> = email_address.clone();
-
     let password: &Signal<String> = &state.password;
-    let password_input: &Signal<String> = password.clone();
-
     let form_message: &Signal<FormMessageState> = create_signal(context, FormMessageState::Hidden);
-    let form_message_display: &Signal<FormMessageState> = form_message.clone();
 
     let login_handler = |event: Event| {
         event.prevent_default();
+        #[cfg(client)]
         spawn_local_scoped(context, async move {
-            if loading.get().as_ref() == &true {
+            if *loading.get() {
                 return;
             }
             loading.set(true);
@@ -118,7 +99,7 @@ pub fn login_page<'page, G: Html>(
                         email_address.set(String::new());
                         password.set(String::new());
 
-                        toast_variant.set(ToastVariant::Success);
+                        message_type.set(MessageType::Success);
                         toast_content.set(String::from("Successfully logged in."));
                         form_message.set(FormMessageState::Visible);
 
@@ -129,7 +110,7 @@ pub fn login_page<'page, G: Html>(
                         toast_content.set(String::from(
                             "Unable to login with the provided credentials.",
                         ));
-                        toast_variant.set(ToastVariant::Error);
+                        message_type.set(MessageType::Error);
                         form_message.set(FormMessageState::Visible)
                     }
                 },
@@ -137,7 +118,7 @@ pub fn login_page<'page, G: Html>(
                     toast_content.set(String::from(
                         "Unable to login with the provided credentials.",
                     ));
-                    toast_variant.set(ToastVariant::Error);
+                    message_type.set(MessageType::Error);
                     form_message.set(FormMessageState::Visible)
                 }
             }
@@ -160,15 +141,15 @@ pub fn login_page<'page, G: Html>(
                                 input(
                                     type="email",
                                     class="form-control",
-                                    bind:value= email_address_input,
+                                    bind:value=email_address,
                                     placeholder = "Enter your email address",
-                                    disabled=loading_email.get().as_ref().to_owned()
+                                    disabled=loading.get().as_ref().to_owned()
                                 ) {}
                                 InputValidation(InputValidationProperties{
-                                    content: display_email_address_validation_content,
-                                    visibility: display_email_address_validation_visibility,
-                                    validity: display_email_address_validity,
-                                    message_type: display_email_address_message_type
+                                    content: email_address_validation_content,
+                                    visibility: email_address_validation_visibility,
+                                    validity: email_address_validity,
+                                    message_type: email_address_message_type
                                 })
                             }
                             div(class="input-row") {
@@ -179,25 +160,23 @@ pub fn login_page<'page, G: Html>(
                                 input(
                                     type="password",
                                     class="form-control",
-                                    bind:value= password_input,
+                                    bind:value=password,
                                     placeholder = "Enter your password",
-                                    disabled=loading_password.get().as_ref().to_owned()
+                                    disabled=loading.get().as_ref().to_owned()
                                 ) {}
 
                             }
                             button(
                                 class="btn btn-primary",
                                 type="submit",
-                                disabled=loading_submit.get().as_ref().to_owned()
+                                disabled=loading.get().as_ref().to_owned()
                             ) {
                                 "Submit"
                             }
-                            (match *form_message_display.get() {
+                            (match *form_message.get() {
                                 FormMessageState::Hidden => view!{context, },
                                 FormMessageState::Visible => {
-                                    let content = content.clone();
-                                    let variant = variant.clone();
-                                    return view! {context, Toast(ToastProperties{content, variant})};
+                                    return view! {context, Toast(ToastProperties{content: toast_content, message_type})};
                                 },
                             })
                         }

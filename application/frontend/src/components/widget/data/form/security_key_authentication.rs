@@ -31,7 +31,7 @@ const USER_ID_STRING: &str = "UZSL85T9AFC";
 pub fn SecurityKeyAuthentication<G: Html>(context: Scope) -> View<G> {
     let loading: &Signal<bool> = create_signal(context, false);
     let email_address: &Signal<String> = create_signal(context, String::new());
-    let email_address_input: &Signal<String> = email_address.clone();
+
     if G::IS_BROWSER {
         spawn_local_scoped(context, async move {});
     };
@@ -125,7 +125,7 @@ pub fn SecurityKeyAuthentication<G: Html>(context: Scope) -> View<G> {
 
                         // let test = window_navigator.credentials().create_with_options(&credential_creation_options).unwrap();
                     }
-                    None => {}
+                    None => todo!(),
                 }
                 loading.set(false);
             });
@@ -138,7 +138,7 @@ pub fn SecurityKeyAuthentication<G: Html>(context: Scope) -> View<G> {
                 label() { "Email Address" }
                 input(
                     type="email",
-                    bind:value=email_address_input,
+                    bind:value=email_address,
                     placeholder = "Enter your email address"
                 ) {}
             }

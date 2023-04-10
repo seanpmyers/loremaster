@@ -11,7 +11,7 @@ use web_sys::Event;
 
 use crate::{
     components::container::{Container, ContainerProperties},
-    components::widget::notification::toast::{Toast, ToastProperties, ToastVariant},
+    components::state::message_type::MessageType,
 };
 
 const PAGE_ROUTE_PATH: &str = "index";
@@ -21,30 +21,32 @@ const PAGE_TITLE: &str = "Welcome | Loremaster";
 #[rx(alias = "IndexPageStateRx")]
 pub struct IndexPageState {
     pub greeting: String,
-    pub current_tab: ToastVariant,
+    pub current_tab: MessageType,
 }
 
 pub fn index_page<'page, G: Html>(
     context: BoundedScope<'_, 'page>,
     state: &'page IndexPageStateRx,
 ) -> View<G> {
-    let current_tab: &Signal<ToastVariant> = create_signal(context, ToastVariant::Default);
+    let current_tab: &Signal<MessageType> = create_signal(context, MessageType::Information);
     let click_first = |event: Event| {
         event.prevent_default();
-        current_tab.set(ToastVariant::Default);
+        current_tab.set(MessageType::Information);
     };
     let click_second = |event: Event| {
-        current_tab.set(ToastVariant::Success);
+        event.prevent_default();
+        current_tab.set(MessageType::Success);
     };
     let click_third = |event: Event| {
-        current_tab.set(ToastVariant::Error);
+        event.prevent_default();
+        current_tab.set(MessageType::Error);
     };
     let click_fourth = |event: Event| {
-        current_tab.set(ToastVariant::Warning);
+        event.prevent_default();
+        current_tab.set(MessageType::Warning);
     };
 
     let content_input: &Signal<String> = create_signal(context, String::new());
-    let content = content_input.clone();
 
     let button_classes: &str = "glow-button";
     view! { context,
@@ -59,10 +61,10 @@ pub fn index_page<'page, G: Html>(
                     button(class=button_classes, on:click=click_fourth) { "Warning" }
                 }
                 (match *state.current_tab.get() {
-                    ToastVariant::Default => view! {context, div() {"Default"}},
-                    ToastVariant::Success => view! {context, div() {"Success"}},
-                    ToastVariant::Error => view! {context, div() {"Error"}},
-                    ToastVariant::Warning => view! {context, div() {"Warning"}},
+                    MessageType::Information => view! {context, div() {"Default"}},
+                    MessageType::Success => view! {context, div() {"Success"}},
+                    MessageType::Error => view! {context, div() {"Error"}},
+                    MessageType::Warning => view! {context, div() {"Warning"}},
                 })
                 div() {
                     button(class="popover-button glow-button") { "Test" }
@@ -91,7 +93,7 @@ pub fn get_template<G: Html>() -> Template<G> {
 async fn get_build_state(_info: StateGeneratorInfo<()>) -> IndexPageState {
     IndexPageState {
         greeting: "Welcome!".to_string(),
-        current_tab: ToastVariant::Default,
+        current_tab: MessageType::Information,
     }
 }
 

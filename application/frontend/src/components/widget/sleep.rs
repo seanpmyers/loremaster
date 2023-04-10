@@ -17,7 +17,6 @@ const HOURS_IN_A_DAY: u8 = 24;
 #[component]
 pub fn SleepWidget<G: Html>(context: Scope) -> View<G> {
     let state: &Signal<ComponentState> = create_signal(context, ComponentState::Loading);
-    let loading: &Signal<ComponentState> = state.clone();
 
     let sleep_start_time: &Signal<Option<Time>> = create_signal(context, None);
     let sleep_end_time: &Signal<Option<Time>> = create_signal(context, None);
@@ -57,12 +56,12 @@ pub fn SleepWidget<G: Html>(context: Scope) -> View<G> {
                                     - (schedule.start_time.hour() - schedule.end_time.hour()))
                                 .to_string(),
                             );
-                            loading.set(ComponentState::Visible);
+                            state.set(ComponentState::Visible);
                         }
-                        None => loading.set(ComponentState::Error),
+                        None => state.set(ComponentState::Error),
                     }
                 }
-                None => loading.set(ComponentState::Hidden),
+                None => state.set(ComponentState::Hidden),
             }
         });
     }
@@ -70,36 +69,31 @@ pub fn SleepWidget<G: Html>(context: Scope) -> View<G> {
     view! { context,
        (match state.get().as_ref() {
            ComponentState::Visible => {
-            let display_hours_awake: &Signal<String> = hours_awake.clone();
-            let display_hours_until_sleep: &Signal<String> = hours_until_sleep.clone();
-            let display_hours_of_sleep: &Signal<String> = hours_of_sleep.clone();
-            let display_wake_up: &Signal<String> = wake_up.clone();
-            let display_bedtime: &Signal<String> = bedtime.clone();
             view! { context,
                section(class="sleep-widget") {
                    article(class="sleep-widget-section") {
                        div(class="sleep-widget-section-top") {
-                           div(class="sleep-widget-number") { (display_hours_awake.get()) }
+                           div(class="sleep-widget-number") { (hours_awake.get()) }
                            div(class="sleep-widget-icon", dangerously_set_inner_html=SUN_SVG_HTML) {}
                        }
                        div(class="sleep-widget-section-bottom") {
                            div() { "Hours awake" }
-                           div() { (display_wake_up.get()) }
+                           div() { (wake_up.get()) }
                        }
                    }
                    article(class="sleep-widget-section") {
                        div(class="sleep-widget-section-top") {
-                           div(class="sleep-widget-number") { (display_hours_until_sleep.get()) }
+                           div(class="sleep-widget-number") { (hours_until_sleep.get()) }
                            div(class="sleep-widget-icon", dangerously_set_inner_html=MOON_SVG_HTML) {}
                        }
                        div(class="sleep-widget-section-bottom") {
                            div() { "Hours until sleep" }
-                           div() { (display_bedtime.get()) }
+                           div() { (bedtime.get()) }
                        }
                    }
                    article(class="sleep-widget-section") {
                        div(class="sleep-widget-section-top") {
-                           div(class="sleep-widget-number") { (display_hours_of_sleep.get()) }
+                           div(class="sleep-widget-number") { (hours_of_sleep.get()) }
                            div(class="sleep-widget-icon", dangerously_set_inner_html=BATTERY_CHARGING_SVG_HTML) {}
                        }
                        div(class="sleep-widget-section-bottom") {
