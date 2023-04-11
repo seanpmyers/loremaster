@@ -1,11 +1,11 @@
 use gloo_timers::future::TimeoutFuture;
 use perseus::prelude::{navigate, spawn_local_scoped, Html};
-use perseus::state::StateGeneratorInfo;
+use perseus::state::{SerdeInfallible, StateGeneratorInfo};
 use perseus::template::Template;
-use perseus::{engine_only_fn, ReactiveState};
+use perseus::{browser_only_fn, engine_only_fn, ReactiveState};
 use serde::{Deserialize, Serialize};
 use sycamore::prelude::{view, Signal, View};
-use sycamore::reactive::{create_signal, BoundedScope, Scope};
+use sycamore::reactive::{create_signal, BoundedScope, RcSignal, Scope};
 use sycamore::web::SsrNode;
 use web_sys::Event;
 
@@ -37,7 +37,10 @@ pub struct LoginPageState {
 
 pub fn login_page<'page, G: Html>(
     context: BoundedScope<'_, 'page>,
-    state: &'page LoginPageStateRx,
+    LoginPageStateRx {
+        email_address,
+        password,
+    }: &'page LoginPageStateRx,
 ) -> View<G> {
     let message_type: &Signal<MessageType> = create_signal(context, MessageType::Information);
     let toast_content: &Signal<String> = create_signal(context, String::new());
@@ -50,20 +53,17 @@ pub fn login_page<'page, G: Html>(
         create_signal(context, MessageType::Information);
 
     let loading: &Signal<bool> = create_signal(context, false);
-    let email_address: &Signal<String> = &state.email_address;
-    let password: &Signal<String> = &state.password;
     let form_message: &Signal<FormMessageState> = create_signal(context, FormMessageState::Hidden);
 
-    let login_handler = |event: Event| {
+    let login_handler = move |event: Event| {
         event.prevent_default();
-        #[cfg(client)]
-        spawn_local_scoped(context, async move {
+        spawn_local_scoped(context, async {
             if *loading.get() {
                 return;
             }
             loading.set(true);
 
-            if email_address.get().is_empty() || password.get().is_empty() {
+            if email_address.get().is_empty() {
                 email_address_validation_content
                     .set(String::from("Email address cannot be empty."));
                 email_address_validation_visibility.set(Visibility::Visible);
@@ -71,12 +71,22 @@ pub fn login_page<'page, G: Html>(
                 email_address_validity.set(Validation::Invalid);
                 loading.set(false);
                 return;
-            } else {
-                email_address_validation_content.set(String::new());
-                email_address_validation_visibility.set(Visibility::Hidden);
-                email_address_message_type.set(MessageType::Information);
-                email_address_validity.set(Validation::Valid);
             }
+
+            if password.get().is_empty() {
+                email_address_validation_content
+                    .set(String::from("Email address cannot be empty."));
+                email_address_validation_visibility.set(Visibility::Visible);
+                email_address_message_type.set(MessageType::Error);
+                email_address_validity.set(Validation::Invalid);
+                loading.set(false);
+                return;
+            }
+
+            email_address_validation_content.set(String::new());
+            email_address_validation_visibility.set(Visibility::Hidden);
+            email_address_message_type.set(MessageType::Information);
+            email_address_validity.set(Validation::Valid);
 
             let potential_response: Option<reqwasm::http::Response> = http_service::post_html_form(
                 &String::from(API_LOGIN_URL),

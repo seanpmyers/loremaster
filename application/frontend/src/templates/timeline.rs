@@ -1,7 +1,7 @@
 use js_sys::Date;
 use perseus::{engine_only_fn, template::Template};
 use sycamore::{
-    prelude::{view, Html, Indexed, IndexedProps, SsrNode, View},
+    prelude::{view, Html, Indexed, SsrNode, View},
     reactive::{create_signal, BoundedScope, Scope, Signal},
 };
 
@@ -49,23 +49,23 @@ pub fn timeline_page<'page, G: Html>(context: BoundedScope<'_, 'page>) -> View<G
                         div(class="me-1 ms-1") { "Age" }
                         div(class="me-1 ms-1") { "Weeks" }
                     }
-                    Indexed(IndexedProps{
-                        iterable: life_years,
-                        view: move |context, year| view! {context,
+                    Indexed(
+                        iterable= life_years,
+                        view= move |context, year| view! {context,
                             div(class="d-flex align-items-center") {
                                 div(class="me-1 ms-1") { (year.to_string()) }
                                 div(class="me-1 ms-1") { ((year - *year_start.get()).to_string()) }
                                 div(class="d-flex me-1 ms-1") {
-                                    Indexed(IndexedProps{
-                                        iterable: circles,
-                                        view: move |context, _circle| view !{ context,
+                                    Indexed(
+                                        iterable=circles,
+                                        view=move |context, _circle| view !{ context,
                                             span(class="timeline-circle m-1") {}
                                         }
-                                    })
+                                    )
                                 }
                             }
                         }
-                    })
+                    )
                 }
             }
         }})

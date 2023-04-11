@@ -11,7 +11,10 @@ use web_sys::Event;
 
 use crate::{
     components::container::{Container, ContainerProperties},
-    components::state::message_type::MessageType,
+    components::{
+        state::message_type::MessageType,
+        widget::notification::toast::{Toast, ToastProperties},
+    },
 };
 
 const PAGE_ROUTE_PATH: &str = "index";
@@ -26,9 +29,11 @@ pub struct IndexPageState {
 
 pub fn index_page<'page, G: Html>(
     context: BoundedScope<'_, 'page>,
-    state: &'page IndexPageStateRx,
+    IndexPageStateRx {
+        greeting,
+        current_tab,
+    }: &'page IndexPageStateRx,
 ) -> View<G> {
-    let current_tab: &Signal<MessageType> = create_signal(context, MessageType::Information);
     let click_first = |event: Event| {
         event.prevent_default();
         current_tab.set(MessageType::Information);
@@ -53,14 +58,14 @@ pub fn index_page<'page, G: Html>(
         Container(ContainerProperties{title: String::from("Loremaster"), children: view!{ context,
             div(class="d-flex flex-column flex-grow-1 p-4 align-items-center") {
                 h1(class="display-3") { "Loremaster" }
-                p() { (state.greeting.get()) }
+                p() { (greeting.get()) }
                 div(class="d-flex", id="lm-tab-test") {
                     button(class=button_classes, on:click=click_first) { "Default" }
                     button(class=button_classes, on:click=click_second) { "Success" }
                     button(class=button_classes, on:click=click_third) { "Error" }
                     button(class=button_classes, on:click=click_fourth) { "Warning" }
                 }
-                (match *state.current_tab.get() {
+                (match *current_tab.get() {
                     MessageType::Information => view! {context, div() {"Default"}},
                     MessageType::Success => view! {context, div() {"Success"}},
                     MessageType::Error => view! {context, div() {"Error"}},
@@ -75,7 +80,10 @@ pub fn index_page<'page, G: Html>(
                      }
                 }
                 input(bind:value=content_input) {}
-
+                Toast(ToastProperties {
+                    content: content_input,
+                    message_type: current_tab
+                })
             }
         }})
     }

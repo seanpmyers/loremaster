@@ -28,9 +28,9 @@ pub fn Week<'a, 'b: 'a, G: Html>(
     days.set(create_week_list(&selected_date.get()));
     view! {context,
         div(class="week-widget", id="") {
-            Keyed( KeyedProps {
-                    iterable: days,
-                    view: |context, day: WeekDayInformation|
+            Keyed(
+                iterable= days,
+                    view= |context, day: WeekDayInformation|
                    {
                     let mut day_div_classes = String::from("card");
                     if &day.number == &selected_date.get().day() { day_div_classes.push_str(" active-card text-light") ;}
@@ -45,8 +45,8 @@ pub fn Week<'a, 'b: 'a, G: Html>(
                             }
                         }
                     }},
-                    key: |day| day.number
-                })
+                    key= |day| day.number
+            )
         }
     }
 }

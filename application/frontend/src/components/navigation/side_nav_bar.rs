@@ -21,9 +21,9 @@ pub fn SideNavBar<G: Html>(context: Scope) -> View<G> {
         nav(class=nav_classes) {
             DateTime()
             ul(class=nav_ul_classes) {
-                Indexed(IndexedProps{
-                    iterable: links,
-                    view: move |context, link| view! { context,
+                Indexed(
+                    iterable= links,
+                    view= move |context, link| view! { context,
                         li(class=nav_li_classes) {
                             a(
                                 class=a_class,
@@ -36,7 +36,7 @@ pub fn SideNavBar<G: Html>(context: Scope) -> View<G> {
                             }
                         }
                     }
-                })
+                )
             }
             section(class=quick_function_classes) {
                 div() {

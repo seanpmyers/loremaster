@@ -29,15 +29,15 @@ pub fn FrequencyOptions<G: Html>(
     view! {context,
         select(name="frequency", class="form-select") {
             option(selected=true, disabled=true) { "Select the frequency" }
-            Indexed( IndexedProps {
-                    iterable: frequencies,
-                    view: |context, frequency: Frequency| {
-                        let display = frequency.to_string();
-                        view!{ context,
-                            option(value=(frequency)) { (display) }
-                        }
-                    },
-                })
+            Indexed(
+                iterable=frequencies,
+                view=|context, frequency: Frequency| {
+                    let display = frequency.to_string();
+                    view!{ context,
+                        option(value=(frequency)) { (display) }
+                    }
+                },
+            )
         }
     }
 }

@@ -30,22 +30,18 @@ pub fn GoalList<'a, 'b: 'a, G: Html>(
         (if *create_selector(context, || !goals.get().is_empty()).get() {
             view! { context,
                 ul(class=" goal_list", id="") {
-                    Keyed( KeyedProps {
-                            iterable: goals,
-                            view : |context, goal: Goal| {
-                                view!{ context,
-                                    li() { (goal.name) }
-                                }
-                            },
-                            key: |goal| goal.id
-                        })
+                    Keyed(
+                        iterable= goals,
+                        view = |context, goal: Goal| view!{ context,
+                            li() { (goal.name) }
+                        },
+                        key= |goal| goal.id
+                    )
                 }
             }
         } else {
             view! { context,
-                div() {
-                    "No goals available."
-                }
+                "No goals available."
             }
         })
     }

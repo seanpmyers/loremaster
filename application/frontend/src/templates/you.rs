@@ -5,7 +5,7 @@ use perseus::{
 };
 use serde::{Deserialize, Serialize};
 use sycamore::{
-    prelude::{view, Html, Keyed, KeyedProps, Signal, SsrNode, View},
+    prelude::{view, Html, Keyed, Signal, SsrNode, View},
     reactive::{create_signal, BoundedScope, Scope},
 };
 use time::{format_description::FormatItem, macros::format_description};
@@ -58,10 +58,8 @@ pub fn you_page<'page, G: Html>(
     }: &'page YouPageStateRx,
 ) -> View<G> {
     let login_success: &Signal<Option<bool>> = create_signal(context, None);
-    let login_display: &Signal<Option<bool>> = login_success.clone();
 
     let new_goal: &Signal<String> = create_signal(context, String::new());
-    let new_goal_input: &Signal<String> = &new_goal.clone();
 
     if G::IS_BROWSER {
         spawn_local_scoped(context, async move {
@@ -78,7 +76,7 @@ pub fn you_page<'page, G: Html>(
                         alias.set(existing_alias);
                     }
                 }
-                None => {}
+                None => todo!(),
             }
             query_response = http_service::get_endpoint(
                 format!("{}/{}", API_BASE_URL, API_ACTION_LIST_ROUTE).as_str(),
@@ -95,7 +93,7 @@ pub fn you_page<'page, G: Html>(
                     });
                     action_list.set(action_list_data);
                 }
-                None => {}
+                None => todo!(),
             }
 
             query_response =
@@ -110,10 +108,10 @@ pub fn you_page<'page, G: Html>(
                             sleep_start.set(schedule.start_time.format(&format).unwrap());
                             sleep_end.set(schedule.end_time.format(&format).unwrap());
                         }
-                        None => (),
+                        None => todo!(),
                     }
                 }
-                None => (),
+                None => todo!(),
             }
         });
     }
@@ -261,7 +259,7 @@ pub fn you_page<'page, G: Html>(
                                 class="form-control",
                                 name="goal",
                                 minLength="1",
-                                bind:value=new_goal_input,
+                                bind:value=new_goal,
                                 placeholder="Enter a new goal"
                             ) {}
                         }
@@ -279,13 +277,13 @@ pub fn you_page<'page, G: Html>(
                             label(class="form-label") {"Select action"}
                             select(name="action", class="form-select") {
                                 option(selected=true, disabled=true) { "Select an action" }
-                                Keyed(KeyedProps {
-                                    iterable: action_list,
-                                    view: |context, action| view! {context,
+                                Keyed(
+                                    iterable = action_list,
+                                    view = |context, action| view! {context,
                                         option(value=(action.id)) { (action.name) }
                                     },
-                                    key: |action| action.id
-                                })
+                                    key = |action| action.id
+                                )
                             }
                         }
                         div(class="mb-3") {
@@ -336,13 +334,13 @@ pub fn you_page<'page, G: Html>(
                     div(class=(section_classes)) {
                         div() { "Actions" }
                         ul() {
-                            Keyed(KeyedProps {
-                                iterable: action_list,
-                                view: |context, action| view! {context,
+                            Keyed(
+                                iterable= action_list,
+                                view= |context, action| view! {context,
                                     li() { (action.name) }
                                 },
-                                key: |action| action.id
-                            })
+                                key= |action| action.id
+                            )
                          }
                      }
                     div(class=(section_classes)) {
@@ -363,7 +361,7 @@ pub fn you_page<'page, G: Html>(
                     }
                 }
             }
-            (if login_display.get().is_some() {
+            (if login_success.get().is_some() {
                 view! {context,
                     Alert(AlertProperties{
                         message_title: create_signal(context, String::from("Success!")),
