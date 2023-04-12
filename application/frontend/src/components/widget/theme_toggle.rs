@@ -3,8 +3,8 @@ use web_sys::{window, Event};
 
 use crate::components::icon::{MOON_SVG_HTML, SUN_SVG_HTML};
 
-#[component(ThemeToggle<G>)]
-pub fn theme_toggle() -> View<G> {
+#[component]
+pub fn ThemeToggle<G: Html>(context: Scope) -> View<G> {
     let theme_switch_handler = move |event: Event| {
         event.prevent_default();
         let root = window()
@@ -18,7 +18,7 @@ pub fn theme_toggle() -> View<G> {
             None => false,
         };
     };
-    view! {
+    view! {context,
         button(
             on:click=theme_switch_handler,
             title="Switch color theme"

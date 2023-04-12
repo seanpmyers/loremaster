@@ -6,6 +6,7 @@ pub mod goal;
 pub mod holiday;
 pub mod intention;
 pub mod person;
+pub mod quick_task;
 pub mod schedule;
 pub mod sleep_schedule;
 pub mod transfer;

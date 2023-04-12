@@ -24,7 +24,7 @@ pub async fn chronicle_by_id_query(
     chronicle_id: &Uuid,
 ) -> Result<Option<Chronicle>> {
     let query_result: Option<Chronicle> = query_as::<_, Chronicle>(QUERY)
-        .bind(&chronicle_id)
+        .bind(chronicle_id)
         .fetch_optional(database_connection)
         .await?;
 

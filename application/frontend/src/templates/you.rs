@@ -1,6 +1,13 @@
 use gloo_timers::future::TimeoutFuture;
-use perseus::{RenderFnResultWithCause, Template};
-use sycamore::prelude::{cloned, view, Html, Keyed, KeyedProps, Signal, SsrNode, View};
+use perseus::{
+    engine_only_fn, prelude::spawn_local_scoped, state::StateGeneratorInfo, template::Template,
+    ReactiveState,
+};
+use serde::{Deserialize, Serialize};
+use sycamore::{
+    prelude::{view, Html, Keyed, Signal, SsrNode, View},
+    reactive::{create_signal, BoundedScope, Scope},
+};
 use time::{format_description::FormatItem, macros::format_description};
 use web_sys::Event;
 
@@ -25,7 +32,11 @@ use crate::{
     },
 };
 
-#[perseus::make_rx(YouPageStateRx)]
+const PAGE_ROUTE_PATH: &str = "you";
+const PAGE_TITLE: &str = "You | Loremaster";
+
+#[derive(Serialize, Deserialize, ReactiveState, Clone)]
+#[rx(alias = "YouPageStateRx")]
 pub struct YouPageState {
     pub email_address: String,
     pub alias: String,
@@ -35,8 +46,8 @@ pub struct YouPageState {
     pub sleep_end: String,
 }
 
-#[perseus::template_rx]
-pub fn you_page(
+pub fn you_page<'page, G: Html>(
+    context: BoundedScope<'_, 'page>,
     YouPageStateRx {
         email_address,
         alias,
@@ -44,130 +55,153 @@ pub fn you_page(
         action_list,
         sleep_start,
         sleep_end,
-    }: YouPageStateRx,
+    }: &'page YouPageStateRx,
 ) -> View<G> {
-    let login_success: Signal<Option<bool>> = Signal::new(None);
-    let login_display: Signal<Option<bool>> = login_success.clone();
+    let login_success: &Signal<Option<bool>> = create_signal(context, None);
 
-    let email_address_input: Signal<String> = email_address.clone();
-    let alias_input: Signal<String> = alias.clone();
-    let display_alias: Signal<String> = alias.clone();
-    let new_action_input: Signal<String> = new_action.clone();
-    let sleep_start_input: Signal<String> = sleep_start.clone();
-    let sleep_end_input: Signal<String> = sleep_end.clone();
-
-    let new_goal: Signal<String> = Signal::new(String::from(""));
-    let new_goal_input: Signal<String> = new_goal.clone();
+    let new_goal: &Signal<String> = create_signal(context, String::new());
 
     if G::IS_BROWSER {
-        perseus::spawn_local(
-            cloned!((email_address, alias, action_list, sleep_start, sleep_end) => async move {
-
-                let mut query_response: Option<String> = http_service::get_endpoint(format!("{}/{}",API_BASE_URL,API_PERSON_META_DATA_ROUTE).as_str(), None).await;
-                match query_response {
-                    Some(response) => {
-                        let person_meta_data: PersonMeta = serde_json::from_str(&response).unwrap();
-                        email_address.set(person_meta_data.email_address);
-                        if let Some(existing_alias) = person_meta_data.alias {
-                            alias.set(existing_alias);
-                        }
-                    },
-                    None => {},
-                }
-                query_response= http_service::get_endpoint(format!("{}/{}",API_BASE_URL,API_ACTION_LIST_ROUTE).as_str(), None).await;
-                match query_response {
-                    Some(response) => {
-                        let mut action_list_data: Vec<Action> = serde_json::from_str(&response).unwrap();
-                        action_list_data.iter_mut().for_each(|action| {
-                            action.name = action.name.remove(0).to_ascii_uppercase().to_string() + &action.name
-                        });
-                        action_list.set(action_list_data);
-                    },
-                    None => {},
-                }
-
-                query_response = http_service::get_endpoint(API_PERSON_SLEEP_SCHEDULE_ROUTE, None).await;
-                    match query_response {
-                        Some(response) => {
-                            let potential_sleep_schedule: Option<SleepSchedule> = serde_json::from_str(&response).unwrap();
-                            match potential_sleep_schedule {
-                                Some(schedule) => {
-                                    let format: &[FormatItem] = format_description!("[hour]:[minute]");
-                                    sleep_start.set(schedule.start_time.format(&format).unwrap());
-                                    sleep_end.set(schedule.end_time.format(&format).unwrap());
-                                },
-                                None => (),
-                            }
-                        },
-                        None => (),
+        spawn_local_scoped(context, async move {
+            let mut query_response: Option<String> = http_service::get_endpoint(
+                format!("{}/{}", API_BASE_URL, API_PERSON_META_DATA_ROUTE).as_str(),
+                None,
+            )
+            .await;
+            match query_response {
+                Some(response) => {
+                    let person_meta_data: PersonMeta = serde_json::from_str(&response).unwrap();
+                    email_address.set(person_meta_data.email_address);
+                    if let Some(existing_alias) = person_meta_data.alias {
+                        alias.set(existing_alias);
                     }
+                }
+                None => todo!(),
+            }
+            query_response = http_service::get_endpoint(
+                format!("{}/{}", API_BASE_URL, API_ACTION_LIST_ROUTE).as_str(),
+                None,
+            )
+            .await;
+            match query_response {
+                Some(response) => {
+                    let mut action_list_data: Vec<Action> =
+                        serde_json::from_str(&response).unwrap();
+                    action_list_data.iter_mut().for_each(|action| {
+                        action.name =
+                            action.name.remove(0).to_ascii_uppercase().to_string() + &action.name
+                    });
+                    action_list.set(action_list_data);
+                }
+                None => todo!(),
+            }
 
-            }),
-        );
+            query_response =
+                http_service::get_endpoint(API_PERSON_SLEEP_SCHEDULE_ROUTE, None).await;
+            match query_response {
+                Some(response) => {
+                    let potential_sleep_schedule: Option<SleepSchedule> =
+                        serde_json::from_str(&response).unwrap();
+                    match potential_sleep_schedule {
+                        Some(schedule) => {
+                            let format: &[FormatItem] = format_description!("[hour]:[minute]");
+                            sleep_start.set(schedule.start_time.format(&format).unwrap());
+                            sleep_end.set(schedule.end_time.format(&format).unwrap());
+                        }
+                        None => todo!(),
+                    }
+                }
+                None => todo!(),
+            }
+        });
     }
 
     let update_email_address_handler = move |event: Event| {
         event.prevent_default();
-        perseus::spawn_local(cloned!((email_address) => async move {
-            http_service::post_html_form(&format!("{}/{}",API_BASE_URL,API_PERSON_EMAIL_ADDRESS_UPDATE_ROUTE), &vec![
-                (String::from("email_address"), email_address.get().as_ref().to_string()),
-            ]).await;
-
-        }));
+        spawn_local_scoped(context, async move {
+            http_service::post_html_form(
+                &format!("{}/{}", API_BASE_URL, API_PERSON_EMAIL_ADDRESS_UPDATE_ROUTE),
+                &vec![(
+                    String::from("email_address"),
+                    email_address.get().as_ref().to_string(),
+                )],
+            )
+            .await;
+        });
     };
 
     let update_meta_handler = move |event: Event| {
         event.prevent_default();
-        perseus::spawn_local(cloned!((alias) => async move {
-            http_service::post_html_form(&format!("{}/{}",API_BASE_URL,API_PERSON_META_UPDATE_ROUTE), &vec![
-                (String::from("alias"), alias.get().as_ref().to_string()),
-            ]).await;
-
-        }));
+        spawn_local_scoped(context, async move {
+            http_service::post_html_form(
+                &format!("{}/{}", API_BASE_URL, API_PERSON_META_UPDATE_ROUTE),
+                &vec![(String::from("alias"), alias.get().as_ref().to_string())],
+            )
+            .await;
+        });
     };
 
     let new_action_handler = move |event: Event| {
         event.prevent_default();
-        perseus::spawn_local(cloned!((new_action, login_success) => async move {
-            http_service::post_html_form(&format!("{}/{}",API_BASE_URL,API_ACTION_NEW_ROUTE), &vec![
-                (String::from("action"), new_action.get().as_ref().to_string()),
-            ]).await;
+        spawn_local_scoped(context, async move {
+            http_service::post_html_form(
+                &format!("{}/{}", API_BASE_URL, API_ACTION_NEW_ROUTE),
+                &vec![(
+                    String::from("action"),
+                    new_action.get().as_ref().to_string(),
+                )],
+            )
+            .await;
             new_action.set(String::new());
 
             login_success.set(Some(true));
             TimeoutFuture::new(10000_u32).await;
             login_success.set(None);
-        }));
+        });
     };
 
     let new_goal_handler = move |event: Event| {
         event.prevent_default();
-        perseus::spawn_local(cloned!((new_goal) => async move {
-            http_service::post_html_form(&format!("{}/{}", API_BASE_URL, API_GOAL_NEW_ROUTE), &vec![
-                (String::from("goal"), new_goal.get().as_ref().to_string()),
-            ]).await;
+        spawn_local_scoped(context, async move {
+            http_service::post_html_form(
+                &format!("{}/{}", API_BASE_URL, API_GOAL_NEW_ROUTE),
+                &vec![(String::from("goal"), new_goal.get().as_ref().to_string())],
+            )
+            .await;
             new_goal.set(String::new());
-        }));
+        })
     };
 
     let update_sleep_schedule_handler = move |event: Event| {
         event.prevent_default();
-        perseus::spawn_local(cloned!((sleep_start, sleep_end) => async move {
-            http_service::post_html_form(&format!("{}/{}",API_BASE_URL,API_PERSON_SLEEP_SCHEDULE_UPDATE_ROUTE), &vec![
-                (String::from("start_time"), sleep_start.get().as_ref().to_string()),
-                (String::from("end_time"), sleep_end.get().as_ref().to_string()),
-            ]).await;
-
-        }));
+        spawn_local_scoped(context, async move {
+            http_service::post_html_form(
+                &format!(
+                    "{}/{}",
+                    API_BASE_URL, API_PERSON_SLEEP_SCHEDULE_UPDATE_ROUTE
+                ),
+                &vec![
+                    (
+                        String::from("start_time"),
+                        sleep_start.get().as_ref().to_string(),
+                    ),
+                    (
+                        String::from("end_time"),
+                        sleep_end.get().as_ref().to_string(),
+                    ),
+                ],
+            )
+            .await;
+        });
     };
 
     let section_classes: &str = "border rounded bg-white shadow-sm p-2 m-2 ";
 
-    view! {
-        Container(ContainerProperties{title: String::from("You"), children: view!{
+    view! {context,
+        Container(ContainerProperties{title: String::from("You"), children: view!{context,
             div(class="d-flex flex-column flex-grow-1 p-4 align-items-center bg-light") {
                 div() {
-                    h1(class="display-3") { ( display_alias.get()) }
+                    h1(class="display-3") { ( alias.get()) }
                     p() { "This is a page dedicated to you." }
                 }
                 div(class="d-flex flex-wrap") {
@@ -178,7 +212,7 @@ pub fn you_page(
                                 type="email",
                                 class="form-control",
                                 name="email_address",
-                                bind:value= email_address_input,
+                                bind:value=email_address,
                                 placeholder = "Enter your email address"
                             ) {}
                         }
@@ -193,7 +227,7 @@ pub fn you_page(
                                 type="text",
                                 name="alias",
                                 class="form-control",
-                                bind:value= alias_input,
+                                bind:value=alias,
                                 placeholder = "Enter an alias"
                             ) {}
                         }
@@ -209,7 +243,7 @@ pub fn you_page(
                                 class="form-control",
                                 name="action",
                                 minLength="1",
-                                bind:value=new_action_input,
+                                bind:value=new_action,
                                 placeholder="Enter a new action"
                             ) {}
                         }
@@ -225,7 +259,7 @@ pub fn you_page(
                                 class="form-control",
                                 name="goal",
                                 minLength="1",
-                                bind:value=new_goal_input,
+                                bind:value=new_goal,
                                 placeholder="Enter a new goal"
                             ) {}
                         }
@@ -243,13 +277,13 @@ pub fn you_page(
                             label(class="form-label") {"Select action"}
                             select(name="action", class="form-select") {
                                 option(selected=true, disabled=true) { "Select an action" }
-                                Keyed(KeyedProps {
-                                    iterable: action_list.handle(),
-                                    template: move |action| view! {
+                                Keyed(
+                                    iterable = action_list,
+                                    view = |context, action| view! {context,
                                         option(value=(action.id)) { (action.name) }
                                     },
-                                    key: |action| action.id
-                                })
+                                    key = |action| action.id
+                                )
                             }
                         }
                         div(class="mb-3") {
@@ -277,7 +311,7 @@ pub fn you_page(
                                 type="time",
                                 class="form-control",
                                 name="start_time",
-                                bind:value=sleep_start_input
+                                bind:value=sleep_start
                             ) {}
                         }
                         div(class="mb-3") {
@@ -286,7 +320,7 @@ pub fn you_page(
                                 type="time",
                                 class="form-control",
                                 name="end_time",
-                                bind:value=sleep_end_input
+                                bind:value=sleep_end
                             ) {}
                         }
                         div(class="mb-3") {
@@ -300,13 +334,13 @@ pub fn you_page(
                     div(class=(section_classes)) {
                         div() { "Actions" }
                         ul() {
-                            Keyed(KeyedProps {
-                                iterable: action_list.handle(),
-                                template: move |action| view! {
+                            Keyed(
+                                iterable= action_list,
+                                view= |context, action| view! {context,
                                     li() { (action.name) }
                                 },
-                                key: |action| action.id
-                            })
+                                key= |action| action.id
+                            )
                          }
                      }
                     div(class=(section_classes)) {
@@ -317,7 +351,7 @@ pub fn you_page(
                      }
                     div(class=(section_classes)) {
                         div() { "Goals" }
-                        GoalList(GoalListProperties{goals: Signal::new(Vec::new())})
+                        GoalList(GoalListProperties{goals: create_signal(context, Vec::new())})
                      }
                     div(class=(section_classes)) {
                         div() { "Values" }
@@ -327,47 +361,45 @@ pub fn you_page(
                     }
                 }
             }
-            (if login_display.get().is_some() {
-                view! {
+            (if login_success.get().is_some() {
+                view! {context,
                     Alert(AlertProperties{
-                        message_title: Signal::new(String::from("Success!")),
-                        message_body: Signal::new(String::from("You have successfully updated your information.")),
-                        display_time: Signal::new(None),
+                        message_title: create_signal(context, String::from("Success!")),
+                        message_body:create_signal(context, String::from("You have successfully updated your information.")),
+                        display_time: create_signal(context, None),
                     })
                 }
             }
             else {
-                view!{ div() {""}}
+                view!{context, div() {""}}
             })
         }})
     }
 }
 
 pub fn get_template<G: Html>() -> Template<G> {
-    Template::new("you")
+    Template::build(PAGE_ROUTE_PATH)
         .build_state_fn(get_build_state)
-        .template(you_page)
-        .head(head)
+        .view_with_state(you_page)
+        .head_with_state(head)
+        .build()
 }
 
-#[perseus::autoserde(build_state)]
-pub async fn get_build_state(
-    _path: String,
-    _locale: String,
-) -> RenderFnResultWithCause<YouPageState> {
-    Ok(YouPageState {
+#[engine_only_fn]
+async fn get_build_state(_info: StateGeneratorInfo<()>) -> YouPageState {
+    YouPageState {
         email_address: String::new(),
         alias: String::from("You"),
         new_action: String::new(),
         action_list: Vec::new(),
         sleep_start: String::new(),
         sleep_end: String::new(),
-    })
+    }
 }
 
-#[perseus::head]
-pub fn head(_props: YouPageState) -> View<SsrNode> {
-    view! {
-        title { "You | Loremaster" }
+#[engine_only_fn]
+fn head(context: Scope, _props: YouPageState) -> View<SsrNode> {
+    view! { context,
+        title { (PAGE_TITLE) }
     }
 }

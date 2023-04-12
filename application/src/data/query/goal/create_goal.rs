@@ -24,8 +24,8 @@ pub async fn create_goal_query(database_connection: &PgPool, goal: &String) -> R
     let new_id: Uuid = Uuid::new_v4();
 
     let query_result: Goal = query_as::<_, Goal>(QUERY)
-        .bind(&new_id)
-        .bind(&goal)
+        .bind(new_id)
+        .bind(goal)
         .fetch_one(database_connection)
         .await?;
 

@@ -1,21 +1,23 @@
 use sycamore::prelude::*;
 use time::Duration;
 
-pub struct AlertProperties {
-    pub message_title: Signal<String>,
-    pub message_body: Signal<String>,
-    pub display_time: Signal<Option<Duration>>,
+#[derive(Prop)]
+pub struct AlertProperties<'a> {
+    pub message_title: &'a ReadSignal<String>,
+    pub message_body: &'a ReadSignal<String>,
+    pub display_time: &'a ReadSignal<Option<Duration>>,
 }
 
-#[component(Alert<G>)]
-pub fn alert(
+#[component]
+pub fn Alert<'a, 'b: 'a, G: Html>(
+    context: Scope<'a>,
     AlertProperties {
         message_title,
         message_body,
         display_time,
-    }: AlertProperties,
+    }: AlertProperties<'b>,
 ) -> View<G> {
-    view! {
+    view! { context,
         div(class="notification-toast-alert", id="") {
             image(class="fi-check-circle") {}
             div() {

@@ -4,7 +4,8 @@
       "ctap",
       "fidokey",
       "Hasher",
-      "reqwasm"
+      "reqwasm",
+      "Rustls"
    ],
    "editor.insertSpaces": false,
    "editor.tabSize": 2,

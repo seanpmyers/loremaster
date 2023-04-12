@@ -7,23 +7,23 @@ use crate::components::{
 
 use super::{get_navigation_links, NavigationLink};
 
-#[component(SideNavBar<G>)]
-pub fn side_nav_bar() -> View<G> {
+#[component]
+pub fn SideNavBar<G: Html>(context: Scope) -> View<G> {
     let nav_classes: &str = "side-nav";
     let nav_ul_classes: &str = "side-nav-container";
     let nav_li_classes: &str = "side-nav-item";
     let a_class: &str = "big-nav-button side-nav-link";
     let quick_function_classes: &str = "quick-functions";
 
-    let links: Signal<Vec<NavigationLink>> = Signal::new(get_navigation_links());
+    let links: &Signal<Vec<NavigationLink>> = create_signal(context, get_navigation_links());
 
-    view! {
+    view! {context,
         nav(class=nav_classes) {
             DateTime()
             ul(class=nav_ul_classes) {
-                Indexed(IndexedProps{
-                    iterable:links.handle(),
-                    template: move |link| view! {
+                Indexed(
+                    iterable= links,
+                    view= move |context, link| view! { context,
                         li(class=nav_li_classes) {
                             a(
                                 class=a_class,
@@ -36,7 +36,7 @@ pub fn side_nav_bar() -> View<G> {
                             }
                         }
                     }
-                })
+                )
             }
             section(class=quick_function_classes) {
                 div() {

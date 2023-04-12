@@ -1,96 +1,168 @@
 use gloo_timers::future::TimeoutFuture;
-use perseus::{Html, RenderFnResultWithCause, SsrNode, Template};
+use perseus::prelude::{navigate, spawn_local_scoped, Html};
+use perseus::state::{SerdeInfallible, StateGeneratorInfo};
+use perseus::template::Template;
+use perseus::{browser_only_fn, engine_only_fn, ReactiveState};
 use serde::{Deserialize, Serialize};
-use sycamore::prelude::{cloned, view, Signal, View};
+use sycamore::prelude::{view, Signal, View};
+use sycamore::reactive::{create_signal, BoundedScope, RcSignal, Scope};
+use sycamore::web::SsrNode;
 use web_sys::Event;
 
 use crate::components::container::{Container, ContainerProperties};
 
+use crate::components::form::input_validation::{InputValidation, InputValidationProperties};
+use crate::components::state::message_type::MessageType;
+use crate::components::state::validation::Validation;
+use crate::components::state::visibility::Visibility;
+use crate::components::widget::notification::toast::{Toast, ToastProperties};
 use crate::utility::constants::API_LOGIN_URL;
 use crate::utility::http_service;
+
+const PAGE_ROUTE_PATH: &str = "login";
+const PAGE_TITLE: &str = "Login - Loremaster";
 
 #[derive(Deserialize, Serialize, Debug, Clone)]
 enum FormMessageState {
     Hidden,
-    Success,
-    Failure,
+    Visible,
 }
 
-#[perseus::make_rx(LoginPageStateRx)]
+#[derive(Serialize, Deserialize, ReactiveState, Clone)]
+#[rx(alias = "LoginPageStateRx")]
 pub struct LoginPageState {
     pub email_address: String,
     pub password: String,
 }
 
-#[perseus::template_rx]
-pub fn login_page(state: LoginPageStateRx) -> View<G> {
-    let loading: Signal<bool> = Signal::new(false);
-    let loading_email: Signal<bool> = loading.clone();
-    let loading_password: Signal<bool> = loading.clone();
-    let loading_submit: Signal<bool> = loading.clone();
+pub fn login_page<'page, G: Html>(
+    context: BoundedScope<'_, 'page>,
+    LoginPageStateRx {
+        email_address,
+        password,
+    }: &'page LoginPageStateRx,
+) -> View<G> {
+    let message_type: &Signal<MessageType> = create_signal(context, MessageType::Information);
+    let toast_content: &Signal<String> = create_signal(context, String::new());
 
-    let email_address: Signal<String> = state.email_address;
-    let email_address_input: Signal<String> = email_address.clone();
+    let email_address_validation_content: &Signal<String> = create_signal(context, String::new());
+    let email_address_validation_visibility: &Signal<Visibility> =
+        create_signal(context, Visibility::Hidden);
+    let email_address_validity: &Signal<Validation> = create_signal(context, Validation::Valid);
+    let email_address_message_type: &Signal<MessageType> =
+        create_signal(context, MessageType::Information);
 
-    let password: Signal<String> = state.password;
-    let password_input: Signal<String> = password.clone();
-
-    let form_message: Signal<FormMessageState> = Signal::new(FormMessageState::Hidden);
-    let form_message_display: Signal<FormMessageState> = form_message.clone();
+    let loading: &Signal<bool> = create_signal(context, false);
+    let form_message: &Signal<FormMessageState> = create_signal(context, FormMessageState::Hidden);
 
     let login_handler = move |event: Event| {
         event.prevent_default();
-        perseus::spawn_local(
-            cloned!((email_address, password, form_message, loading) => async move {
-                if loading.get().as_ref() == &true { return; }
-                loading.set(true);
-                let potential_response: Option<reqwasm::http::Response> = http_service::post_html_form(&String::from(API_LOGIN_URL), &vec![
-                    (String::from("email_address"), email_address.get().as_ref().to_string()),
-                    (String::from("password"), password.get().as_ref().to_string()),
-                ]).await;
+        spawn_local_scoped(context, async {
+            if *loading.get() {
+                return;
+            }
+            loading.set(true);
 
-                match potential_response {
-                    Some(response) => {
-                        match response.status() {
-                            200 => {
-                                form_message.set(FormMessageState::Success);
-                                email_address.set(String::new());
-                                password.set(String::new());
-                                TimeoutFuture::new(4000_u32).await;
-                                perseus::navigate("/chronicle/");
-                            },
-                            _ => form_message.set(FormMessageState::Failure),
-                        }
-
-                    },
-                    None => form_message.set(FormMessageState::Failure),
-                }
+            if email_address.get().is_empty() {
+                email_address_validation_content
+                    .set(String::from("Email address cannot be empty."));
+                email_address_validation_visibility.set(Visibility::Visible);
+                email_address_message_type.set(MessageType::Error);
+                email_address_validity.set(Validation::Invalid);
                 loading.set(false);
-            }),
-        );
+                return;
+            }
+
+            if password.get().is_empty() {
+                email_address_validation_content
+                    .set(String::from("Email address cannot be empty."));
+                email_address_validation_visibility.set(Visibility::Visible);
+                email_address_message_type.set(MessageType::Error);
+                email_address_validity.set(Validation::Invalid);
+                loading.set(false);
+                return;
+            }
+
+            email_address_validation_content.set(String::new());
+            email_address_validation_visibility.set(Visibility::Hidden);
+            email_address_message_type.set(MessageType::Information);
+            email_address_validity.set(Validation::Valid);
+
+            let potential_response: Option<reqwasm::http::Response> = http_service::post_html_form(
+                &String::from(API_LOGIN_URL),
+                &vec![
+                    (
+                        String::from("email_address"),
+                        email_address.get().as_ref().to_string(),
+                    ),
+                    (
+                        String::from("password"),
+                        password.get().as_ref().to_string(),
+                    ),
+                ],
+            )
+            .await;
+
+            match potential_response {
+                Some(response) => match response.status() {
+                    200 => {
+                        email_address.set(String::new());
+                        password.set(String::new());
+
+                        message_type.set(MessageType::Success);
+                        toast_content.set(String::from("Successfully logged in."));
+                        form_message.set(FormMessageState::Visible);
+
+                        TimeoutFuture::new(4000_u32).await;
+                        navigate("/chronicle/");
+                    }
+                    _ => {
+                        toast_content.set(String::from(
+                            "Unable to login with the provided credentials.",
+                        ));
+                        message_type.set(MessageType::Error);
+                        form_message.set(FormMessageState::Visible)
+                    }
+                },
+                None => {
+                    toast_content.set(String::from(
+                        "Unable to login with the provided credentials.",
+                    ));
+                    message_type.set(MessageType::Error);
+                    form_message.set(FormMessageState::Visible)
+                }
+            }
+            loading.set(false);
+        });
     };
 
-    view! {
+    view! {context,
         Container(ContainerProperties{
             title: String::from("Login"),
-            children: view! {
-                div(class="container shadow card p-4 border-0 rounded text-black") {
+            children: view! {context,
+                div(class="") {
                     div(class="card-body") {
                         h3(class="card-title display-6") {"Login"}
                         form(on:submit=login_handler) {
-                            div(class="mb-3") {
+                            div(class="input-row") {
                                 label(
                                     name="email_address",
                                     class="form-label") { "Email Address" }
                                 input(
                                     type="email",
                                     class="form-control",
-                                    bind:value= email_address_input,
+                                    bind:value=email_address,
                                     placeholder = "Enter your email address",
-                                    disabled=loading_email.get().as_ref().to_owned()
+                                    disabled=loading.get().as_ref().to_owned()
                                 ) {}
+                                InputValidation(InputValidationProperties{
+                                    content: email_address_validation_content,
+                                    visibility: email_address_validation_visibility,
+                                    validity: email_address_validity,
+                                    message_type: email_address_message_type
+                                })
                             }
-                            div(class="mb-3") {
+                            div(class="input-row") {
                                 label(
                                     name="password",
                                     class="form-label"
@@ -98,24 +170,26 @@ pub fn login_page(state: LoginPageStateRx) -> View<G> {
                                 input(
                                     type="password",
                                     class="form-control",
-                                    bind:value= password_input,
+                                    bind:value=password,
                                     placeholder = "Enter your password",
-                                    disabled=loading_password.get().as_ref().to_owned()
+                                    disabled=loading.get().as_ref().to_owned()
                                 ) {}
+
                             }
                             button(
                                 class="btn btn-primary",
                                 type="submit",
-                                disabled=loading_submit.get().as_ref().to_owned()
+                                disabled=loading.get().as_ref().to_owned()
                             ) {
                                 "Submit"
                             }
+                            (match *form_message.get() {
+                                FormMessageState::Hidden => view!{context, },
+                                FormMessageState::Visible => {
+                                    return view! {context, Toast(ToastProperties{content: toast_content, message_type})};
+                                },
+                            })
                         }
-                        (match *form_message_display.get() {
-                            FormMessageState::Hidden => view!{ div() {}},
-                            FormMessageState::Success => view!{ div(class="badge bg-success rounded") {"Successfully logged in."}},
-                            FormMessageState::Failure => view!{ div(class="badge bg-danger rounded") {"Unable to login with the provided credentials."}}
-                        })
                     }
                 }
             }
@@ -124,26 +198,24 @@ pub fn login_page(state: LoginPageStateRx) -> View<G> {
 }
 
 pub fn get_template<G: Html>() -> Template<G> {
-    Template::new("login")
+    Template::build(PAGE_ROUTE_PATH)
         .build_state_fn(get_build_state)
-        .template(login_page)
-        .head(head)
+        .view_with_state(login_page)
+        .head_with_state(head)
+        .build()
 }
 
-#[perseus::autoserde(build_state)]
-pub async fn get_build_state(
-    _path: String,
-    _locale: String,
-) -> RenderFnResultWithCause<LoginPageState> {
-    Ok(LoginPageState {
+#[engine_only_fn]
+async fn get_build_state(_info: StateGeneratorInfo<()>) -> LoginPageState {
+    LoginPageState {
         email_address: String::new(),
         password: String::new(),
-    })
+    }
 }
 
-#[perseus::head]
-pub fn head(_props: LoginPageState) -> View<SsrNode> {
-    view! {
-        title { "Login - Loremaster " }
+#[engine_only_fn]
+fn head(context: Scope, _props: LoginPageState) -> View<SsrNode> {
+    view! { context,
+        title { (PAGE_TITLE) }
     }
 }

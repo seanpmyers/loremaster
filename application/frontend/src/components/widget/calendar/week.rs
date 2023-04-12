@@ -11,29 +11,31 @@ pub struct WeekDayInformation {
     pub week_day: time::Weekday,
 }
 
-pub struct WeekProperties {
-    pub selected_date: Signal<time::OffsetDateTime>,
-    pub days: Signal<Vec<WeekDayInformation>>,
+#[derive(Prop)]
+pub struct WeekProperties<'a> {
+    pub selected_date: &'a Signal<time::OffsetDateTime>,
+    pub days: &'a Signal<Vec<WeekDayInformation>>,
 }
 
-#[component(Week<G>)]
-pub fn week(
+#[component]
+pub fn Week<'a, 'b: 'a, G: Html>(
+    context: Scope<'a>,
     WeekProperties {
         selected_date,
         days,
-    }: WeekProperties,
+    }: WeekProperties<'b>,
 ) -> View<G> {
     days.set(create_week_list(&selected_date.get()));
-    view! {
+    view! {context,
         div(class="week-widget", id="") {
-            Keyed( KeyedProps {
-                    iterable: days.handle(),
-                    template: move |day: WeekDayInformation|
+            Keyed(
+                iterable= days,
+                    view= |context, day: WeekDayInformation|
                    {
                     let mut day_div_classes = String::from("card");
                     if &day.number == &selected_date.get().day() { day_div_classes.push_str(" active-card text-light") ;}
                     else { day_div_classes.push_str(" bg-white")}
-                    view!{
+                    view!{ context,
                         div(class=(day_div_classes)) {
                             div(class="m-1") {
                                 (day.number)
@@ -43,8 +45,8 @@ pub fn week(
                             }
                         }
                     }},
-                    key: |day| day.number
-                })
+                    key= |day| day.number
+            )
         }
     }
 }
@@ -56,14 +58,14 @@ pub fn create_week_list(selected_date: &time::OffsetDateTime) -> Vec<WeekDayInfo
     for (index, day) in DAYS_OF_WEEK.iter().enumerate() {
         let number: u8 = selected_date
             .add(time::Duration::days(
-                -1 * selected_weekday.number_days_from_sunday() as i64,
+                -(selected_weekday.number_days_from_sunday() as i64),
             ))
             .add(time::Duration::days(index as i64))
             .day();
 
         result.push(WeekDayInformation {
-            number: number,
-            week_day: day.clone(),
+            number,
+            week_day: *day,
         })
     }
 

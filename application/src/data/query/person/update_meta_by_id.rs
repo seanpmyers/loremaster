@@ -35,8 +35,8 @@ pub async fn update_meta_by_id_query(
     alias: &str,
 ) -> Result<PersonMeta> {
     let updated_row_count: u64 = query(QUERY)
-        .bind(&person_id)
-        .bind(&alias)
+        .bind(person_id)
+        .bind(alias)
         .execute(database_connection)
         .await?
         .rows_affected();
@@ -48,7 +48,7 @@ pub async fn update_meta_by_id_query(
     }
 
     let query_result: PersonMeta = query_as::<_, PersonMeta>(RESULT_QUERY)
-        .bind(&person_id)
+        .bind(person_id)
         .fetch_one(database_connection)
         .await?;
     Ok(query_result)

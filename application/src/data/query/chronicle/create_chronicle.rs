@@ -43,10 +43,10 @@ pub async fn create_chronicle_query(
     match chronicle_id {
         Some(id) => {
             let query_result: Chronicle = query_as::<_, Chronicle>(CREATE_CHRONICLE_QUERY_WITH_ID)
-                .bind(&id)
-                .bind(&person_id)
-                .bind(&chronicle_date)
-                .bind(&chronicle_time)
+                .bind(id)
+                .bind(person_id)
+                .bind(chronicle_date)
+                .bind(chronicle_time)
                 .fetch_one(database_connection)
                 .await?;
 
@@ -54,9 +54,9 @@ pub async fn create_chronicle_query(
         }
         None => {
             let query_result: Chronicle = query_as::<_, Chronicle>(CREATE_CHRONICLE_QUERY)
-                .bind(&person_id)
-                .bind(&chronicle_date)
-                .bind(&chronicle_time)
+                .bind(person_id)
+                .bind(chronicle_date)
+                .bind(chronicle_time)
                 .fetch_one(database_connection)
                 .await?;
 

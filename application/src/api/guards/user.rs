@@ -11,7 +11,7 @@ use crate::utility::constants::cookie_fields::USER_ID;
 
 #[derive(Serialize, Deserialize, Debug, Clone, Copy)]
 pub struct User(pub Uuid);
-
+// TODO: check database for user id/session id
 #[async_trait]
 impl<S> FromRequestParts<S> for User
 where

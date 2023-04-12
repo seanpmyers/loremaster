@@ -22,8 +22,8 @@ pub async fn add_action_query(
     info!("QUERY CALL: add_action_query");
 
     let updated_row_count: u64 = query(QUERY)
-        .bind(&person_id)
-        .bind(&action_id)
+        .bind(person_id)
+        .bind(action_id)
         .execute(database_connection)
         .await?
         .rows_affected();

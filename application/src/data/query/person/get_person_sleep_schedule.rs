@@ -26,7 +26,7 @@ pub async fn get_person_sleep_schedule_query(
 ) -> Result<Option<SleepSchedule>> {
     info!("QUERY CALL: get_person_sleep_schedule_query");
     let query_result: Option<SleepSchedule> = query_as::<_, SleepSchedule>(QUERY)
-        .bind(&person_id)
+        .bind(person_id)
         .fetch_optional(database_connection)
         .await?;
     Ok(query_result)

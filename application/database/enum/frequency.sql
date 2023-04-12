@@ -5,5 +5,7 @@ CREATE TYPE frequency AS ENUM (
     'Month',
     'Year',
     'Hour',
-    'Minute'
+    'Minute',
+    'Custom',
+    'Subsequent'
 );

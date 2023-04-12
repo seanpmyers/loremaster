@@ -1,3 +1,4 @@
+use perseus::prelude::spawn_local_scoped;
 use sycamore::prelude::*;
 
 use crate::{
@@ -8,39 +9,39 @@ use crate::{
     },
 };
 
-pub struct GoalListProperties {
-    pub goals: Signal<Vec<Goal>>,
+#[derive(Prop)]
+pub struct GoalListProperties<'a> {
+    pub goals: &'a Signal<Vec<Goal>>,
 }
 
-#[component(GoalList<G>)]
-pub fn goal_list(GoalListProperties { goals }: GoalListProperties) -> View<G> {
+#[component]
+pub fn GoalList<'a, 'b: 'a, G: Html>(
+    context: Scope<'a>,
+    GoalListProperties { goals }: GoalListProperties<'b>,
+) -> View<G> {
     if G::IS_BROWSER {
-        perseus::spawn_local(cloned!((goals) => async move {
+        spawn_local_scoped(context, async move {
             if let Some(goal_list) = get_goals().await {
                 goals.set(goal_list);
             }
-        }));
+        });
     }
-    view! {
-        (if goals.get().len() > 0 {
-            view! {
+    view! { context,
+        (if *create_selector(context, || !goals.get().is_empty()).get() {
+            view! { context,
                 ul(class=" goal_list", id="") {
-                    Keyed( KeyedProps {
-                            iterable: goals.handle(),
-                            template: move |goal: Goal| {
-                                view!{
-                                    li() { (goal.name) }
-                                }
-                            },
-                            key: |goal| goal.id
-                        })
+                    Keyed(
+                        iterable= goals,
+                        view = |context, goal: Goal| view!{ context,
+                            li() { (goal.name) }
+                        },
+                        key= |goal| goal.id
+                    )
                 }
             }
         } else {
-            view! {
-                div() {
-                    "No goals available."
-                }
+            view! { context,
+                "No goals available."
             }
         })
     }

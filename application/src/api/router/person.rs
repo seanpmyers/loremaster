@@ -14,20 +14,18 @@ use crate::{
     api::{
         guards::user::User,
         handler::person::{
-            create_action, create_goal, get_action_list_handler, get_frequency_list_handler,
-            get_goal_list_handler, get_person_meta_data, get_sleep_schedule_handler,
-            remove_one_goal_handler, update_email_handler, update_person_meta_handler,
-            update_sleep_schedule_handler, UniqueEntryResult, UserInputValidationOutcome,
+            create_action, create_goal, get_action_list_handler, get_goal_list_handler,
+            get_person_meta_data, get_sleep_schedule_handler, remove_one_goal_handler,
+            update_email_handler, update_person_meta_handler, update_sleep_schedule_handler,
+            UniqueEntryResult, UserInputValidationOutcome,
         },
         response::ApiError,
+        web_server::ApplicationState,
     },
     data::{
-        entity::{
-            action::Action, frequency::Frequency, person::PersonMeta, sleep_schedule::SleepSchedule,
-        },
+        entity::{action::Action, person::PersonMeta, sleep_schedule::SleepSchedule},
         postgres_handler::PostgresHandler,
     },
-    ApplicationState,
 };
 
 pub async fn meta(
@@ -238,14 +236,6 @@ pub async fn update_sleep_schedule(
     Ok((StatusCode::ACCEPTED, Json(result)).into_response())
 }
 
-pub async fn get_frequency_list(
-    State(_postgres_service): State<PostgresHandler>,
-    _user: User,
-) -> Result<Response, ApiError> {
-    let frequency_types: Vec<Frequency> = get_frequency_list_handler()?;
-    Ok((StatusCode::OK, Json(frequency_types)).into_response())
-}
-
 #[derive(Deserialize, Serialize, Debug)]
 pub struct CompoundingInterestInputs {
     pub duration_in_years: u16,
@@ -273,7 +263,6 @@ pub fn router() -> Router<ApplicationState> {
         .route("/person/meta", get(meta))
         .route("/person/sleep-schedule", get(get_sleep_schedule))
         .route("/person/action-list", get(get_action_list))
-        .route("/person/frequency-list", get(get_frequency_list))
         .route(
             "/person/compounding-interest-calculator",
             get(compounding_interest_calculator),

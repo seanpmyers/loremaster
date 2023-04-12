@@ -78,12 +78,12 @@ struct Frontend {
     pub port: u16,
 }
 
-pub fn get_configuration_from_file(environment: &String) -> Result<LoremasterConfiguration> {
+pub fn get_configuration_from_file(environment: &str) -> Result<LoremasterConfiguration> {
     let file_content: String = fs::read_to_string(LOREMASTER_CONFIGURATION_FILE_PATH)?;
 
     let configuration: LoremasterConfigurationFile = toml::from_str(&file_content)?;
 
-    match environment.as_str() {
+    match environment {
         "local" => Ok(LoremasterConfiguration {
             test_field: configuration.test_field,
             postgresql_connection_string: configuration.local.database.postgresql_connection_string,

@@ -19,10 +19,11 @@ use serde::Deserialize;
 use crate::{
     api::{
         handler::authentication::{
-            handle_register_with_security_key, register_handler, security_key_challenge_handler,
+            handle_register_security_key, register_handler, security_key_challenge_handler,
             RegistrationResult,
         },
         response::ApiError,
+        web_server::ApplicationState,
     },
     data::{
         entity::person::Credentials, postgres_handler::PostgresHandler,
@@ -36,7 +37,6 @@ use crate::{
         },
         password_encryption::{PasswordEncryption, PasswordEncryptionService},
     },
-    ApplicationState,
 };
 
 #[derive(Deserialize, Debug)]
@@ -98,7 +98,7 @@ async fn authenticate(
     let clean_password: &str = authentication_form.password.trim();
 
     let valid_email_address: EmailAddress =
-        EmailAddress::from_str(&clean_email).map_err(|error| anyhow!("{}", error))?;
+        EmailAddress::from_str(clean_email).map_err(|error| anyhow!("{}", error))?;
 
     let query_result: Option<Credentials> =
         credential_by_email_address_query(&postgres_service.database_pool, &valid_email_address)
@@ -107,9 +107,7 @@ async fn authenticate(
 
     let Some(person) = query_result else {
         info!("No email found matching user input: {}", clean_email);
-        return Err(ApiError::Anyhow {
-            source: anyhow!(FAILED_LOGIN_MESSAGE),
-        })
+        return Ok((StatusCode::BAD_REQUEST, FAILED_LOGIN_MESSAGE).into_response());
     };
 
     let valid_password: bool = encryption_service
@@ -118,9 +116,7 @@ async fn authenticate(
 
     if !valid_password {
         warn!("Invalid password for email: {}", clean_email);
-        return Err(ApiError::Anyhow {
-            source: anyhow!(FAILED_LOGIN_MESSAGE),
-        });
+        return Ok((StatusCode::BAD_REQUEST, FAILED_LOGIN_MESSAGE).into_response());
     }
 
     let updated_cookie_jar: PrivateCookieJar = cookie_jar.add(
@@ -153,10 +149,10 @@ async fn security_key_challenge(
     Ok(Json(result))
 }
 
-async fn register_with_security_key(
+async fn register_security_key(
     State(security_key_service): State<SecurityKeyService>,
 ) -> Result<Response, ApiError> {
-    let result = handle_register_with_security_key(&security_key_service, &String::new()).await?;
+    handle_register_security_key(&security_key_service, &String::new()).await?;
     Ok((StatusCode::CREATED, "Successfully registered security key").into_response())
 }
 
@@ -169,4 +165,8 @@ pub fn router() -> Router<ApplicationState> {
         .route("/authentication/authenticate", post(authenticate))
         .route("/authentication/logout", post(logout))
         .route("/authentication/register", post(register))
+        .route(
+            "/authentication/register-security-key",
+            post(register_security_key),
+        )
 }

@@ -21,8 +21,8 @@ pub async fn update_person_sleep_schedule_query(
     info!("QUERY CALL: update_person_sleep_schedule_query");
 
     let updated_row_count: u64 = query(QUERY)
-        .bind(&person_id)
-        .bind(&schedule_id)
+        .bind(person_id)
+        .bind(schedule_id)
         .execute(database_connection)
         .await?
         .rows_affected();
