@@ -1,14 +1,18 @@
 use perseus::{engine_only_fn, template::Template};
 use sycamore::{
     prelude::{view, Html, SsrNode, View},
-    reactive::{BoundedScope, Scope},
+    reactive::{create_signal, BoundedScope, Scope, Signal},
 };
+
+use crate::components::accordion::{Accordion, AccordionItem};
 
 const PAGE_ROUTE_PATH: &str = "design-system";
 const PAGE_TITLE: &str = "Design System | Chronilore";
 const MAIN_HEADER: &str = "Chronilore Design System";
 
 pub fn design_system_page<'page, G: Html>(context: BoundedScope<'_, 'page>) -> View<G> {
+    let first_item: &Signal<String> = create_signal(context, String::from("First"));
+    let second_item: &Signal<String> = create_signal(context, String::from("Second"));
     view! {context,
         div(class="") {
             h1(class="") { (MAIN_HEADER) }
@@ -17,7 +21,20 @@ pub fn design_system_page<'page, G: Html>(context: BoundedScope<'_, 'page>) -> V
                 br() {}
                 "Test"
              }
-
+             div() {
+                h3() { "Accordion" }
+                Accordion(id=create_signal(context, String::from(""))) {
+                    AccordionItem(title=first_item) {
+                        div() { "Example body for first item"}
+                    }
+                    AccordionItem(title=second_item) {
+                        div() { "Example body for second item"}
+                    }
+                }
+            }
+            div() {
+                h3() { "Tab Panels" }
+            }
         }
     }
 }

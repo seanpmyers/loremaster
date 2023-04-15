@@ -4,19 +4,19 @@ use sycamore::{
     reactive::{BoundedScope, Scope},
 };
 
-use crate::components::container::{Container, ContainerProperties};
+use crate::components::container::Container;
 
 const PAGE_TITLE: &str = "About | Loremaster";
 const PAGE_ROUTE_PATH: &str = "about";
 
 pub fn about_page<'page, G: Html>(context: BoundedScope<'_, 'page>) -> View<G> {
     view! {context,
-        Container(ContainerProperties{title: String::from("About"), children: view!{ context,
+        Container(title="About") {
             div(class="d-flex flex-column flex-grow-1 p-4 align-items-center") {
                 h1(class="display-3") { "About" }
                 p() { "This is a website." }
             }
-        }})
+        }
     }
 }
 

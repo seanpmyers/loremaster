@@ -9,6 +9,7 @@ Loremaster.toml
 /application/target
 /application/frontend/target
 /application/frontend/dist
+/application/frontend/pkg
 
 # Environment files
 .env

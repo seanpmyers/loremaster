@@ -1,7 +1,7 @@
 use std::ops::Deref;
 
 use js_sys::{Array, Object, Uint8Array};
-use perseus::prelude::spawn_local_scoped;
+use perseus::{prelude::spawn_local_scoped, web_log};
 use sycamore::prelude::*;
 use wasm_bindgen::JsValue;
 use wasm_bindgen_futures::JsFuture;
@@ -12,7 +12,11 @@ use web_sys::{
 };
 
 use crate::{
-    components::icon::{FINGERPRINT_SVG_HTML, KEY_2_SVG_HTML},
+    components::{
+        form::input_validation::InputValidation,
+        icon::{FINGERPRINT_SVG_HTML, KEY_2_SVG_HTML},
+        state::{message_type::MessageType, validation::Validation, visibility::Visibility},
+    },
     data::entity::security_key::SecurityKeyChallenge,
     utility::{
         constants::{API_BASE_URL, API_SECURITY_KEY_CHALLENGE_ROUTE},
@@ -32,6 +36,13 @@ pub fn SecurityKeyAuthentication<G: Html>(context: Scope) -> View<G> {
     let loading: &Signal<bool> = create_signal(context, false);
     let email_address: &Signal<String> = create_signal(context, String::new());
 
+    let email_address_validation_content: &Signal<String> = create_signal(context, String::new());
+    let email_address_validation_visibility: &Signal<Visibility> =
+        create_signal(context, Visibility::Hidden);
+    let email_address_validity: &Signal<Validation> = create_signal(context, Validation::Valid);
+    let email_address_message_type: &Signal<MessageType> =
+        create_signal(context, MessageType::Information);
+
     if G::IS_BROWSER {
         spawn_local_scoped(context, async move {});
     };
@@ -40,9 +51,21 @@ pub fn SecurityKeyAuthentication<G: Html>(context: Scope) -> View<G> {
         event.prevent_default();
         if G::IS_BROWSER {
             spawn_local_scoped(context, async move {
-                if email_address.get().is_empty() {
+                web_log!("Here");
+                if loading.get().as_ref() == &true {
                     return;
                 }
+
+                if email_address.get().is_empty() {
+                    email_address_validation_content
+                        .set(String::from("Email address cannot be empty."));
+                    email_address_validation_visibility.set(Visibility::Visible);
+                    email_address_message_type.set(MessageType::Error);
+                    email_address_validity.set(Validation::Invalid);
+                    loading.set(false);
+                    return;
+                }
+
                 loading.set(true);
                 let query_response: Option<String> = http_service::get_endpoint(
                     format!("{}/{}", API_BASE_URL, API_SECURITY_KEY_CHALLENGE_ROUTE).as_str(),
@@ -141,6 +164,11 @@ pub fn SecurityKeyAuthentication<G: Html>(context: Scope) -> View<G> {
                     bind:value=email_address,
                     placeholder = "Enter your email address"
                 ) {}
+                InputValidation(
+                    content= email_address_validation_content,
+                    visibility= email_address_validation_visibility,
+                    validity= email_address_validity,
+                    message_type= email_address_message_type)
             }
             button(class="filled-button", on:click=register_handler) {
                 div(class="filled-button-icon", dangerously_set_inner_html=KEY_2_SVG_HTML) {}

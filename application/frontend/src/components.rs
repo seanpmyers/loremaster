@@ -5,4 +5,5 @@ pub mod icon;
 pub mod navigation;
 pub mod state;
 pub mod tab;
+pub mod tab_panel;
 pub mod widget;
