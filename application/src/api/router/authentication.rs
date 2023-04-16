@@ -1,4 +1,4 @@
-use std::{net::SocketAddr, str::FromStr};
+use std::{net::SocketAddr, str::FromStr, sync::Arc};
 
 use anyhow::anyhow;
 use axum::{
@@ -15,12 +15,16 @@ use axum_extra::extract::{
 use email_address::EmailAddress;
 use log::{info, warn};
 use serde::Deserialize;
+use webauthn_rs::{
+    prelude::{CreationChallengeResponse, RegisterPublicKeyCredential},
+    Webauthn,
+};
 
 use crate::{
     api::{
         handler::authentication::{
-            handle_register_security_key, register_handler, security_key_challenge_handler,
-            RegistrationResult,
+            register_handler, web_authentication_api_register_finish_handler,
+            web_authentication_api_register_start_handler, RegistrationResult,
         },
         response::ApiError,
         web_server::ApplicationState,
@@ -29,7 +33,6 @@ use crate::{
         entity::person::Credentials, postgres_handler::PostgresHandler,
         query::person::credential_by_email_address::credential_by_email_address_query,
     },
-    security::authentication::security_key::{SecurityKeyChallenge, SecurityKeyService},
     utility::{
         constants::{
             cookie_fields, BLOCKED_EMAIL_MESSAGE, FAILED_LOGIN_MESSAGE, INVALID_EMAIL_MESSAGE,
@@ -140,33 +143,50 @@ async fn logout(cookie_jar: PrivateCookieJar) -> Result<Response, ApiError> {
     Ok((updated_cookie_jar, "Successfully logged out.").into_response())
 }
 
-async fn security_key_challenge(
-    State(security_key_service): State<SecurityKeyService>,
-) -> Result<Json<SecurityKeyChallenge>, ApiError> {
-    info!("API CALL: /authentication/security-key-challenge");
-    let result: SecurityKeyChallenge =
-        security_key_challenge_handler(&security_key_service).await?;
+#[derive(Deserialize, Debug)]
+struct WebAuthenticationRegistrationForm {
+    email_address: String,
+    alias: String,
+}
+
+async fn web_authentication_api_register_start(
+    State(web_authentication_service): State<Arc<Webauthn>>,
+    Form(web_authentication_registration_form): Form<WebAuthenticationRegistrationForm>,
+) -> Result<Json<CreationChallengeResponse>, ApiError> {
+    info!("API CALL: /authentication/webauthn/start");
+    let result: CreationChallengeResponse = web_authentication_api_register_start_handler(
+        &web_authentication_service,
+        &web_authentication_registration_form.email_address,
+        &web_authentication_registration_form.alias,
+    )
+    .await?;
     Ok(Json(result))
 }
 
-async fn register_security_key(
-    State(security_key_service): State<SecurityKeyService>,
+async fn web_authentication_api_register_finish(
+    State(web_authentication_service): State<Arc<Webauthn>>,
+    Json(user_credential_json): Json<RegisterPublicKeyCredential>,
 ) -> Result<Response, ApiError> {
-    handle_register_security_key(&security_key_service, &String::new()).await?;
+    info!("API CALL: /authentication/webauthn/finish");
+    web_authentication_api_register_finish_handler(
+        &web_authentication_service,
+        &user_credential_json,
+    )
+    .await?;
     Ok((StatusCode::CREATED, "Successfully registered security key").into_response())
 }
 
 pub fn router() -> Router<ApplicationState> {
     Router::new()
         .route(
-            "/authentication/security-key-challenge",
-            get(security_key_challenge),
+            "/authentication/webauthn/start",
+            get(web_authentication_api_register_start),
         )
         .route("/authentication/authenticate", post(authenticate))
         .route("/authentication/logout", post(logout))
         .route("/authentication/register", post(register))
         .route(
-            "/authentication/register-security-key",
-            post(register_security_key),
+            "/authentication/webauthn/finish",
+            post(web_authentication_api_register_finish),
         )
 }

@@ -6,7 +6,8 @@
       "Hasher",
       "openapi",
       "reqwasm",
-      "Rustls"
+      "Rustls",
+      "webauthn"
    ],
    "editor.insertSpaces": false,
    "editor.tabSize": 2,

@@ -15,6 +15,7 @@
 \i database/table/dictionary.sql
 \i database/table/term.sql
 \i database/table/schedule.sql
+\i database/table/web_authentication_challenge.sql
 
 -- Relation Tables
 \i database/table/person_action.sql
