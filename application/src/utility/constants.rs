@@ -17,3 +17,7 @@ pub const ENVIRONMENT: &str = "environment";
 
 // pub const FRONTEND_ORIGIN_URL: &str = "http://127.0.0.1:";
 pub const LOREMASTER_CONFIGURATION_FILE_PATH: &str = "./Loremaster.toml";
+
+pub const RELAYING_PARTY_ID: &str = "chronilore.day";
+pub const LOCAL_HOST_RELAYING_PARTY_ID: &str = "localhost";
+pub const RELAYING_PARTY: &str = "Loremaster";

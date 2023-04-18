@@ -1,4 +1,5 @@
 pub mod action;
+pub mod authentication;
 pub mod chronicle;
 pub mod email_address;
 pub mod frequency;

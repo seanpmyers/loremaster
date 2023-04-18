@@ -10,7 +10,7 @@ use sycamore::{
 use web_sys::Event;
 
 use crate::{
-    components::container::{Container, ContainerProperties},
+    components::container::Container,
     components::{
         state::message_type::MessageType,
         widget::notification::toast::{Toast, ToastProperties},
@@ -55,7 +55,7 @@ pub fn index_page<'page, G: Html>(
 
     let button_classes: &str = "glow-button";
     view! { context,
-        Container(ContainerProperties{title: String::from("Loremaster"), children: view!{ context,
+        Container(title="Loremaster") {
             div(class="d-flex flex-column flex-grow-1 p-4 align-items-center") {
                 h1(class="display-3") { "Loremaster" }
                 p() { (greeting.get()) }
@@ -85,7 +85,7 @@ pub fn index_page<'page, G: Html>(
                     message_type: current_tab
                 })
             }
-        }})
+        }
     }
 }
 

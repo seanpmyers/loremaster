@@ -6,7 +6,7 @@ use sycamore::{
 };
 
 use crate::{
-    components::container::{Container, ContainerProperties},
+    components::container::Container,
     utility::date_time_helper::{get_day_of_week_from_integer, get_month_from_integer},
 };
 
@@ -37,7 +37,7 @@ pub fn timeline_page<'page, G: Html>(context: BoundedScope<'_, 'page>) -> View<G
         ));
     }
     view! { context,
-        Container(ContainerProperties{title: String::from("Timeline"), children: view!{context,
+        Container(title="Timeline") {
             div(class="d-flex flex-column flex-grow-1 p-4") {
                 div(class="d-flex") {
                     h3(class="fw-normal") { (date.get()) }
@@ -68,7 +68,7 @@ pub fn timeline_page<'page, G: Html>(context: BoundedScope<'_, 'page>) -> View<G
                     )
                 }
             }
-        }})
+        }
     }
 }
 

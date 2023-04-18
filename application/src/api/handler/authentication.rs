@@ -1,9 +1,16 @@
-use std::str::FromStr;
+use std::{str::FromStr, sync::Arc};
 
 use anyhow::{anyhow, Result};
 use email_address::EmailAddress;
 use log::info;
 use sqlx::{Pool, Postgres};
+use uuid::Uuid;
+use webauthn_rs::{
+    prelude::{
+        CreationChallengeResponse, CredentialID, PasskeyRegistration, RegisterPublicKeyCredential,
+    },
+    Webauthn,
+};
 
 use crate::{
     data::{
@@ -15,9 +22,6 @@ use crate::{
                 credential_by_email_address::credential_by_email_address_query,
             },
         },
-    },
-    security::authentication::security_key::{
-        PersonSecurityKey, SecurityKeyAuthentication, SecurityKeyChallenge, SecurityKeyService,
     },
     utility::password_encryption::{PasswordEncryption, PasswordEncryptionService},
 };
@@ -91,17 +95,31 @@ pub async fn register_handler(
     Ok(RegistrationResult::Success)
 }
 
-pub async fn security_key_challenge_handler(
-    security_key_service: &SecurityKeyService,
-) -> Result<SecurityKeyChallenge> {
-    security_key_service.create_challenge()
+pub async fn web_authentication_api_register_start_handler(
+    web_authentication_service: &Arc<Webauthn>,
+    user_name: &str,
+    user_display_name: &str,
+) -> Result<CreationChallengeResponse> {
+    let new_user_id: Uuid = Uuid::new_v4();
+    //TODO: exclude any existing credentials
+    //TODO: query for existing credentials
+    let excluded_credentials: Option<Vec<CredentialID>> = None;
+    let (challenge, passkey_registration): (CreationChallengeResponse, PasskeyRegistration) =
+        web_authentication_service
+            .start_passkey_registration(
+                new_user_id,
+                user_name,
+                user_display_name,
+                excluded_credentials,
+            )
+            .expect("Invalid input during webauthn passkey registration start");
+    //TODO: store passkey_registration
+    Ok(challenge)
 }
 
-pub async fn handle_register_security_key(
-    security_key_service: &SecurityKeyService,
-    personal_identification_number: &String,
-) -> Result<PersonSecurityKey> {
-    let result: PersonSecurityKey =
-        security_key_service.register_key(personal_identification_number.to_string())?;
-    Ok(result)
+pub async fn web_authentication_api_register_finish_handler(
+    web_authentication_service: &Arc<Webauthn>,
+    user_credential_json: &RegisterPublicKeyCredential,
+) -> Result<()> {
+    Ok(())
 }

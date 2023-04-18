@@ -1,15 +1,15 @@
 use gloo_timers::future::TimeoutFuture;
 use perseus::prelude::{navigate, spawn_local_scoped, Html};
-use perseus::state::{SerdeInfallible, StateGeneratorInfo};
+use perseus::state::StateGeneratorInfo;
 use perseus::template::Template;
-use perseus::{browser_only_fn, engine_only_fn, ReactiveState};
+use perseus::{engine_only_fn, ReactiveState};
 use serde::{Deserialize, Serialize};
 use sycamore::prelude::{view, Signal, View};
-use sycamore::reactive::{create_signal, BoundedScope, RcSignal, Scope};
+use sycamore::reactive::{create_signal, BoundedScope, Scope};
 use sycamore::web::SsrNode;
 use web_sys::Event;
 
-use crate::components::container::{Container, ContainerProperties};
+use crate::components::container::Container;
 
 use crate::components::form::input_validation::{InputValidation, InputValidationProperties};
 use crate::components::state::message_type::MessageType;
@@ -137,63 +137,60 @@ pub fn login_page<'page, G: Html>(
     };
 
     view! {context,
-        Container(ContainerProperties{
-            title: String::from("Login"),
-            children: view! {context,
-                div(class="") {
-                    div(class="card-body") {
-                        h3(class="card-title display-6") {"Login"}
-                        form(on:submit=login_handler) {
-                            div(class="input-row") {
-                                label(
-                                    name="email_address",
-                                    class="form-label") { "Email Address" }
-                                input(
-                                    type="email",
-                                    class="form-control",
-                                    bind:value=email_address,
-                                    placeholder = "Enter your email address",
-                                    disabled=loading.get().as_ref().to_owned()
-                                ) {}
-                                InputValidation(InputValidationProperties{
-                                    content: email_address_validation_content,
-                                    visibility: email_address_validation_visibility,
-                                    validity: email_address_validity,
-                                    message_type: email_address_message_type
-                                })
-                            }
-                            div(class="input-row") {
-                                label(
-                                    name="password",
-                                    class="form-label"
-                                ) { "Password" }
-                                input(
-                                    type="password",
-                                    class="form-control",
-                                    bind:value=password,
-                                    placeholder = "Enter your password",
-                                    disabled=loading.get().as_ref().to_owned()
-                                ) {}
-
-                            }
-                            button(
-                                class="btn btn-primary",
-                                type="submit",
+        Container(title="Login") {
+            div(class="") {
+                div(class="card-body") {
+                    h3(class="card-title display-6") {"Login"}
+                    form(on:submit=login_handler) {
+                        div(class="input-row") {
+                            label(
+                                name="email_address",
+                                class="form-label") { "Email Address" }
+                            input(
+                                type="email",
+                                class="form-control",
+                                bind:value=email_address,
+                                placeholder = "Enter your email address",
                                 disabled=loading.get().as_ref().to_owned()
-                            ) {
-                                "Submit"
-                            }
-                            (match *form_message.get() {
-                                FormMessageState::Hidden => view!{context, },
-                                FormMessageState::Visible => {
-                                    return view! {context, Toast(ToastProperties{content: toast_content, message_type})};
-                                },
+                            ) {}
+                            InputValidation(InputValidationProperties{
+                                content: email_address_validation_content,
+                                visibility: email_address_validation_visibility,
+                                validity: email_address_validity,
+                                message_type: email_address_message_type
                             })
                         }
+                        div(class="input-row") {
+                            label(
+                                name="password",
+                                class="form-label"
+                            ) { "Password" }
+                            input(
+                                type="password",
+                                class="form-control",
+                                bind:value=password,
+                                placeholder = "Enter your password",
+                                disabled=loading.get().as_ref().to_owned()
+                            ) {}
+
+                        }
+                        button(
+                            class="btn btn-primary",
+                            type="submit",
+                            disabled=loading.get().as_ref().to_owned()
+                        ) {
+                            "Submit"
+                        }
+                        (match *form_message.get() {
+                            FormMessageState::Hidden => view!{context, },
+                            FormMessageState::Visible => {
+                                return view! {context, Toast(ToastProperties{content: toast_content, message_type})};
+                            },
+                        })
                     }
                 }
             }
-        })
+        }
     }
 }
 

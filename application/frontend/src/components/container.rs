@@ -2,18 +2,23 @@ use sycamore::prelude::*;
 
 use crate::components::navigation::{side_nav_bar::SideNavBar, top_nav_bar::TopNavBar};
 
-pub struct ContainerProperties<G: Html> {
-    pub title: String,
-    pub children: View<G>,
+#[derive(Prop)]
+pub struct ContainerProperties<'a, G: Html> {
+    pub title: &'a str,
+    pub children: Children<'a, G>,
 }
 
 #[component]
-pub fn Container<G: Html>(context: Scope, properties: ContainerProperties<G>) -> View<G> {
+pub fn Container<'a, G: Html>(
+    context: Scope<'a>,
+    ContainerProperties { title, children }: ContainerProperties<'a, G>,
+) -> View<G> {
+    let children = children.call(context);
     view! {context,
         TopNavBar()
-        div(class="", id="loremaster-main") {
+        div(class="", id="loremaster-main", data-title=title) {
             SideNavBar()
-            (properties.children.clone())
+            (children)
         }
     }
 }

@@ -1,14 +1,12 @@
 use crate::api;
-use crate::security::authentication::security_key::SecurityKeyAuthentication;
 use crate::utility::constants::files::FRONTEND_DIST_PATH;
-use crate::utility::constants::ENVIRONMENT;
+use crate::utility::constants::{ENVIRONMENT, LOCAL_HOST_RELAYING_PARTY_ID, RELAYING_PARTY};
 use crate::utility::loremaster_configuration::{
     get_configuration_from_file, LoremasterConfiguration,
 };
 use crate::utility::password_encryption::PasswordEncryption;
 use crate::{
     data::postgres_handler::PostgresHandler,
-    security::authentication::security_key::SecurityKeyService,
     utility::password_encryption::PasswordEncryptionService,
 };
 use anyhow::Result;
@@ -19,7 +17,10 @@ use axum_extra::extract::cookie::Key;
 use axum_server::tls_rustls::RustlsConfig;
 use log::info;
 use std::net::SocketAddr;
+use std::sync::Arc;
 use tower_http::services::ServeDir;
+use webauthn_rs::prelude::Url;
+use webauthn_rs::{Webauthn, WebauthnBuilder};
 
 pub async fn start() -> Result<()> {
     let environment: String = std::env::var(ENVIRONMENT)?;
@@ -38,10 +39,20 @@ pub async fn start() -> Result<()> {
         configuration.site_secret.clone(),
     );
 
+    //TODO: match environment
+    let relaying_party_url: Url =
+        Url::parse("http://localhost:{configuration.port}").expect("Invalid URL");
+    let web_authentication_service: Webauthn =
+        WebauthnBuilder::new(LOCAL_HOST_RELAYING_PARTY_ID, &relaying_party_url)
+            .expect("Invalid WebAuthn builder configuration.")
+            .rp_name(RELAYING_PARTY)
+            .build()
+            .expect("Invalid WebAuthn builder configuration.");
+
     let application_state: ApplicationState = ApplicationState {
         postgres_service,
         encryption_service,
-        security_key_service: SecurityKeyService::new(),
+        web_authentication_service: Arc::new(web_authentication_service),
         key: Key::from(configuration.site_secret.as_bytes()),
     };
 
@@ -91,7 +102,7 @@ async fn get_tls_configuration() -> Result<RustlsConfig> {
 pub struct ApplicationState {
     postgres_service: PostgresHandler,
     encryption_service: PasswordEncryptionService,
-    security_key_service: SecurityKeyService,
+    web_authentication_service: Arc<Webauthn>,
     key: Key,
 }
 
@@ -113,8 +124,8 @@ impl FromRef<ApplicationState> for PasswordEncryptionService {
     }
 }
 
-impl FromRef<ApplicationState> for SecurityKeyService {
+impl FromRef<ApplicationState> for Arc<Webauthn> {
     fn from_ref(state: &ApplicationState) -> Self {
-        state.security_key_service.clone()
+        state.web_authentication_service.clone()
     }
 }
