@@ -143,15 +143,15 @@ pub async fn web_authentication_api_register_start_handler(
     info!("Email can be registered.");
 
     let user_id: Uuid = get_optional_web_authentication_id_by_user_name_query(
-        &database_pool,
-        &valid_email_address.as_str(),
+        database_pool,
+        valid_email_address.as_str(),
     )
     .await?
     .unwrap_or_else(Uuid::new_v4);
 
     remove_stale_web_authentication_challenges_by_user_name_query(
-        &database_pool,
-        &valid_email_address.as_str(),
+        database_pool,
+        valid_email_address.as_str(),
     )
     .await?;
     //TODO: exclude any existing credentials
@@ -162,14 +162,14 @@ pub async fn web_authentication_api_register_start_handler(
         web_authentication_service
             .start_passkey_registration(
                 user_id,
-                &valid_email_address.as_str(),
+                valid_email_address.as_str(),
                 user_alias,
                 excluded_credentials,
             )
             .expect("Invalid input during webauthn passkey registration start");
 
     add_web_authentication_challenge_query(
-        &database_pool,
+        database_pool,
         &WebAuthenticationChallenge {
             id: user_id,
             user_name: valid_email_address.as_str().to_string(),
@@ -187,22 +187,18 @@ pub async fn web_authentication_api_register_finish_handler(
     email_address: &str,
     user_credential: &RegisterPublicKeyCredential,
 ) -> Result<RegistrationResult> {
-    match get_web_authentication_by_user_name_query(&database_pool, email_address).await? {
-        Some(challenge) => {
-            let state: PasskeyRegistration =
-                serde_json::from_value(challenge.passkey_registration)?;
+    let Some(challenge) = get_web_authentication_by_user_name_query(&database_pool, email_address).await? 
+    else { return Ok(RegistrationResult::InvalidEmailAddress); };
 
-            let passkey: Passkey = web_authentication_service
-                .finish_passkey_registration(user_credential, &state)
-                .expect("Invalid input during webauthn passkey registration finish");
+    let state: PasskeyRegistration = serde_json::from_value(challenge.passkey_registration)?;
 
-            //TODO: Store passkey
-            let 
+    let passkey: Passkey = web_authentication_service
+        .finish_passkey_registration(user_credential, &state)
+        .expect("Invalid input during webauthn passkey registration finish");
 
-            Ok(RegistrationResult::Valid)
-        }
-        None => Ok(RegistrationResult::InvalidEmailAddress),
-    }
+    //TODO: Store passkey
+
+    Ok(RegistrationResult::Valid)
 }
 
 pub async fn web_authentication_api_login_start_handler(
@@ -210,8 +206,8 @@ pub async fn web_authentication_api_login_start_handler(
     web_authentication_service: &Arc<Webauthn>,
     email_address: &str,
 ) -> Result<()> {
-    let passkeys: Vec<Passkey> = get_passkeys_by_email_address_query().await?;
-    let thing = web_authentication_service.start_passkey_authentication(&passkeys);
+    // let passkeys: Vec<Passkey> = get_passkeys_by_email_address_query().await?;
+    // let thing = web_authentication_service.start_passkey_authentication(&passkeys);
     Ok(())
 }
 
@@ -220,7 +216,7 @@ pub async fn web_authentication_api_login_finish_handler(
     web_authentication_service: &Arc<Webauthn>,
     public_key_credential: &PublicKeyCredential,
 ) -> Result<()> {
-    let thing =
-        web_authentication_service.finish_passkey_authentication(public_key_credential, state);
+    // let thing =
+    //     web_authentication_service.finish_passkey_authentication(public_key_credential, state);
     Ok(())
 }
