@@ -12,4 +12,5 @@ pub mod schedule;
 pub mod sleep_schedule;
 pub mod transfer;
 pub mod web_authentication_challenge;
+pub mod web_authentication_key;
 pub mod weekday;
