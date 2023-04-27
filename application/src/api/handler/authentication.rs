@@ -18,7 +18,7 @@ use crate::{
         entity::{
             self,
             person::Credentials,
-            web_authentication_challenge::{self, WebAuthenticationChallenge},
+            web_authentication_challenge::{self, WebAuthenticationChallenge}, web_authentication_key::WebAuthenticationKey,
         },
         query::{
             authentication::{
@@ -187,7 +187,20 @@ pub async fn web_authentication_api_register_finish_handler(
     email_address: &str,
     user_credential: &RegisterPublicKeyCredential,
 ) -> Result<RegistrationResult> {
-    let Some(challenge) = get_web_authentication_by_user_name_query(&database_pool, email_address).await? 
+    let clean_email: &str = email_address.trim();
+
+    if !EmailAddress::is_valid(email_address) {
+        return Ok(RegistrationResult::InvalidEmailAddress);
+    }
+
+    if !ALLOWED_EMAIL_ADDRESSES.contains(&email_address) {
+        return Ok(RegistrationResult::InvalidEmailAddress);
+    }
+
+    let valid_email_address: EmailAddress =
+        EmailAddress::from_str(clean_email).map_err(|error| anyhow!("{}", error))?;
+
+    let Some(challenge) = get_web_authentication_by_user_name_query(database_pool, email_address).await? 
     else { return Ok(RegistrationResult::InvalidEmailAddress); };
 
     let state: PasskeyRegistration = serde_json::from_value(challenge.passkey_registration)?;
@@ -196,7 +209,17 @@ pub async fn web_authentication_api_register_finish_handler(
         .finish_passkey_registration(user_credential, &state)
         .expect("Invalid input during webauthn passkey registration finish");
 
+
+    create_email_address_query(database_pool, &valid_email_address).await?;
+
     //TODO: Store passkey
+    let key: WebAuthenticationKey = WebAuthenticationKey {
+        id: Uuid::new_v4(),
+        credential_id: passkey.cred_id().0.clone(),
+        cose_algorithm: *passkey.cred_algorithm() as i32,
+        passkey: serde_json::to_value(passkey)?
+
+    };
 
     Ok(RegistrationResult::Valid)
 }
