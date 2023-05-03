@@ -40,8 +40,8 @@ pub async fn start() -> Result<()> {
     );
 
     //TODO: match environment
-    let relaying_party_url: Url =
-        Url::parse("http://localhost:{configuration.port}").expect("Invalid URL");
+    let formatted_url: String = format!("https://localhost:{}", configuration.port);
+    let relaying_party_url: Url = Url::parse(formatted_url.as_str()).expect("Invalid URL");
     let web_authentication_service: Webauthn =
         WebauthnBuilder::new(LOCAL_HOST_RELAYING_PARTY_ID, &relaying_party_url)
             .expect("Invalid WebAuthn builder configuration.")
