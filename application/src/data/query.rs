@@ -4,5 +4,6 @@ pub mod chronicle;
 pub mod email_address;
 pub mod frequency;
 pub mod goal;
+pub mod passkey;
 pub mod person;
 pub mod sleep_schedule;

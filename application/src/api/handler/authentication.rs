@@ -7,16 +7,30 @@ use sqlx::{Pool, Postgres};
 use uuid::Uuid;
 use webauthn_rs::{
     prelude::{
-        CreationChallengeResponse, CredentialID, PasskeyRegistration, RegisterPublicKeyCredential,
+        CreationChallengeResponse, CredentialID, Passkey, PasskeyRegistration, PublicKeyCredential,
+        RegisterPublicKeyCredential,
     },
     Webauthn,
 };
 
 use crate::{
     data::{
-        entity::{self, person::Credentials},
+        entity::{
+            self,
+            person::Credentials,
+            web_authentication_challenge::{self, WebAuthenticationChallenge}, web_authentication_key::WebAuthenticationKey,
+        },
         query::{
-            email_address::create_email_address::create_email_address_query,
+            authentication::{
+                add_web_authentication_challenge::add_web_authentication_challenge_query,
+                get_web_authentication_by_user_name::get_web_authentication_by_user_name_query,
+                get_web_authentication_challenges::get_optional_web_authentication_id_by_user_name_query,
+                remove_stale_web_authentication_challenges_by_user_name::remove_stale_web_authentication_challenges_by_user_name_query,
+            },
+            email_address::{
+                create_email_address::create_email_address_query,
+                email_address_in_use::email_address_in_use_query,
+            },
             person::{
                 create_person::create_person_query,
                 credential_by_email_address::credential_by_email_address_query,
@@ -27,7 +41,7 @@ use crate::{
 };
 
 pub enum RegistrationResult {
-    Success,
+    Valid,
     InvalidEmailAddress,
     BlockedEmailAddress,
     EmailAddressInUse,
@@ -43,6 +57,7 @@ pub async fn register_handler(
     input_email_address: &str,
     input_password: &str,
 ) -> Result<RegistrationResult> {
+    //TODO: ensure sanitized/clean
     let clean_email: &str = input_email_address.trim();
     let clean_password: &str = input_password.trim();
 
@@ -92,34 +107,139 @@ pub async fn register_handler(
     .await
     .map_err(|error| anyhow!("{}", error))?;
 
-    Ok(RegistrationResult::Success)
+    Ok(RegistrationResult::Valid)
 }
 
 pub async fn web_authentication_api_register_start_handler(
+    database_pool: &Pool<Postgres>,
     web_authentication_service: &Arc<Webauthn>,
-    user_name: &str,
-    user_display_name: &str,
-) -> Result<CreationChallengeResponse> {
-    let new_user_id: Uuid = Uuid::new_v4();
+    email_address: &str,
+    user_alias: &str,
+) -> Result<(RegistrationResult, Option<CreationChallengeResponse>)> {
+    //TODO: ensure sanitized/clean
+    let clean_email: &str = email_address.trim();
+
+    if !EmailAddress::is_valid(email_address) {
+        return Ok((RegistrationResult::InvalidEmailAddress, None));
+    }
+
+    if !ALLOWED_EMAIL_ADDRESSES.contains(&email_address) {
+        return Ok((RegistrationResult::BlockedEmailAddress, None));
+    }
+
+    let valid_email_address: EmailAddress =
+        EmailAddress::from_str(clean_email).map_err(|error| anyhow!("{}", error))?;
+
+    info!("Checking if the provided email address is already in use.");
+    let email_in_use: bool = email_address_in_use_query(database_pool, &valid_email_address)
+        .await
+        .map_err(|error| anyhow!("{}", error))?;
+
+    if email_in_use {
+        info!("Existing user found!");
+        //TODO: Send an email to the specified address and indicate someone tried to re-register using that email
+        return Ok((RegistrationResult::EmailAddressInUse, None));
+    }
+    info!("Email can be registered.");
+
+    let user_id: Uuid = get_optional_web_authentication_id_by_user_name_query(
+        database_pool,
+        valid_email_address.as_str(),
+    )
+    .await?
+    .unwrap_or_else(Uuid::new_v4);
+
+    remove_stale_web_authentication_challenges_by_user_name_query(
+        database_pool,
+        valid_email_address.as_str(),
+    )
+    .await?;
     //TODO: exclude any existing credentials
     //TODO: query for existing credentials
+
     let excluded_credentials: Option<Vec<CredentialID>> = None;
     let (challenge, passkey_registration): (CreationChallengeResponse, PasskeyRegistration) =
         web_authentication_service
             .start_passkey_registration(
-                new_user_id,
-                user_name,
-                user_display_name,
+                user_id,
+                valid_email_address.as_str(),
+                user_alias,
                 excluded_credentials,
             )
             .expect("Invalid input during webauthn passkey registration start");
-    //TODO: store passkey_registration
-    Ok(challenge)
+
+    add_web_authentication_challenge_query(
+        database_pool,
+        &WebAuthenticationChallenge {
+            id: user_id,
+            user_name: valid_email_address.as_str().to_string(),
+            passkey_registration: serde_json::to_value(passkey_registration)?,
+        },
+    )
+    .await?;
+
+    Ok((RegistrationResult::Valid, Some(challenge)))
 }
 
 pub async fn web_authentication_api_register_finish_handler(
+    database_pool: &Pool<Postgres>,
     web_authentication_service: &Arc<Webauthn>,
-    user_credential_json: &RegisterPublicKeyCredential,
+    email_address: &str,
+    user_credential: &RegisterPublicKeyCredential,
+) -> Result<RegistrationResult> {
+    let clean_email: &str = email_address.trim();
+
+    if !EmailAddress::is_valid(email_address) {
+        return Ok(RegistrationResult::InvalidEmailAddress);
+    }
+
+    if !ALLOWED_EMAIL_ADDRESSES.contains(&email_address) {
+        return Ok(RegistrationResult::InvalidEmailAddress);
+    }
+
+    let valid_email_address: EmailAddress =
+        EmailAddress::from_str(clean_email).map_err(|error| anyhow!("{}", error))?;
+
+    let Some(challenge) = get_web_authentication_by_user_name_query(database_pool, email_address).await? 
+    else { return Ok(RegistrationResult::InvalidEmailAddress); };
+
+    let state: PasskeyRegistration = serde_json::from_value(challenge.passkey_registration)?;
+
+    let passkey: Passkey = web_authentication_service
+        .finish_passkey_registration(user_credential, &state)
+        .expect("Invalid input during webauthn passkey registration finish");
+
+
+    create_email_address_query(database_pool, &valid_email_address).await?;
+
+    //TODO: Store passkey
+    let key: WebAuthenticationKey = WebAuthenticationKey {
+        id: Uuid::new_v4(),
+        credential_id: passkey.cred_id().0.clone(),
+        cose_algorithm: *passkey.cred_algorithm() as i32,
+        passkey: serde_json::to_value(passkey)?
+
+    };
+
+    Ok(RegistrationResult::Valid)
+}
+
+pub async fn web_authentication_api_login_start_handler(
+    database_pool: &Pool<Postgres>,
+    web_authentication_service: &Arc<Webauthn>,
+    email_address: &str,
 ) -> Result<()> {
+    // let passkeys: Vec<Passkey> = get_passkeys_by_email_address_query().await?;
+    // let thing = web_authentication_service.start_passkey_authentication(&passkeys);
+    Ok(())
+}
+
+pub async fn web_authentication_api_login_finish_handler(
+    database_pool: &Pool<Postgres>,
+    web_authentication_service: &Arc<Webauthn>,
+    public_key_credential: &PublicKeyCredential,
+) -> Result<()> {
+    // let thing =
+    //     web_authentication_service.finish_passkey_authentication(public_key_credential, state);
     Ok(())
 }

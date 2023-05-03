@@ -15,10 +15,7 @@ use axum_extra::extract::{
 use email_address::EmailAddress;
 use log::{info, warn};
 use serde::Deserialize;
-use webauthn_rs::{
-    prelude::{CreationChallengeResponse, RegisterPublicKeyCredential},
-    Webauthn,
-};
+use webauthn_rs::{prelude::RegisterPublicKeyCredential, Webauthn};
 
 use crate::{
     api::{
@@ -63,7 +60,7 @@ async fn register(
     )
     .await?
     {
-        RegistrationResult::Success => Ok((
+        RegistrationResult::Valid => Ok((
             StatusCode::ACCEPTED,
             REGISTRATION_SUCCESS_MESSAGE.to_string(),
         )
@@ -150,26 +147,52 @@ struct WebAuthenticationRegistrationForm {
 }
 
 async fn web_authentication_api_register_start(
+    State(postgres_service): State<PostgresHandler>,
     State(web_authentication_service): State<Arc<Webauthn>>,
     Form(web_authentication_registration_form): Form<WebAuthenticationRegistrationForm>,
-) -> Result<Json<CreationChallengeResponse>, ApiError> {
+) -> Result<Response, ApiError> {
     info!("API CALL: /authentication/webauthn/start");
-    let result: CreationChallengeResponse = web_authentication_api_register_start_handler(
+    match web_authentication_api_register_start_handler(
+        &postgres_service.database_pool,
         &web_authentication_service,
         &web_authentication_registration_form.email_address,
         &web_authentication_registration_form.alias,
     )
-    .await?;
-    Ok(Json(result))
+    .await?
+    {
+        (RegistrationResult::Valid, Some(credential_challenge)) => {
+            Ok((StatusCode::ACCEPTED, Json(Some(credential_challenge))).into_response())
+        }
+        (RegistrationResult::InvalidEmailAddress, _) => {
+            Ok((StatusCode::BAD_REQUEST, INVALID_EMAIL_MESSAGE).into_response())
+        }
+        (RegistrationResult::BlockedEmailAddress, _) => {
+            Ok((StatusCode::FORBIDDEN, String::from(BLOCKED_EMAIL_MESSAGE)).into_response())
+        }
+        (RegistrationResult::EmailAddressInUse, _) => Ok((
+            StatusCode::ACCEPTED,
+            REGISTRATION_SUCCESS_MESSAGE.to_string(),
+        )
+            .into_response()),
+        //TODO: Log it
+        (_, _) => Ok((
+            StatusCode::INTERNAL_SERVER_ERROR,
+            "Something went wrong on our side.",
+        )
+            .into_response()),
+    }
 }
 
 async fn web_authentication_api_register_finish(
+    State(postgres_service): State<PostgresHandler>,
     State(web_authentication_service): State<Arc<Webauthn>>,
     Json(user_credential_json): Json<RegisterPublicKeyCredential>,
 ) -> Result<Response, ApiError> {
     info!("API CALL: /authentication/webauthn/finish");
     web_authentication_api_register_finish_handler(
+        &postgres_service.database_pool,
         &web_authentication_service,
+        &"", //TODO:
         &user_credential_json,
     )
     .await?;
