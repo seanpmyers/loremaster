@@ -11,7 +11,6 @@ const QUERY: &str = "
         public.person (
             id
             , email_address_id
-            , encrypted_password
             , registration_date 
             , alias
             , chronicle_id
@@ -21,7 +20,6 @@ const QUERY: &str = "
     RETURNING
         id
         , email_address_id
-        , encrypted_password
         , registration_date 
         , alias
         , chronicle_id
@@ -30,7 +28,6 @@ const QUERY: &str = "
 pub async fn create_person_query(
     database_connection: &PgPool,
     email_address_id: &Uuid,
-    encrypted_password: &str,
     alias: Option<&str>,
     chronicle_id: Option<Uuid>,
 ) -> Result<Person> {
@@ -41,7 +38,6 @@ pub async fn create_person_query(
     let query_result: Person = query_as::<_, Person>(QUERY)
         .bind(new_person_id)
         .bind(email_address_id)
-        .bind(encrypted_password)
         .bind(creation_date)
         .bind(alias)
         .bind(chronicle_id)
