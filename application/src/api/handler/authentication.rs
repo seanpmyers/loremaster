@@ -18,14 +18,14 @@ use crate::{
         entity::{
             self,
             person::Credentials,
-            web_authentication_challenge::{self, WebAuthenticationChallenge}, web_authentication_key::WebAuthenticationKey,
+            web_authentication_challenge::WebAuthenticationChallenge, web_authentication_key::WebAuthenticationKey,
         },
         query::{
             authentication::{
                 add_web_authentication_challenge::add_web_authentication_challenge_query,
                 get_web_authentication_by_user_name::get_web_authentication_by_user_name_query,
                 get_web_authentication_challenges::get_optional_web_authentication_id_by_user_name_query,
-                remove_stale_web_authentication_challenges_by_user_name::remove_stale_web_authentication_challenges_by_user_name_query,
+                remove_stale_web_authentication_challenges_by_user_name::remove_stale_web_authentication_challenges_by_user_name_query, self,
             },
             email_address::{
                 create_email_address::create_email_address_query,
@@ -33,8 +33,8 @@ use crate::{
             },
             person::{
                 create_person::create_person_query,
-                credential_by_email_address::credential_by_email_address_query,
-            },
+                credential_by_email_address::credential_by_email_address_query, self,
+            }, password
         },
     },
     utility::password_encryption::{PasswordEncryption, PasswordEncryptionService},
@@ -79,33 +79,35 @@ pub async fn register_handler(
     info!("Checking for existing users with provided email address.");
     let existing_credentials: Option<Credentials> =
         credential_by_email_address_query(database_pool, &valid_email_address)
-            .await
-            .map_err(|error| anyhow!("{}", error))?;
+            .await?;
 
     if existing_credentials.is_some() {
         info!("Existing user found!");
         //TODO: Send an email to the specified address and indicate someone tried to re-register using that email
         return Ok(RegistrationResult::EmailAddressInUse);
     }
-
     info!("Email can be registered.");
-    let encrypted_password: String = encryption_service
-        .encrypt_password(clean_password)
-        .map_err(|error| anyhow!("{}", error))?;
 
     let new_email_address: entity::email_address::EmailAddress =
         create_email_address_query(database_pool, &valid_email_address).await?;
 
     info!("Adding new user to database.");
-    create_person_query(
+    let person: entity::person::Person = create_person_query(
         database_pool,
         &new_email_address.id,
-        &encrypted_password,
         None,
         None,
     )
-    .await
-    .map_err(|error| anyhow!("{}", error))?;
+    .await?;
+
+    let encrypted_password: String = encryption_service
+    .encrypt_password(clean_password)?;
+
+    let new_password_id: Uuid = password::add_password::add_password_query(database_pool, &encrypted_password).await?;
+
+    //TODO:If anything fails up to here we need to handle the person/password not in use
+    // possibly rewrite query to be one transaction instead of individual queries
+    person::add_password::add_password_query(database_pool,&person.id, &new_password_id).await?;
 
     Ok(RegistrationResult::Valid)
 }
@@ -210,16 +212,28 @@ pub async fn web_authentication_api_register_finish_handler(
         .expect("Invalid input during webauthn passkey registration finish");
 
 
-    create_email_address_query(database_pool, &valid_email_address).await?;
+    let new_email_address = create_email_address_query(database_pool, &valid_email_address).await?;
 
-    //TODO: Store passkey
     let key: WebAuthenticationKey = WebAuthenticationKey {
         id: Uuid::new_v4(),
         credential_id: passkey.cred_id().0.clone(),
         cose_algorithm: *passkey.cred_algorithm() as i32,
         passkey: serde_json::to_value(passkey)?
-
     };
+
+    authentication::add_web_authentication_key::add_web_authentication_key_query(database_pool, &key).await?;
+
+    info!("Adding new user to database.");
+    let person: entity::person::Person = create_person_query(
+        database_pool,
+        &new_email_address.id,
+        None,
+        None,
+    )
+    .await?;
+
+    //TODO: create relation between person and key
+    person::add_web_authentication_key::add_web_authentication_key_query(database_pool, &person.id,&key.id).await?;
 
     Ok(RegistrationResult::Valid)
 }

@@ -14,7 +14,7 @@ use axum_extra::extract::{
 };
 use email_address::EmailAddress;
 use log::{info, warn};
-use serde::Deserialize;
+use serde::{Deserialize, Serialize};
 use webauthn_rs::{prelude::RegisterPublicKeyCredential, Webauthn};
 
 use crate::{
@@ -183,17 +183,23 @@ async fn web_authentication_api_register_start(
     }
 }
 
+#[derive(Debug, Clone, Deserialize, Serialize)]
+struct RegistrationInput {
+    pub email_address: String,
+    pub user_credential_json: RegisterPublicKeyCredential,
+}
+
 async fn web_authentication_api_register_finish(
     State(postgres_service): State<PostgresHandler>,
     State(web_authentication_service): State<Arc<Webauthn>>,
-    Json(user_credential_json): Json<RegisterPublicKeyCredential>,
+    Json(registration_input): Json<RegistrationInput>,
 ) -> Result<Response, ApiError> {
     info!("API CALL: /authentication/webauthn/finish");
     web_authentication_api_register_finish_handler(
         &postgres_service.database_pool,
         &web_authentication_service,
-        &"", //TODO:
-        &user_credential_json,
+        &registration_input.email_address,
+        &registration_input.user_credential_json,
     )
     .await?;
     Ok((StatusCode::CREATED, "Successfully registered security key").into_response())

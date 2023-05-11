@@ -1,5 +1,5 @@
 CREATE TABLE
-    "skill" (
+    "password" (
         "id" uuid NOT NULL PRIMARY KEY,
-        "name" text UNIQUE NOT NULL
+        "encrypted_password" text NOT NULL
     );
