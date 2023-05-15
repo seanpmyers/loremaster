@@ -861,9 +861,9 @@ checksum = "478c572c3d73181ff3c2539045f6eb99e5491218eae919370993b890cdbdd98e"
 
 [[package]]
 name = "perseus"
-version = "0.4.0"
+version = "0.4.1"
 source = "registry+https://github.com/rust-lang/crates.io-index"
-checksum = "c692ad07b59511f3f2faac6ae47136b0f7f28fe92a962da60459b659ddf947ca"
+checksum = "28b1230830033fe9611e1f65d26639ad18bc628877dbd9ce3034998897dd9e74"
 dependencies = [
  "async-trait",
  "chrono",
@@ -903,9 +903,9 @@ dependencies = [
 
 [[package]]
 name = "perseus-macro"
-version = "0.4.0"
+version = "0.4.1"
 source = "registry+https://github.com/rust-lang/crates.io-index"
-checksum = "868803376c686cfe84dc5a84114ea631bd561f243f1a48115c4418b19c9d199b"
+checksum = "365751b4a34d7b5f0758d08e570c3052fd8e99300fe0433d00f45731ef4453ec"
 dependencies = [
  "darling",
  "proc-macro2",
