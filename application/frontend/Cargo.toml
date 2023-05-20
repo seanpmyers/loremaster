@@ -11,7 +11,7 @@ futures-util = { version = "0.3.27" }
 gloo-timers = { version = "0.2.6", features = ["futures"] }
 js-sys = { version = "0.3.63" }
 log = { version = "0.4.17" }
-perseus = { version = "0.4.1", features = ["hydrate"] }
+perseus = { version = "0.4.2", features = ["hydrate"] }
 reqwasm = { version = "0.5.0" }
 serde = { version = "1.0.163", features = ["derive"] }
 serde_json = { version = "1.0.96" }
@@ -56,6 +56,6 @@ web-sys = { version = "0.3.62", features = [
 
 [target.'cfg(engine)'.dependencies]
 tokio = { version = "1.28.1", features = ["macros", "rt", "rt-multi-thread"] }
-perseus-axum = { version = "=0.4.0", features = ["dflt-server"] }
+perseus-axum = { version = "=0.4.1", features = ["dflt-server"] }
 
 [target.'cfg(client)'.dependencies]

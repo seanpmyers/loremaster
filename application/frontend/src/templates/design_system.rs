@@ -4,7 +4,10 @@ use sycamore::{
     reactive::{create_signal, BoundedScope, Scope, Signal},
 };
 
-use crate::components::accordion::{Accordion, AccordionItem};
+use crate::components::{
+    accordion::{Accordion, AccordionItem},
+    widget::theme_toggle::ThemeToggle,
+};
 
 const PAGE_ROUTE_PATH: &str = "design-system";
 const PAGE_TITLE: &str = "Design System | Chronilore";
@@ -15,7 +18,10 @@ pub fn design_system_page<'page, G: Html>(context: BoundedScope<'_, 'page>) -> V
     let second_item: &Signal<String> = create_signal(context, String::from("Second"));
     view! {context,
         div(class="") {
-            h1(class="") { (MAIN_HEADER) }
+            div() {
+                h1(class="") { (MAIN_HEADER) }
+                ThemeToggle()
+            }
             p() {
                 "Chronilore's set of design standards intended to manage and guide all design work done by Chronilore."
                 br() {}
