@@ -1,4 +1,5 @@
 :root {
+	--background: #000;
 	--primary-background-gradient: linear-gradient(112deg, rgba(63, 74, 87, 1) 0%, rgba(28, 34, 40, 1) 100%);
 	--primary-background-color: #060402;
 	--secondary-background-color: black;
@@ -17,6 +18,7 @@
 }
 
 .light {
+	--background: #fff;
 	--primary-background-gradient: linear-gradient(112deg, rgba(242, 239, 245, 1) 0%, rgba(199, 216, 238, 1) 100%);
 	--primary-background-color: #f9fbfd;
 	--secondary-background-color: white;
@@ -84,6 +86,9 @@ button {
 	padding: .3rem;
 	margin: .2rem;
 	cursor: pointer;
+	border: 0;
+	border-radius: 4px;
+	box-shadow: rgba(0, 0, 0, 0.16) 0px 1px 4px;
 }
 
 form {
