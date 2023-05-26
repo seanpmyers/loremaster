@@ -892,9 +892,9 @@ dependencies = [
 
 [[package]]
 name = "perseus-axum"
-version = "0.4.1"
+version = "0.4.2"
 source = "registry+https://github.com/rust-lang/crates.io-index"
-checksum = "dfab8765f8c6175b67aa9edc654c930eb10502772ae07f47c3c5d0a8286aba38"
+checksum = "e2a8dbd3d782f689ce771343dfcbabb724e6e130a82179043914a15d594fcc29"
 dependencies = [
  "axum",
  "perseus",
