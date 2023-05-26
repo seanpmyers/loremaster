@@ -18,14 +18,15 @@ pub fn design_system_page<'page, G: Html>(context: BoundedScope<'_, 'page>) -> V
     let second_item: &Signal<String> = create_signal(context, String::from("Second"));
     view! {context,
         div(class="") {
-            div() {
-                h1(class="") { (MAIN_HEADER) }
-                ThemeToggle()
-            }
+            h1(class="") { (MAIN_HEADER) }
             p() {
                 "Chronilore's set of design standards intended to manage and guide all design work done by Chronilore."
                 br() {}
                 "Test"
+             }
+             div() {
+                h3() { "Theme Toggle" }
+                ThemeToggle()
              }
              div() {
                 h3() { "Accordion" }
