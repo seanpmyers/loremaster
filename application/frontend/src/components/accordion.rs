@@ -38,7 +38,7 @@ pub fn AccordionItem<'a, G: Html>(
     let children = children.call(context);
     let collapsed: &Signal<bool> = create_signal(context, true);
     let item_css_classes: &Signal<&str> = create_signal(context, "accordion-collapse collapse");
-    let svg: &Signal<&str> = create_signal(context, CHEVRON_DOWN_SVG_HTML);
+    let svg: &Signal<&str> = create_signal(context, CHEVRON_UP_SVG_HTML);
     let handle_click = move |event: Event| {
         event.prevent_default();
         if G::IS_BROWSER {
@@ -47,11 +47,11 @@ pub fn AccordionItem<'a, G: Html>(
                 match *collapsed.get() {
                     true => {
                         item_css_classes.set("accordion-collapse collapse");
-                        svg.set(CHEVRON_DOWN_SVG_HTML);
+                        svg.set(CHEVRON_UP_SVG_HTML);
                     }
                     false => {
                         item_css_classes.set("accordion-collapse collapse show");
-                        svg.set(CHEVRON_UP_SVG_HTML);
+                        svg.set(CHEVRON_DOWN_SVG_HTML);
                     }
                 }
             });
@@ -61,9 +61,9 @@ pub fn AccordionItem<'a, G: Html>(
     view! {context,
         div(class="accordion-item") {
             h2(class="accordion-item-title") {
-                button(on:click=handle_click) {
+                button(on:click=handle_click, class="accordion-toggle") {
                     span() { (title.get()) }
-                    span(dangerously_set_inner_html=*svg.get()) {  }
+                    span(class="accordion-shevron", dangerously_set_inner_html=*svg.get()) {  }
                  }
             }
             div(class=item_css_classes) {

@@ -23,3 +23,7 @@ application/frontend/resources/styles/library/*
 .terraform/
 *.tfstate
 application/database/.project
+
+.DS_Store
+application/.DS_Store
+application/frontend/.DS_Store

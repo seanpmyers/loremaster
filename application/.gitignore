@@ -1,3 +1,5 @@
 /target
 .perseus/
 certs/*.pem
+
+.DS_Store
