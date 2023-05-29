@@ -604,6 +604,15 @@ form .input-row label {}
 	flex-grow: 1;
 }
 
+.accordion-toggle {
+	display: flex;
+	flex-direction: row;
+}
+
+.accordion-shevron {
+	flex: 1;
+	text-align: end;
+}
 
 .collapse:not(.show) {
 	display: none;
@@ -615,6 +624,22 @@ form .input-row label {}
 
 .placeholder-glow {
 	animation: placeholder-glow 2s linear infinite alternate;
+}
+
+.tab-panel {}
+
+.tab-button-group {
+	display: flex;
+	flex-direction: row;
+}
+
+.tab-button {}
+
+.tab-section {
+	background: white;
+	color: black;
+	border-radius: 4px;
+	padding: 1rem;
 }
 
 @keyframes placeholder-glow {
