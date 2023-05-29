@@ -4,6 +4,7 @@ use super::icon::{
 };
 
 pub mod side_nav_bar;
+pub mod tab;
 pub mod top_nav_bar;
 
 #[derive(Debug, Clone, PartialEq, Eq)]
