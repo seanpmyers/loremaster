@@ -4,7 +4,9 @@
 	--border-color: #4d4d4d;
 	--border-radius: 6px;
 	--medium-text: 18px;
-	--small-box-shadow:rgba(0, 0, 0, 0.16) 0px 1px 4px;
+	--small-box-shadow: rgba(0, 0, 0, 0.16) 0px 1px 4px;
+	--text-color: white;
+	--dimmed-text-color: #a3a3a3;
 
 	--blue: #1a75ed;
 
@@ -30,7 +32,9 @@
 	--border-color: #eee;
 	--border-radius: 6px;
 	--medium-text: 18px;
-	--small-box-shadow:rgba(0, 0, 0, 0.16) 0px 1px 4px;
+	--small-box-shadow: rgba(0, 0, 0, 0.16) 0px 1px 4px;
+	--text-color: black;
+	--dimmed-text-color: #535353;
 
 	--blue: #1a75ed;
 
@@ -333,8 +337,8 @@ form {
 
 .card {
 	border: solid 0.1rem var(--border-color);
-	border-radius: 1vmin;
-	padding: .2vmin;
+	border-radius: var(--border-radius);
+	padding: .6rem;
 	margin: 0.5vmin;
 	background-color: var(--third-background-color);
 }
@@ -665,7 +669,7 @@ form .input-row label {}
 	box-shadow: var(--small-box-shadow);
 }
 
-.tab-button-group .tab-button:first-of-type{
+.tab-button-group .tab-button:first-of-type {
 	border-left-width: 0;
 	border-left-style: none;
 	border-top-left-radius: var(--border-radius);
@@ -690,6 +694,7 @@ form .input-row label {}
 	background: transparent;
 	padding: 1rem;
 	font-size: var(--medium-text);
+	color: var(--dimmed-text-color);
 }
 
 .tab-button:hover {
@@ -697,6 +702,7 @@ form .input-row label {}
 }
 
 .tab-button.active-tab {
+	color: var(--text-color);
 	border-bottom-color: var(--blue);
 	border-bottom-style: solid;
 	border-bottom-width: 2px;
@@ -713,66 +719,66 @@ form .input-row label {}
 
 .switch {
 	position: relative;
-  display: inline-block;
-  width: 60px;
-  height: 34px;
+	display: inline-block;
+	width: 60px;
+	height: 34px;
 	border-radius: 34px;
 }
 
 .switch input {
 	opacity: 0;
-  width: 0;
-  height: 0;
+	width: 0;
+	height: 0;
 }
 
 .switch span {
 	position: absolute;
-  cursor: pointer;
-  top: 0;
-  left: 0;
-  right: 0;
-  bottom: 0;
-  background-color: #ccc;
-  -webkit-transition: .4s;
-  transition: .4s;
+	cursor: pointer;
+	top: 0;
+	left: 0;
+	right: 0;
+	bottom: 0;
+	background-color: #ccc;
+	-webkit-transition: .4s;
+	transition: .4s;
 }
 
 .switch span:before {
 	position: absolute;
-  content: "";
-  height: 26px;
-  width: 26px;
-  left: 4px;
-  bottom: 4px;
-  background-color: white;
-  -webkit-transition: .2s;
-  transition: .2s;
+	content: "";
+	height: 26px;
+	width: 26px;
+	left: 4px;
+	bottom: 4px;
+	background-color: white;
+	-webkit-transition: .2s;
+	transition: .2s;
 }
 
-.switch input:checked + span {
-  background-color: #2196F3;
+.switch input:checked+span {
+	background-color: #2196F3;
 }
 
-.switch input:focus + span {
-  box-shadow: 0 0 1px #2196F3;
+.switch input:focus+span {
+	box-shadow: 0 0 1px #2196F3;
 }
 
-.switch input:checked + span:before {
-  -webkit-transform: translateX(26px);
-  -ms-transform: translateX(26px);
-  transform: translateX(26px);
+.switch input:checked+span:before {
+	-webkit-transform: translateX(26px);
+	-ms-transform: translateX(26px);
+	transform: translateX(26px);
 }
 
 .switch span {
-  border-radius: 34px;
+	border-radius: 34px;
 }
 
 .switch span:before {
-  border-radius: 50%;
+	border-radius: 50%;
 }
 
 .design-system {
-	background-color: var(--background-hover);
+	background-color: var(--background);
 	height: 100%;
 	display: grid;
 	grid-template-areas: 'header header' 'nav content';
@@ -798,6 +804,8 @@ form .input-row label {}
 	grid-area: content;
 	padding: 1rem;
 }
+
+
 
 @keyframes placeholder-glow {
 	0% {

@@ -39,22 +39,26 @@ pub fn design_system_page<'page, G: Html>(context: BoundedScope<'_, 'page>) -> V
             div(class="design-system-content") {
                 div() {
                     h3() { "Theme Toggle" }
-                    ThemeToggle()
+                    div(class="card") {
+                        ThemeToggle()
+                    }
                 }
                  div() {
                     h3() { "Accordion" }
-                    Accordion(id=create_signal(context, String::from(""))) {
-                        AccordionItem(title=first_item) {
-                            div() { "Example body for first item"}
-                        }
-                        AccordionItem(title=second_item) {
-                            div() { "Example body for second item"}
+                    div(class="card") {
+                        Accordion(id=create_signal(context, String::from(""))) {
+                            AccordionItem(title=first_item) {
+                                div() { "Example body for first item"}
+                            }
+                            AccordionItem(title=second_item) {
+                                div() { "Example body for second item"}
+                            }
                         }
                     }
                 }
                 div() {
                     h3() { "Tab Panels" }
-                    div() {
+                    div(class="card") {
                         TabPanel(active_tab=active_tab, classes=tab_panel_classes) {
                             div(class="tab-button-group") {
                                 TabButton(title=String::from("First"), index=TabIndex(0), classes=tab_button_classes)
@@ -75,7 +79,9 @@ pub fn design_system_page<'page, G: Html>(context: BoundedScope<'_, 'page>) -> V
                 }
                 div() {
                     h3() { "Switch" }
-                    Switch(on=switch_on, classes=switch_classes)
+                    div(class="card") {
+                        Switch(on=switch_on, classes=switch_classes)
+                    }
                 }
             }
         }
