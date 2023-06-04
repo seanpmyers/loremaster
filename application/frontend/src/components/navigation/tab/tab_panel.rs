@@ -1,7 +1,6 @@
 use sycamore::prelude::*;
 
-#[derive(Clone, Copy)]
-pub struct TabIndex(pub u32);
+pub type TabIndex = u32;
 
 #[derive(Prop)]
 pub struct TabPanelProperties<'tab_panel, G: Html> {

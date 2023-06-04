@@ -26,7 +26,7 @@ pub fn TabButton<'tab, G: Html>(
     };
 
     view! {context,
-        button(class=(match active_tab.get().as_ref().0 == index.0 {
+        button(class=(match active_tab.get().as_ref() == &index {
             true => format!("{} active-tab", classes.get()),
             false => format!("{}", classes),
         }), id="", on:click=clicked) {
