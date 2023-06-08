@@ -322,12 +322,16 @@ form {
 .glow-button {
 	padding: 1vmin;
 	margin: .3vmin;
-	color: var(--default-text-color);
-	background-color: rgb(99, 102, 241);
+	color: white;
+	background-color: #6366f1;
 	box-shadow: rgba(99, 102, 241, 0.9) 0px 8px 18px -8px;
 	border: transparent;
 	border-radius: 0.5rem;
 	cursor: pointer;
+}
+
+.glow-button:hover {
+	background-color: #8f91ef;
 }
 
 .week-widget {
