@@ -1,7 +1,7 @@
 use serde::{Deserialize, Serialize};
 use uuid::Uuid;
 
-use crate::components::combobox::{ComboBoxDatum, ComboBoxOption};
+use crate::{components::combobox::ComboBoxOption, templates::design_system::ComboBoxDatum};
 
 #[derive(Deserialize, Serialize, Debug, Clone, PartialEq, Eq)]
 pub struct Action {

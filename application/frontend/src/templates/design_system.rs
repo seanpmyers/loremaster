@@ -1,15 +1,19 @@
 use perseus::{engine_only_fn, template::Template, web_log};
 use sycamore::{
     prelude::*,
-    reactive::{create_selector, create_signal, BoundedScope, ReadSignal, Scope, Signal},
+    reactive::{create_signal, BoundedScope, Scope, Signal},
 };
 use uuid::Uuid;
 use web_sys::Event;
 
+pub trait ComboBoxDatum {
+    fn to_combobox_option(self) -> ComboBoxOption;
+}
+
 use crate::{
     components::{
         accordion::{Accordion, AccordionItem},
-        combobox::{ComboBox, ComboBoxDatum, ComboBoxOption},
+        combobox::{ComboBox, ComboBoxOption},
         navigation::tab::tab_panel::{TabIndex, TabPanel},
         navigation::tab::{tab_button::TabButton, tab_section::TabSection},
         switch::Switch,
@@ -21,27 +25,10 @@ use crate::{
 const PAGE_ROUTE_PATH: &str = "design-system";
 const PAGE_TITLE: &str = "Design System | Chronilore";
 const MAIN_HEADER: &str = "Chronilore Design System";
+const SYCAMORE_GITHUB_URL: &str = "https://github.com/sycamore-rs/sycamore";
+const PERSEUS_GITHUB_URL: &str = "https://github.com/framesurge/perseus";
 
 pub fn design_system_page<'page, G: Html>(context: BoundedScope<'_, 'page>) -> View<G> {
-    let fake_actions: Vec<Action> = vec![
-        Action {
-            id: Uuid::nil(),
-            name: String::from("Run"),
-        },
-        Action {
-            id: Uuid::nil(),
-            name: String::from("Sleep"),
-        },
-        Action {
-            id: Uuid::nil(),
-            name: String::from("Code"),
-        },
-        Action {
-            id: Uuid::nil(),
-            name: String::from("Play game"),
-        },
-    ];
-
     let empty_class: &Signal<String> = create_signal(context, String::from(""));
 
     let first_item: &Signal<String> = create_signal(context, String::from("First"));
@@ -57,36 +44,43 @@ pub fn design_system_page<'page, G: Html>(context: BoundedScope<'_, 'page>) -> V
 
     let demo_container_classes: &Signal<String> = create_signal(context, String::from("card"));
 
-    let selected: &Signal<Option<Uuid>> = create_signal(context, None);
-    let query: &Signal<String> = create_signal(context, String::new());
-    let other = create_signal(
-        context,
-        fake_actions
-            .iter()
-            .map(|action| action.clone().to_combobox_option().display_text)
-            .collect::<Vec<_>>(),
-    );
-    let options: &ReadSignal<Vec<RcSignal<ComboBoxOption>>> =
-        create_memo(context, move || query.get()).map(context, move |query| {
-            let query: String = query.trim().to_lowercase();
-            let result = fake_actions
-                .iter()
-                .map(|action| create_rc_signal(action.clone().to_combobox_option()))
-                .filter(|datum| datum.get().display_text.to_lowercase().contains(&query))
-                .collect::<Vec<_>>();
-            let first = match result.first() {
-                Some(value) => value.get().display_text.clone(),
-                None => String::new(),
-            };
-            web_log!("{} {} {}", query, first, result.len());
-            other.set(vec![first]);
-            result
-        });
+    let combobox_selected: &Signal<Option<Uuid>> = create_signal(context, None);
+    let combobox_query: &Signal<String> = create_signal(context, String::new());
+
+    let combobox_action_options: Vec<ComboBoxOption> = vec![
+        Action {
+            id: Uuid::nil(),
+            name: String::from("Run"),
+        }
+        .to_combobox_option(),
+        Action {
+            id: Uuid::nil(),
+            name: String::from("Sleep"),
+        }
+        .to_combobox_option(),
+        Action {
+            id: Uuid::nil(),
+            name: String::from("Code"),
+        }
+        .to_combobox_option(),
+        Action {
+            id: Uuid::nil(),
+            name: String::from("Play game"),
+        }
+        .to_combobox_option(),
+    ];
 
     view! {context,
         div(class="design-system") {
             div(class="design-system-header") {
                 h2(class="design-system-header") { (MAIN_HEADER) }
+                p() {
+                    (format!("All components are built with "))
+                    a(href=SYCAMORE_GITHUB_URL, target="_NEW_TAB") {"sycamore"}
+                    " and "
+                    a(href=PERSEUS_GITHUB_URL, target="_NEW_TAB") {"perseus"}
+                    "."
+                 }
             }
             div(class="design-system-nav") {
                 "nav"
@@ -147,15 +141,13 @@ pub fn design_system_page<'page, G: Html>(context: BoundedScope<'_, 'page>) -> V
                 div() {
                     h3() { "Combobox" }
                     div(class=demo_container_classes) {
-                        div() {
-                            Indexed(
-                                iterable=other,
-                                view= |context, option| view! { context,
-                                    div() { (option) }
-                                },
-                            )
-                         }
-                        ComboBox(query=query, selected=selected, options=options, classes=empty_class)
+                        ComboBox(
+                            query=combobox_query,
+                            selected=combobox_selected,
+                            options=combobox_action_options,
+                            classes=empty_class,
+                            selected_html_input_name=String::from("actionId")
+                        )
                     }
                 }
             }
