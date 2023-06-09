@@ -7,7 +7,7 @@ use crate::components::navigation::tab::tab_panel::TabIndex;
 pub struct TabButtonProperties<'tab> {
     pub title: String,
     pub index: TabIndex,
-    pub classes: &'tab ReadSignal<String>,
+    pub classes: &'tab Signal<String>,
 }
 
 #[component]
@@ -26,7 +26,10 @@ pub fn TabButton<'tab, G: Html>(
     };
 
     view! {context,
-        button(class=(classes.get()), id="", on:click=clicked) {
+        button(class=(match active_tab.get().as_ref() == &index {
+            true => format!("{} active-tab", classes.get()),
+            false => format!("{}", classes),
+        }), id="", on:click=clicked) {
             (title)
         }
     }

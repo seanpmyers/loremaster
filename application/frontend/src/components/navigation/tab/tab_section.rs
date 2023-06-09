@@ -29,7 +29,7 @@ pub fn TabSection<'tab, G: Html>(
 
     let children: View<G> = children.call(context);
     view! {context,
-        (match active_tab.get().0 == index.0 {
+        (match active_tab.get().as_ref() == &index {
             true => {
                 view! {context, div(class=(classes.get()), id="", on:click=clicked) {
                     (children)
