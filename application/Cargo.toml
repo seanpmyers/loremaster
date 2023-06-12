@@ -55,7 +55,7 @@ sqlx = { version = "0.6.3", features = [
 thiserror = "1.0.40"
 # Time
 time = { version = "0.3.22", features = ["serde", "std", "parsing"] }
-time-tz = { version = "1.0.2" }
+time-tz = { version = "1.0.3" }
 # Backend async I/O functionality
 tokio = { version = "1.28.2", features = ["full"] }
 tokio-stream = { version = "0.1.14" }
