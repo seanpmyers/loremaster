@@ -4,6 +4,7 @@ pub mod container;
 pub mod form;
 pub mod icon;
 pub mod information;
+pub mod modal;
 pub mod navigation;
 pub mod popover;
 pub mod state;

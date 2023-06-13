@@ -42,6 +42,7 @@ web-sys = { version = "0.3.62", features = [
 	"Element",
 	"Event",
 	"EventTarget",
+	"HtmlDialogElement",
 	"HtmlDocument",
 	"Navigator",
 	"PublicKeyCredentialCreationOptions",

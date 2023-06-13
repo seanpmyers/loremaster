@@ -122,6 +122,12 @@ form {
 	align-items: start;
 }
 
+dialog {
+	background: var(--background);
+	padding: 2rem;
+	border: none;
+}
+
 
 #loremaster-main {
 	display: flex;

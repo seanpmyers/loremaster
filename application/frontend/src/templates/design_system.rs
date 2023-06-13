@@ -14,6 +14,7 @@ use crate::{
     components::{
         accordion::{Accordion, AccordionItem},
         combobox::{ComboBox, ComboBoxOption},
+        modal::Modal,
         navigation::tab::tab_panel::{TabIndex, TabPanel},
         navigation::tab::{tab_button::TabButton, tab_section::TabSection},
         switch::Switch,
@@ -157,9 +158,11 @@ pub fn design_system_page<'page, G: Html>(context: BoundedScope<'_, 'page>) -> V
                     }
                 }
                 div() {
-                    h3() { "Dialog" }
+                    h3() { "Modal" }
                     div(class=demo_container_classes) {
-
+                        Modal(html_class=empty_class, button_label="Open modal") {
+                            div() { "Test" }
+                        }
                     }
                 }
                 div() {
