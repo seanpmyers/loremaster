@@ -16,6 +16,7 @@ pub struct ComboBoxOption {
 #[derive(Prop)]
 pub struct ComboBoxProperties<'combobox> {
     pub classes: &'combobox ReadSignal<String>,
+    pub label: String,
     pub options: Vec<ComboBoxOption>,
     pub query: &'combobox Signal<String>,
     pub selected: &'combobox Signal<Option<Uuid>>,
@@ -27,6 +28,7 @@ pub fn ComboBox<'combobox, G: Html>(
     context: Scope<'combobox>,
     ComboBoxProperties {
         classes,
+        label,
         selected_html_input_name,
         options,
         query,
@@ -50,6 +52,7 @@ pub fn ComboBox<'combobox, G: Html>(
 
     view! {context,
         div(class=classes) {
+            label() { (label) }
             input(type="text", bind:value=query) {}
             input(type="hidden", value=(match selected.get().as_ref() {
                 Some(option) => option.to_string(),

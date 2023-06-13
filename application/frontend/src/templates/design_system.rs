@@ -14,6 +14,7 @@ use crate::{
     components::{
         accordion::{Accordion, AccordionItem},
         combobox::{ComboBox, ComboBoxOption},
+        modal::Modal,
         navigation::tab::tab_panel::{TabIndex, TabPanel},
         navigation::tab::{tab_button::TabButton, tab_section::TabSection},
         switch::Switch,
@@ -135,19 +136,39 @@ pub fn design_system_page<'page, G: Html>(context: BoundedScope<'_, 'page>) -> V
                 div() {
                     h3() { "Popover" }
                     div(class=demo_container_classes) {
-
+                        div() {
+                            label() { "Hover" }
+                        }
+                        div() {
+                            label() { "Button" }
+                        }
                     }
                 }
                 div() {
                     h3() { "Combobox" }
                     div(class=demo_container_classes) {
                         ComboBox(
+                            label=String::from("Example ComboBox"),
                             query=combobox_query,
                             selected=combobox_selected,
                             options=combobox_action_options,
                             classes=empty_class,
                             selected_html_input_name=String::from("actionId")
                         )
+                    }
+                }
+                div() {
+                    h3() { "Modal" }
+                    div(class=demo_container_classes) {
+                        Modal(html_class=empty_class, button_label="Open modal") {
+                            div() { "Test" }
+                        }
+                    }
+                }
+                div() {
+                    h3() { "Information" }
+                    div(class=demo_container_classes) {
+
                     }
                 }
             }
