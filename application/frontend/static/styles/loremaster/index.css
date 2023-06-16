@@ -815,6 +815,17 @@ form .input-row label {}
 	padding: 1rem;
 }
 
+.modal {}
+
+.modal--active {
+	transform: translateY(0px);
+	opacity: 1;
+
+	&::backdrop {
+		background-color: rgba(black, 0.5);
+	}
+}
+
 
 
 @keyframes placeholder-glow {
