@@ -1,4 +1,3 @@
-use perseus::web_log;
 use sycamore::builder::prelude::*;
 use sycamore::prelude::*;
 use uuid::Uuid;
@@ -26,6 +25,7 @@ pub fn Modal<'modal, G: Html>(
     let dialog_id = Uuid::new_v4();
     let dialog = dialog::<G>()
         .id(dialog_id.to_string())
+        .class("modal")
         .c(fragment([
             div().c(children).view(context),
             button()
