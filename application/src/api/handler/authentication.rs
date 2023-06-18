@@ -120,12 +120,12 @@ pub async fn web_authentication_api_register_start_handler(
 ) -> Result<(RegistrationResult, Option<CreationChallengeResponse>)> {
     //TODO: ensure sanitized/clean
     let clean_email: &str = email_address.trim();
-
-    if !EmailAddress::is_valid(email_address) {
+    info!("{}", clean_email);
+    if !EmailAddress::is_valid(clean_email) {
         return Ok((RegistrationResult::InvalidEmailAddress, None));
     }
 
-    if !ALLOWED_EMAIL_ADDRESSES.contains(&email_address) {
+    if !ALLOWED_EMAIL_ADDRESSES.contains(&clean_email) {
         return Ok((RegistrationResult::BlockedEmailAddress, None));
     }
 

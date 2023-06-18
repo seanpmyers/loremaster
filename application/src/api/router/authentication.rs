@@ -209,7 +209,7 @@ pub fn router() -> Router<ApplicationState> {
     Router::new()
         .route(
             "/authentication/webauthn/start",
-            get(web_authentication_api_register_start),
+            post(web_authentication_api_register_start),
         )
         .route("/authentication/authenticate", post(authenticate))
         .route("/authentication/logout", post(logout))

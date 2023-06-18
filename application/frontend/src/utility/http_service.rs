@@ -4,7 +4,7 @@ use web_sys::RequestMode;
 use super::constants::{HTTP_HEADER_CONTENT_TYPE, HTTP_HEADER_CONTENT_TYPE_FORM};
 
 pub async fn post_html_form(
-    endpoint_url: &String,
+    endpoint_url: &str,
     fields: &Vec<(String, String)>,
 ) -> Option<reqwasm::http::Response> {
     let mut body_string: String = String::new();
