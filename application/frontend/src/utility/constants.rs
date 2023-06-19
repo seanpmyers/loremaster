@@ -14,6 +14,9 @@ pub const API_GOAL_NEW_ROUTE: &str = "person/goal-new";
 pub const API_GOAL_LIST_ROUTE: &str = "person/goal-list";
 pub const API_WEBAUTHN_START_ROUTE: &str = "authentication/webauthn/start";
 pub const API_WEBAUTHN_FINISH_ROUTE: &str = "authentication/webauthn/finish";
+pub const API_WEBAUTHN_LOGIN_START_ROUTE: &str = "authentication/webauthn/login/start";
+pub const API_WEBAUTHN_LOGIN_END_ROUTE: &str =
+    "authentication/webauthn/login/finish/public_key_credential.json";
 pub const HTTP_HEADER_CONTENT_TYPE: &str = "Content-Type";
 pub const HTTP_HEADER_CONTENT_TYPE_FORM: &str = "application/x-www-form-urlencoded";
 pub const EMAIL_ADDRESS_FIELD: &str = "email_address";

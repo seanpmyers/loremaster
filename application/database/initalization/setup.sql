@@ -15,7 +15,8 @@
 \i database/table/dictionary.sql
 \i database/table/term.sql
 \i database/table/schedule.sql
-\i database/table/web_authentication_challenge.sql
+\i database/table/web_authentication_register.sql
+\i database/table/web_authentication_login.sql
 \i database/table/web_authentication_key.sql
 \i database/table/password.sql
 
