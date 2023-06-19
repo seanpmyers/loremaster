@@ -18,8 +18,9 @@ use crate::{
         icon::{FINGERPRINT_SVG_HTML, KEY_2_SVG_HTML},
         state::{message_type::MessageType, validation::Validation, visibility::Visibility},
     },
+    data::entity::webauthn::RegistrationInput,
     utility::{
-        constants::{API_BASE_URL, API_WEBAUTHN_START_ROUTE},
+        constants::{API_BASE_URL, API_WEBAUTHN_FINISH_ROUTE, API_WEBAUTHN_START_ROUTE},
         http_service,
     },
 };
@@ -75,6 +76,7 @@ pub fn SecurityKeyAuthentication<G: Html>(context: Scope) -> View<G> {
                 ];
 
                 loading.set(true);
+                //TODO: Fix error handling
                 let query_response = http_service::post_html_form(
                     format!("{}/{}", API_BASE_URL, API_WEBAUTHN_START_ROUTE).as_str(),
                     &form_fields,
@@ -108,6 +110,18 @@ pub fn SecurityKeyAuthentication<G: Html>(context: Scope) -> View<G> {
                         let register_public_key_credential: RegisterPublicKeyCredential =
                             RegisterPublicKeyCredential::from(public_key_credential);
                         // start the fetch routine to post to the server
+                        let registration_input: RegistrationInput = RegistrationInput {
+                            email_address: email_address.get().as_ref().clone(),
+                            user_credential_json: register_public_key_credential,
+                        };
+                        let json = serde_json::to_string(&registration_input).unwrap();
+                        let result = http_service::post_json(
+                            &format!("{}/{}", API_BASE_URL, API_WEBAUTHN_FINISH_ROUTE),
+                            json,
+                        )
+                        .await
+                        .unwrap();
+                        web_log!("Status: {} - {}", result.status(), result.status_text());
                     }
                     Err(_) => todo!(),
                 };
