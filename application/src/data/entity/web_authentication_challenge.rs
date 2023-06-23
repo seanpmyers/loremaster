@@ -6,5 +6,8 @@ use uuid::Uuid;
 pub struct WebAuthenticationChallenge {
     pub id: Uuid,
     pub user_name: String,
-    pub passkey_registration: Value,
+    pub passkey: Value,
 }
+
+pub type WebAuthenticationRegister = WebAuthenticationChallenge;
+pub type WebAuthenticationLogin = WebAuthenticationChallenge;

@@ -15,13 +15,19 @@ use axum_extra::extract::{
 use email_address::EmailAddress;
 use log::{info, warn};
 use serde::{Deserialize, Serialize};
-use webauthn_rs::{prelude::RegisterPublicKeyCredential, Webauthn};
+use webauthn_rs::{
+    prelude::{PublicKeyCredential, RegisterPublicKeyCredential},
+    Webauthn,
+};
 
 use crate::{
     api::{
         handler::authentication::{
-            register_handler, web_authentication_api_register_finish_handler,
-            web_authentication_api_register_start_handler, RegistrationResult,
+            register_handler, web_authentication_api_login_finish_handler,
+            web_authentication_api_login_start_handler,
+            web_authentication_api_register_finish_handler,
+            web_authentication_api_register_start_handler, AuthenticationResult,
+            RegistrationResult,
         },
         response::ApiError,
         web_server::ApplicationState,
@@ -183,6 +189,7 @@ async fn web_authentication_api_register_start(
     }
 }
 
+//TODO: Rename
 #[derive(Debug, Clone, Deserialize, Serialize)]
 struct RegistrationInput {
     pub email_address: String,
@@ -205,11 +212,89 @@ async fn web_authentication_api_register_finish(
     Ok((StatusCode::CREATED, "Successfully registered security key").into_response())
 }
 
+#[derive(Deserialize, Debug)]
+struct WebAuthenticationLoginStartForm {
+    email_address: String,
+}
+
+async fn web_authentication_api_login_start(
+    State(postgres_service): State<PostgresHandler>,
+    State(web_authentication_service): State<Arc<Webauthn>>,
+    Form(request_input): Form<WebAuthenticationLoginStartForm>,
+) -> Result<Response, ApiError> {
+    match web_authentication_api_login_start_handler(
+        &postgres_service.database_pool,
+        &web_authentication_service,
+        &request_input.email_address,
+    )
+    .await?
+    {
+        (AuthenticationResult::InvalidEmailAddress, _) => {
+            Ok((StatusCode::BAD_REQUEST, INVALID_EMAIL_MESSAGE).into_response())
+        }
+        (AuthenticationResult::InvalidInput, _) => {
+            Ok((StatusCode::BAD_REQUEST, INVALID_EMAIL_MESSAGE).into_response())
+        }
+        (AuthenticationResult::InvalidKey, _) => {
+            Ok((StatusCode::BAD_REQUEST, INVALID_PASSWORD_MESSAGE).into_response())
+        }
+        (AuthenticationResult::Valid, Some(challenge)) => {
+            Ok((StatusCode::ACCEPTED, Json(Some(challenge))).into_response())
+        }
+        (_, _) => Ok((StatusCode::BAD_REQUEST, INVALID_EMAIL_MESSAGE).into_response()),
+    }
+}
+
+#[derive(Deserialize, Debug)]
+struct PersonPublicKeyCredential {
+    email_address: String,
+    public_key_credential: PublicKeyCredential,
+}
+
+async fn web_authentication_api_login_finish(
+    State(postgres_service): State<PostgresHandler>,
+    State(web_authentication_service): State<Arc<Webauthn>>,
+    cookie_jar: PrivateCookieJar,
+    Json(request_input): Json<PersonPublicKeyCredential>,
+) -> Result<Response, ApiError> {
+    match web_authentication_api_login_finish_handler(
+        &postgres_service.database_pool,
+        &web_authentication_service,
+        &request_input.email_address,
+        &request_input.public_key_credential,
+    )
+    .await?
+    {
+        (AuthenticationResult::InvalidEmailAddress, None) => {
+            Ok((StatusCode::BAD_REQUEST, INVALID_EMAIL_MESSAGE).into_response())
+        }
+        (AuthenticationResult::InvalidInput, None) => {
+            Ok((StatusCode::BAD_REQUEST, "Bad Input").into_response())
+        }
+        (AuthenticationResult::InvalidKey, None) => {
+            Ok((StatusCode::BAD_REQUEST, "Bad key").into_response())
+        }
+        (AuthenticationResult::Valid, Some(person_id)) => {
+            let updated_cookie_jar: PrivateCookieJar = cookie_jar.add(
+                Cookie::build(cookie_fields::USER_ID, person_id.to_string())
+                    .same_site(SameSite::Strict)
+                    .path("/")
+                    .http_only(true)
+                    .secure(true)
+                    .finish(),
+            );
+
+            Ok((updated_cookie_jar, SUCCESSFUL_LOGIN_MESSAGE.to_string()).into_response())
+        }
+        (_, _) => Ok((StatusCode::BAD_REQUEST, "Bad Input").into_response()),
+    }
+}
+
 pub fn router() -> Router<ApplicationState> {
     Router::new()
         .route(
             "/authentication/webauthn/start",
-            get(web_authentication_api_register_start),
+            post(web_authentication_api_register_start),
         )
         .route("/authentication/authenticate", post(authenticate))
         .route("/authentication/logout", post(logout))
@@ -217,5 +302,13 @@ pub fn router() -> Router<ApplicationState> {
         .route(
             "/authentication/webauthn/finish",
             post(web_authentication_api_register_finish),
+        )
+        .route(
+            "/authentication/webauthn/login/start",
+            post(web_authentication_api_login_start),
+        )
+        .route(
+            "/authentication/webauthn/login/finish/person_public_key_credential.json",
+            post(web_authentication_api_login_finish),
         )
 }

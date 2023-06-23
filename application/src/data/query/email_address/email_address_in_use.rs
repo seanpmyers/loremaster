@@ -8,7 +8,6 @@ const QUERY: &str = "
    SELECT
       person.id
       , email_address.display as email_address
-      , person.encrypted_password
    FROM
       public.email_address
    INNER JOIN

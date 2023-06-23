@@ -7,11 +7,11 @@ const QUERY: &str = "
     SELECT
         id
         , user_name
-        , passkey_registration
+        , passkey
     FROM
-        public.web_authentication_challenge
+        public.web_authentication_register
     WHERE
-        web_authentication_challenge.user_name = $1
+        web_authentication_register.user_name = $1
     LIMIT 
         1
 ;";

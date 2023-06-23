@@ -16,7 +16,7 @@ const QUERY: &str = "
             , chronicle_id
         )
     VALUES 
-    ($1, $2, $3, $4, $5, $6)
+    ($1, $2, $3, $4, $5)
     RETURNING
         id
         , email_address_id

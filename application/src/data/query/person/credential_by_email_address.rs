@@ -9,11 +9,15 @@ const QUERY: &str = "
    SELECT
       person.id
       , email_address.display as email_address
-      , person.encrypted_password
+      , password.encrypted_password
    FROM
       public.email_address
    INNER JOIN
       public.person ON public.email_address.id = person.email_address_id
+   INNER JOIN
+      public.person_password ON person.id = person_password.person_id
+   INNER JOIN
+      public.password ON person_password.password_id = password.id
    WHERE
       email_address.local_part = $1
       AND email_address.domain = $2

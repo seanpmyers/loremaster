@@ -4,6 +4,8 @@
 		"bindgen",
 		"combobox",
 		"gloo",
-		"reqwasm"
+		"proto",
+		"reqwasm",
+		"webauthn"
 	]
 }

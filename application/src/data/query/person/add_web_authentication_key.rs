@@ -5,12 +5,12 @@ use uuid::Uuid;
 
 const QUERY: &str = "
     INSERT INTO
-			public.person_web_authentication_key (
-					person_id
-					, web_authentication_key_id
-			)
+        public.person_web_authentication_key (
+            person_id
+            , web_authentication_key_id
+        )
     VALUES 
-    	($1, $2)
+        ($1, $2)
     ;";
 
 pub async fn add_web_authentication_key_query(
