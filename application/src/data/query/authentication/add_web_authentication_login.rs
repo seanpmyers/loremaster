@@ -8,14 +8,14 @@ const QUERY: &str = "
         public.web_authentication_login (
             id
             , user_name
-            , passkey_authentication
+            , passkey
         )
     VALUES 
         ($1, $2, $3)
     RETURNING
         id
         , user_name
-        , passkey_authentication
+        , passkey
 ;";
 
 pub async fn add_web_authentication_login_query(

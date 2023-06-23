@@ -15,6 +15,7 @@ use crate::components::form::input_validation::{InputValidation, InputValidation
 use crate::components::state::message_type::MessageType;
 use crate::components::state::validation::Validation;
 use crate::components::state::visibility::Visibility;
+use crate::components::widget::data::form::web_authentication_api_login::WebAuthenticationAPILogin;
 use crate::components::widget::notification::toast::{Toast, ToastProperties};
 use crate::utility::constants::API_LOGIN_URL;
 use crate::utility::http_service;
@@ -188,6 +189,9 @@ pub fn login_page<'page, G: Html>(
                             },
                         })
                     }
+                }
+                div() {
+                    WebAuthenticationAPILogin()
                 }
             }
         }

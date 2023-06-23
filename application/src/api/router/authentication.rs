@@ -305,7 +305,7 @@ pub fn router() -> Router<ApplicationState> {
         )
         .route(
             "/authentication/webauthn/login/start",
-            get(web_authentication_api_login_start),
+            post(web_authentication_api_login_start),
         )
         .route(
             "/authentication/webauthn/login/finish/person_public_key_credential.json",

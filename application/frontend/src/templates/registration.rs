@@ -14,7 +14,7 @@ use crate::components::form::input_validation::InputValidation;
 use crate::components::state::message_type::MessageType;
 use crate::components::state::validation::Validation;
 use crate::components::state::visibility::Visibility;
-use crate::components::widget::data::form::security_key_authentication::SecurityKeyAuthentication;
+use crate::components::widget::data::form::web_authentication_api_registration::WebAuthenticationAPIRegistration;
 use crate::utility::constants::{ACCEPTED_HTTP_STATUS_CODE, API_REGISTER_URL, OK_HTTP_STATUS_CODE};
 use crate::utility::http_service;
 
@@ -144,7 +144,7 @@ pub fn registration_page<'page, G: Html>(
                         FormMessageState::Success => view!{context, div(class="badge bg-success rounded") {"Successfully registered."}},
                         FormMessageState::Failure => view!{context, div(class="badge bg-danger rounded") {"Unable to register with the provided credentials."}}
                     })
-                    SecurityKeyAuthentication()
+                    WebAuthenticationAPIRegistration()
                 }
             }
             }

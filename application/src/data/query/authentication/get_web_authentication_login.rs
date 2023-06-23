@@ -11,7 +11,7 @@ const QUERY: &str = "
 	FROM
 		public.web_authentication_login
 	WHERE
-   	web_authentication_login.user_name = $1
+   	    web_authentication_login.user_name = $1
 ;";
 
 pub async fn get_web_authentication_login_query(

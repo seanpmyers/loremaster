@@ -1,6 +1,6 @@
 CREATE TABLE
     "web_authentication_login" (
         "id" uuid NOT NULL PRIMARY KEY,
-        "email_address" text NOT NULL,
-        "passkey_authentication" jsonb NOT NULL
+        "user_name" text NOT NULL,
+        "passkey" jsonb NOT NULL
     );
