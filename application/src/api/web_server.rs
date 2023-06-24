@@ -1,9 +1,11 @@
 use crate::api;
+use crate::configuration::application::LoremasterWebServerConfiguration;
 use crate::utility::constants::files::FRONTEND_DIST_PATH;
-use crate::utility::constants::{ENVIRONMENT, LOCAL_HOST_RELAYING_PARTY_ID, RELAYING_PARTY};
-use crate::utility::loremaster_configuration::{
-    get_configuration_from_file, LoremasterConfiguration,
+use crate::utility::constants::{
+    DEV_RELAYING_PARTY_ID, LOCAL_HOST_RELAYING_PARTY_ID, QA_RELAYING_PARTY_ID, RELAYING_PARTY,
+    RELAYING_PARTY_ID,
 };
+
 use crate::utility::password_encryption::PasswordEncryption;
 use crate::{
     data::postgres_handler::PostgresHandler,
@@ -22,28 +24,31 @@ use tower_http::services::ServeDir;
 use webauthn_rs::prelude::Url;
 use webauthn_rs::{Webauthn, WebauthnBuilder};
 
-pub async fn start() -> Result<()> {
-    let environment: String = std::env::var(ENVIRONMENT)?;
-    let configuration: LoremasterConfiguration = get_configuration_from_file(&environment)?;
-
+pub async fn start(configuration: LoremasterWebServerConfiguration) -> Result<()> {
     let transport_layer_security_configuration: RustlsConfig = get_tls_configuration().await?;
 
     info!("Attempting to establish a database connection...");
     let postgres_service: PostgresHandler =
-        PostgresHandler::new(configuration.postgresql_connection_string).await?;
+        PostgresHandler::new(configuration.database.postgresql_connection_string).await?;
     info!("Connection established.");
 
     info!("Creating encryption service...");
     let encryption_service: PasswordEncryptionService = PasswordEncryptionService::new(
-        configuration.hash_iterations,
-        configuration.site_secret.clone(),
+        configuration.encryption.hash_iterations,
+        configuration.encryption.site_secret.clone(),
     );
 
-    //TODO: match environment
-    let formatted_url: String = format!("https://localhost:{}", configuration.port);
+    let relaying_party_id: &str = match configuration.environment {
+        crate::configuration::application::Environment::Local => LOCAL_HOST_RELAYING_PARTY_ID,
+        crate::configuration::application::Environment::Development => DEV_RELAYING_PARTY_ID,
+        crate::configuration::application::Environment::QualityAssurance => QA_RELAYING_PARTY_ID,
+        crate::configuration::application::Environment::Production => RELAYING_PARTY_ID,
+    };
+
+    let formatted_url: String = format!("https://localhost:{}", configuration.web_server.port);
     let relaying_party_url: Url = Url::parse(formatted_url.as_str()).expect("Invalid URL");
     let web_authentication_service: Webauthn =
-        WebauthnBuilder::new(LOCAL_HOST_RELAYING_PARTY_ID, &relaying_party_url)
+        WebauthnBuilder::new(relaying_party_id, &relaying_party_url)
             .expect("Invalid WebAuthn builder configuration.")
             .rp_name(RELAYING_PARTY)
             .build()
@@ -53,7 +58,7 @@ pub async fn start() -> Result<()> {
         postgres_service,
         encryption_service,
         web_authentication_service: Arc::new(web_authentication_service),
-        key: Key::from(configuration.site_secret.as_bytes()),
+        key: Key::from(configuration.encryption.site_secret.as_bytes()),
     };
 
     let front_end_directory_router: MethodRouter = get_service(ServeDir::new(FRONTEND_DIST_PATH));
@@ -66,12 +71,14 @@ pub async fn start() -> Result<()> {
         .with_state(application_state)
         .fallback_service(front_end_directory_router);
 
-    let socket_address: SocketAddr =
-        SocketAddr::from((configuration.ipv4_address, configuration.port));
+    let socket_address: SocketAddr = SocketAddr::from((
+        configuration.web_server.ipv4_address,
+        configuration.web_server.port,
+    ));
 
     info!(
         "Starting web server...\n\n [https://localhost:{}]\n",
-        configuration.port
+        configuration.web_server.port
     );
     serve(
         application_router,

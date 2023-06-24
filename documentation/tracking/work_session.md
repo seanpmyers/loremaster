@@ -6,3 +6,4 @@
 | WebAuthn |2023-06-19| 91 minutes | Implemented functional login (back-end start and finish routes/handlers) |
 | WebAuthn |2023-06-23| 62 minutes | Updating webauthn front-end login form and fixed some things with back-end api handlers/queries. Basic registration and login with webauthn functioning. |
 | Project Management |2023-06-24| 60 minutes | Refining the process of issue tracking using GitHub. |
+| RON Configuration |2023-06-24| 58 minutes | Updating application configuration to use ron file. |
