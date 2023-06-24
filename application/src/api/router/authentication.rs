@@ -5,7 +5,7 @@ use axum::{
     extract::{ConnectInfo, State},
     http::StatusCode,
     response::{IntoResponse, Response},
-    routing::{get, post},
+    routing::post,
     Json, Router,
 };
 use axum_extra::extract::{
