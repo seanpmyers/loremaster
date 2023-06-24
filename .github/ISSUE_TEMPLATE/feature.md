@@ -47,6 +47,6 @@ A list of resources, can be links
 
 This is where a list of options can be created.
 
-- [x] (option 1)[https://github.com/seanpmyers/loremaster]
-- [ ] (option 2)[https://github.com/seanpmyers/loremaster]
-- [ ] (option 3)[https://github.com/seanpmyers/loremaster]
+- [x] [option](https://github.com/seanpmyers/loremaster)
+- [ ] [other option](https://github.com/seanpmyers/loremaster)
+- [ ] [another option](https://github.com/seanpmyers/loremaster)
