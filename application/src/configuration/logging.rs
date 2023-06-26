@@ -1,17 +1,19 @@
-use crate::utility::constants::ENVIRONMENT;
 use env_logger::{Builder, Target};
 use log::LevelFilter;
 use std::io::Write;
 use time::{format_description::well_known::Rfc3339, OffsetDateTime};
 
-pub fn configure_logging() {
+use super::application::LoremasterWebServerConfiguration;
+
+pub fn configure_logging(configuration: &LoremasterWebServerConfiguration) {
+    let environment: String = configuration.environment.to_string().to_ascii_uppercase();
     Builder::new()
         .target(Target::Stdout)
-        .format(|buf, record| -> Result<(), std::io::Error> {
+        .format(move |buf, record| -> Result<(), std::io::Error> {
             writeln!(
                 buf,
                 "[LOREMASTER_{}]: [{}] [{}] - {}",
-                std::env::var(ENVIRONMENT).unwrap().to_ascii_uppercase(),
+                environment,
                 OffsetDateTime::now_utc().format(&Rfc3339).unwrap(),
                 record.level(),
                 record.args()
