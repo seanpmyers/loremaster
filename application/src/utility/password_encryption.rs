@@ -35,7 +35,7 @@ impl PasswordEncryption for PasswordEncryptionService {
 
         argon2_parameters.t_cost(self.iterations).p_cost(2);
 
-        let argon2 = Argon2::new_with_secret(
+        let argon2: Argon2<'_> = Argon2::new_with_secret(
             self.site_secret.as_bytes(),
             argon2::Algorithm::Argon2id,
             argon2::Version::V0x13,
@@ -61,7 +61,7 @@ impl PasswordEncryption for PasswordEncryptionService {
         let mut argon2_parameters: ParamsBuilder = argon2::ParamsBuilder::new();
         argon2_parameters.t_cost(self.iterations).p_cost(2);
 
-        let argon2 = Argon2::new_with_secret(
+        let argon2: Argon2<'_> = Argon2::new_with_secret(
             self.site_secret.as_bytes(),
             argon2::Algorithm::Argon2id,
             argon2::Version::V0x13,
@@ -69,7 +69,7 @@ impl PasswordEncryption for PasswordEncryptionService {
         )
         .map_err(|error| anyhow!("{}", error))?;
 
-        let parsed_hash = PasswordHash::new(encrypted_password).unwrap();
+        let parsed_hash: PasswordHash<'_> = PasswordHash::new(encrypted_password).unwrap();
         info!(
             "Verify password: elapsed: {}ms",
             now.elapsed().as_millis().to_string()
@@ -82,19 +82,39 @@ impl PasswordEncryption for PasswordEncryptionService {
 
 #[cfg(test)]
 mod tests {
-    use crate::utility::{
-        loremaster_configuration::{get_configuration_from_file, LoremasterConfiguration},
-        password_encryption::{PasswordEncryption, PasswordEncryptionService},
+    use crate::{
+        configuration::application::LoremasterWebServerConfiguration,
+        utility::password_encryption::{PasswordEncryption, PasswordEncryptionService},
     };
     use anyhow::Result;
 
+    const TEST_RON_CONTENT: &str = r#"
+    LoremasterWebServerConfiguration(
+        environment: Local,
+        scheduler_state: Off,
+        web_server: (
+            port: 8000,
+            ipv4_address: (127, 0, 0, 1),
+        ),
+        database: (
+            postgresql_connection_string: "postgres://postgres:postgres@localhost/postgres",
+        ),
+        encryption: (
+            hash_iterations: 2,
+            site_secret: "b4/b03GLm3FluirZwz/FH0wFxcOVLOu0FHefdkL8TH7AJ1yqAGIWTmJtvsGbOrt8AyIpWJhxhUGwmm59lt0r9g==",
+        ),
+        front_end: (
+            port: 8080
+        ),
+    )
+    "#;
+
     #[test]
     fn verify_same_key() -> Result<()> {
-        let configuration: LoremasterConfiguration =
-            get_configuration_from_file(&String::from("local"))?;
+        let configuration: LoremasterWebServerConfiguration = ron::from_str(TEST_RON_CONTENT)?;
         let encryption_service = PasswordEncryptionService::new(
-            configuration.hash_iterations,
-            configuration.site_secret,
+            configuration.encryption.hash_iterations,
+            configuration.encryption.site_secret,
         );
         let encrypted_key: String = encryption_service.encrypt_password("input")?;
         let encrypted_key2: String = encryption_service.encrypt_password("input")?;
@@ -107,11 +127,10 @@ mod tests {
 
     #[test]
     fn verify_different_keys() -> Result<()> {
-        let configuration: LoremasterConfiguration =
-            get_configuration_from_file(&String::from("local"))?;
+        let configuration: LoremasterWebServerConfiguration = ron::from_str(TEST_RON_CONTENT)?;
         let encryption_service = PasswordEncryptionService::new(
-            configuration.hash_iterations,
-            configuration.site_secret,
+            configuration.encryption.hash_iterations,
+            configuration.encryption.site_secret,
         );
         // The check function should return false if
         let verify_result: bool = encryption_service.verify_password(
@@ -124,11 +143,10 @@ mod tests {
 
     #[test]
     fn unique_encryption_check() -> Result<()> {
-        let configuration: LoremasterConfiguration =
-            get_configuration_from_file(&String::from("local"))?;
+        let configuration: LoremasterWebServerConfiguration = ron::from_str(TEST_RON_CONTENT)?;
         let encryption_service = PasswordEncryptionService::new(
-            configuration.hash_iterations,
-            configuration.site_secret,
+            configuration.encryption.hash_iterations,
+            configuration.encryption.site_secret,
         );
         assert_ne!(
             encryption_service.encrypt_password("input")?,

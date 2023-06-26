@@ -1,8 +1,8 @@
 LoremasterWebServerConfiguration(
-	evironment: Local,
+	environment: Local,
 	scheduler_state: Off,
 	web_server: WebServer(
-		ipv4_address: [127, 0, 0, 1],
+		ipv4_address: (127, 0, 0, 1),
 		port: 8000,
 	),
 	database: Database(
