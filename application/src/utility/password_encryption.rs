@@ -101,7 +101,7 @@ mod tests {
         ),
         encryption: (
             hash_iterations: 2,
-            site_secret: "b4/b03GLm3FluirZwz/FH0wFxcOVLOu0FHefdkL8TH7AJ1yqAGIWTmJtvsGbOrt8AyIpWJhxhUGwmm59lt0r9g==",
+            site_secret: "thisisjustanexample",
         ),
         front_end: (
             port: 8080
