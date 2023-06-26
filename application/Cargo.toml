@@ -63,7 +63,7 @@ tokio = { version = "1.28.2", features = ["full"] }
 tokio-stream = { version = "0.1.14" }
 tokio-test = { version = "0.4.2" }
 # Encode/decode TOML content/files
-toml = { version = "0.7.4" }
+toml = { version = "0.7.5" }
 # Tower middleware and utilities for HTTP clients and servers
 tower-http = { version = "0.4.1", features = ["cors", "fs"] }
 # Implementation of Universally Unique Identifiers (Uuid)
