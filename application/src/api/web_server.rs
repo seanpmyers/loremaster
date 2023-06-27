@@ -1,6 +1,8 @@
 use crate::api;
 use crate::configuration::application::LoremasterWebServerConfiguration;
-use crate::utility::constants::files::FRONTEND_DIST_PATH;
+use crate::utility::constants::files::{
+    FRONTEND_DIST_PATH, SSL_CERT_FILE_PATH, SSL_CERT_KEY_FILE_PATH, SSL_CERT_PATH,
+};
 use crate::utility::constants::{
     DEV_RELAYING_PARTY_ID, LOCAL_HOST_RELAYING_PARTY_ID, QA_RELAYING_PARTY_ID, RELAYING_PARTY,
     RELAYING_PARTY_ID,
@@ -102,7 +104,11 @@ async fn serve(
 }
 
 async fn get_tls_configuration() -> Result<RustlsConfig> {
-    Ok(RustlsConfig::from_pem_file("certs/cert.pem", "certs/key.pem").await?)
+    Ok(RustlsConfig::from_pem_file(
+        format!("{}/{}", SSL_CERT_PATH, SSL_CERT_FILE_PATH),
+        format!("{}/{}", SSL_CERT_PATH, SSL_CERT_KEY_FILE_PATH),
+    )
+    .await?)
 }
 
 #[derive(Clone)]
