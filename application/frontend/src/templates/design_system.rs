@@ -74,7 +74,7 @@ pub fn design_system_page<'page, G: Html>(context: BoundedScope<'_, 'page>) -> V
     view! {context,
         div(class="design-system") {
             div(class="design-system-header") {
-                h2(class="design-system-header") { (MAIN_HEADER) }
+                h2(class="") { (MAIN_HEADER) }
                 p() {
                     (format!("All components are built with "))
                     a(href=SYCAMORE_GITHUB_URL, target="_NEW_TAB") {"sycamore"}
@@ -163,6 +163,48 @@ pub fn design_system_page<'page, G: Html>(context: BoundedScope<'_, 'page>) -> V
                         Modal(html_class=empty_class, button_label="Open modal") {
                             div() { "Test" }
                         }
+                    }
+                }
+                div() {
+                    h3() { "Information" }
+                    div(class=demo_container_classes) {
+
+                    }
+                }
+                div() {
+                    h3() { "Information" }
+                    div(class=demo_container_classes) {
+
+                    }
+                }
+                div() {
+                    h3() { "Information" }
+                    div(class=demo_container_classes) {
+
+                    }
+                }
+                div() {
+                    h3() { "Information" }
+                    div(class=demo_container_classes) {
+
+                    }
+                }
+                div() {
+                    h3() { "Information" }
+                    div(class=demo_container_classes) {
+
+                    }
+                }
+                div() {
+                    h3() { "Information" }
+                    div(class=demo_container_classes) {
+
+                    }
+                }
+                div() {
+                    h3() { "Information" }
+                    div(class=demo_container_classes) {
+
                     }
                 }
                 div() {

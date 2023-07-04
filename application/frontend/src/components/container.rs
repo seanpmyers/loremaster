@@ -13,11 +13,11 @@ pub fn Container<'a, G: Html>(
     context: Scope<'a>,
     ContainerProperties { title, children }: ContainerProperties<'a, G>,
 ) -> View<G> {
-    let children = children.call(context);
+    let children: View<G> = children.call(context);
     view! {context,
         TopNavBar()
+        SideNavBar()
         div(class="", id="loremaster-main", data-title=title) {
-            SideNavBar()
             (children)
         }
     }

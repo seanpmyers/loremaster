@@ -69,15 +69,16 @@ html {
 	font-family: var(--default-font-family);
 	background: var(--background);
 	color: var(--default-text-color);
-	display: flex;
+	height: 100%;
 }
 
-body,
 #root,
 .__perseus_content {
-	min-height: 100%;
-	min-width: 100%;
-	height: 100vh;
+	height: 100%;
+	display: grid;
+	grid-template-areas: 'header header' 'nav content';
+	grid-template-rows: auto 1fr;
+	grid-template-columns: 10vw 1fr;
 }
 
 
@@ -88,16 +89,14 @@ body {
 	/* background: linear-gradient(310deg, rgb(20, 23, 39), rgb(58, 65, 111)); */
 	/* background: radial-gradient(circle, rgba(255, 255, 255, 1) 0%, rgba(254, 254, 255, 0.8113446062018558) 100%); */
 	/* background-image: linear-gradient(to right, #fff5f0, #fef2ee, #fef0ec, #fdedeb, #fcebea, #fcecec, #fcecef, #fbedf1, #faf1f6, #faf5fa, #fbf8fd, #fcfcff); */
-	display: flex;
-	flex-grow: 1;
 	background: var(--background);
 	transition: 0.6s linear;
+	height: 100%;
 }
 
 body:first-child {
 	margin: 0;
 	padding: 0;
-	flex-grow: 1;
 }
 
 button {
@@ -130,9 +129,10 @@ dialog {
 
 
 #loremaster-main {
-	display: flex;
-	flex-direction: row;
-
+	grid-area: content;
+	padding: 1rem;
+	max-height: 90vh;
+	overflow: scroll;
 }
 
 .loremaster-text {
@@ -207,9 +207,11 @@ dialog {
 
 
 .top-nav {
-	display: flex;
-	flex-wrap: wrap;
+	grid-area: header;
+	max-height: 8vh;
 	align-items: center;
+	display: flex;
+	flex-direction: row;
 }
 
 .top-nav ul {
@@ -246,13 +248,13 @@ dialog {
 }
 
 .side-nav {
-	display: flex;
-	flex-direction: column;
-	background-color: var(--third-background-color);
-	border: 3px solid var(--border-color);
-	border-radius: 1rem;
-	margin: 1rem;
-	padding: 2.8rem;
+	grid-area: nav;
+	border-right-width: 1px;
+	border-right-style: solid;
+	border-right-color: var(--background);
+	background-color: var(--background);
+	padding-top: .6rem;
+	max-height: 90vh;
 }
 
 .side-nav-container {
@@ -799,6 +801,7 @@ form .input-row label {}
 .design-system-header {
 	grid-area: header;
 	background-color: var(--background);
+	max-height: 8vh;
 }
 
 .design-system-nav {
@@ -808,11 +811,14 @@ form .input-row label {}
 	border-right-color: var(--background);
 	background-color: var(--background);
 	padding-top: .6rem;
+	max-height: 90vh;
 }
 
 .design-system-content {
 	grid-area: content;
 	padding: 1rem;
+	max-height: 90vh;
+	overflow: scroll;
 }
 
 .modal {}
