@@ -1,4 +1,8 @@
-use perseus::{prelude::spawn_local_scoped, web_log};
+use gloo_timers::future::TimeoutFuture;
+use perseus::{
+    prelude::{navigate, spawn_local_scoped},
+    web_log,
+};
 use sycamore::prelude::*;
 use wasm_bindgen::JsValue;
 use wasm_bindgen_futures::JsFuture;
@@ -100,13 +104,20 @@ pub fn WebAuthenticationAPILogin<G: Html>(context: Scope) -> View<G> {
                             public_key_credential,
                         };
                         let json = serde_json::to_string(&login_input).unwrap();
-                        let result = http_service::post_json(
+                        match http_service::post_json(
                             &format!("{}/{}", API_BASE_URL, API_WEBAUTHN_LOGIN_END_ROUTE),
                             json,
                         )
                         .await
-                        .unwrap();
-                        web_log!("Status: {} - {}", result.status(), result.status_text());
+                        {
+                            Some(response) => {
+                                if response.ok() {
+                                    TimeoutFuture::new(4000_u32).await;
+                                    navigate("/chronicle/");
+                                }
+                            }
+                            None => todo!(),
+                        }
                     }
                     Err(_) => todo!(),
                 };
