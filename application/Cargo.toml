@@ -29,7 +29,7 @@ env_logger = "0.10.0"
 # Provides async programming foundational functionality
 futures = "0.3.27"
 # A library for HTML entity encoding and decoding
-htmlescape = { version = "0.3.1" }
+html-escape = { version = "0.2.13" }
 # Logging
 log = { version = "0.4.19" }
 # Rust Object Notation
