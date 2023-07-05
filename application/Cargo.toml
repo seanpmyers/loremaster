@@ -54,7 +54,7 @@ sqlx = { version = "0.6.3", features = [
 # NewSQL database -- to be used as an alternative to postgresql for this app
 # surrealdb = { version = "1.0.0-beta.8" }
 # Error/exception handling
-thiserror = "1.0.40"
+thiserror = "1.0.41"
 # Time
 time = { version = "0.3.22", features = ["serde", "std", "parsing"] }
 time-tz = { version = "1.0.3" }
