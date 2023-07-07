@@ -1,10 +1,9 @@
-use perseus::{engine_only_fn, template::Template, web_log};
+use perseus::{engine_only_fn, template::Template};
 use sycamore::{
     prelude::*,
     reactive::{create_signal, BoundedScope, Scope, Signal},
 };
 use uuid::Uuid;
-use web_sys::Event;
 
 pub trait ComboBoxDatum {
     fn to_combobox_option(self) -> ComboBoxOption;
@@ -14,6 +13,7 @@ use crate::{
     components::{
         accordion::{Accordion, AccordionItem},
         combobox::{ComboBox, ComboBoxOption},
+        container::Container,
         modal::Modal,
         navigation::tab::tab_panel::{TabIndex, TabPanel},
         navigation::tab::{tab_button::TabButton, tab_section::TabSection},
@@ -72,145 +72,144 @@ pub fn design_system_page<'page, G: Html>(context: BoundedScope<'_, 'page>) -> V
     ];
 
     view! {context,
-        div(class="design-system") {
-            div(class="design-system-header") {
-                h2(class="") { (MAIN_HEADER) }
-                p() {
-                    (format!("All components are built with "))
-                    a(href=SYCAMORE_GITHUB_URL, target="_NEW_TAB") {"sycamore"}
-                    " and "
-                    a(href=PERSEUS_GITHUB_URL, target="_NEW_TAB") {"perseus"}
-                    "."
-                 }
-            }
-            div(class="design-system-nav") {
-                "nav"
-            }
-            div(class="design-system-content") {
-                div() {
-                    h3() { "Theme Toggle" }
-                    div(class=demo_container_classes) {
-                        ThemeToggle()
-                    }
+        Container(title="Design System") {
+            div(class="design-system") {
+                div(class="design-system-header") {
+                    h2(class="") { (MAIN_HEADER) }
+                    p() {
+                        (format!("All components are built with "))
+                        a(href=SYCAMORE_GITHUB_URL, target="_NEW_TAB") {"sycamore"}
+                        " and "
+                        a(href=PERSEUS_GITHUB_URL, target="_NEW_TAB") {"perseus"}
+                        "."
+                     }
                 }
-                 div() {
-                    h3() { "Accordion" }
-                    div(class=demo_container_classes) {
-                        Accordion(id=create_signal(context, String::from(""))) {
-                            AccordionItem(title=first_item) {
-                                div() { "Example body for first item"}
-                            }
-                            AccordionItem(title=second_item) {
-                                div() { "Example body for second item"}
+                div(class="design-system-content") {
+                    div() {
+                        h3() { "Theme Toggle" }
+                        div(class=demo_container_classes) {
+                            ThemeToggle()
+                        }
+                    }
+                     div() {
+                        h3() { "Accordion" }
+                        div(class=demo_container_classes) {
+                            Accordion(id=create_signal(context, String::from(""))) {
+                                AccordionItem(title=first_item) {
+                                    div() { "Example body for first item"}
+                                }
+                                AccordionItem(title=second_item) {
+                                    div() { "Example body for second item"}
+                                }
                             }
                         }
                     }
-                }
-                div() {
-                    h3() { "Tab Panels" }
-                    div(class=demo_container_classes) {
-                        TabPanel(active_tab=active_tab, classes=tab_panel_classes) {
-                            div(class="tab-button-group") {
-                                TabButton(title=String::from("First"), index=0_u32, classes=tab_button_classes)
-                                TabButton(title=String::from("Second"), index=1_u32, classes=tab_button_classes)
-                                TabButton(title=String::from("Third"), index=2_u32, classes=tab_button_classes)
-                            }
-                            TabSection(title=String::from("tab1"), index=0_u32, classes=tab_section_classes){
-                                div() {"First"}
-                            }
-                            TabSection(title=String::from("tab2"), index=1_u32, classes=tab_section_classes){
-                                div() {"Second"}
-                            }
-                            TabSection(title=String::from("tab3"), index=2_u32, classes=tab_section_classes){
-                                div() {"Third"}
+                    div() {
+                        h3() { "Tab Panels" }
+                        div(class=demo_container_classes) {
+                            TabPanel(active_tab=active_tab, classes=tab_panel_classes) {
+                                div(class="tab-button-group") {
+                                    TabButton(title=String::from("First"), index=0_u32, classes=tab_button_classes)
+                                    TabButton(title=String::from("Second"), index=1_u32, classes=tab_button_classes)
+                                    TabButton(title=String::from("Third"), index=2_u32, classes=tab_button_classes)
+                                }
+                                TabSection(title=String::from("tab1"), index=0_u32, classes=tab_section_classes){
+                                    div() {"First"}
+                                }
+                                TabSection(title=String::from("tab2"), index=1_u32, classes=tab_section_classes){
+                                    div() {"Second"}
+                                }
+                                TabSection(title=String::from("tab3"), index=2_u32, classes=tab_section_classes){
+                                    div() {"Third"}
+                                }
                             }
                         }
                     }
-                }
-                div() {
-                    h3() { "Switch" }
-                    div(class=demo_container_classes) {
-                        Switch(toggled=switch_on, classes=switch_classes)
-                    }
-                }
-                div() {
-                    h3() { "Popover" }
-                    div(class=demo_container_classes) {
-                        div() {
-                            label() { "Hover" }
-                        }
-                        div() {
-                            label() { "Button" }
+                    div() {
+                        h3() { "Switch" }
+                        div(class=demo_container_classes) {
+                            Switch(toggled=switch_on, classes=switch_classes)
                         }
                     }
-                }
-                div() {
-                    h3() { "Combobox" }
-                    div(class=demo_container_classes) {
-                        ComboBox(
-                            label=String::from("Example ComboBox"),
-                            query=combobox_query,
-                            selected=combobox_selected,
-                            options=combobox_action_options,
-                            classes=empty_class,
-                            selected_html_input_name=String::from("actionId")
-                        )
-                    }
-                }
-                div() {
-                    h3() { "Modal" }
-                    div(class=demo_container_classes) {
-                        Modal(html_class=empty_class, button_label="Open modal") {
-                            div() { "Test" }
+                    div() {
+                        h3() { "Popover" }
+                        div(class=demo_container_classes) {
+                            div() {
+                                label() { "Hover" }
+                            }
+                            div() {
+                                label() { "Button" }
+                            }
                         }
                     }
-                }
-                div() {
-                    h3() { "Information" }
-                    div(class=demo_container_classes) {
-
+                    div() {
+                        h3() { "Combobox" }
+                        div(class=demo_container_classes) {
+                            ComboBox(
+                                label=String::from("Example ComboBox"),
+                                query=combobox_query,
+                                selected=combobox_selected,
+                                options=combobox_action_options,
+                                classes=empty_class,
+                                selected_html_input_name=String::from("actionId")
+                            )
+                        }
                     }
-                }
-                div() {
-                    h3() { "Information" }
-                    div(class=demo_container_classes) {
-
+                    div() {
+                        h3() { "Modal" }
+                        div(class=demo_container_classes) {
+                            Modal(html_class=empty_class, button_label="Open modal") {
+                                div() { "Test" }
+                            }
+                        }
                     }
-                }
-                div() {
-                    h3() { "Information" }
-                    div(class=demo_container_classes) {
+                    div() {
+                        h3() { "Information" }
+                        div(class=demo_container_classes) {
 
+                        }
                     }
-                }
-                div() {
-                    h3() { "Information" }
-                    div(class=demo_container_classes) {
+                    div() {
+                        h3() { "Information" }
+                        div(class=demo_container_classes) {
 
+                        }
                     }
-                }
-                div() {
-                    h3() { "Information" }
-                    div(class=demo_container_classes) {
+                    div() {
+                        h3() { "Information" }
+                        div(class=demo_container_classes) {
 
+                        }
                     }
-                }
-                div() {
-                    h3() { "Information" }
-                    div(class=demo_container_classes) {
+                    div() {
+                        h3() { "Information" }
+                        div(class=demo_container_classes) {
 
+                        }
                     }
-                }
-                div() {
-                    h3() { "Information" }
-                    div(class=demo_container_classes) {
+                    div() {
+                        h3() { "Information" }
+                        div(class=demo_container_classes) {
 
+                        }
                     }
-                }
-                div() {
-                    h3() { "Information" }
-                    div(class=demo_container_classes) {
+                    div() {
+                        h3() { "Information" }
+                        div(class=demo_container_classes) {
 
+                        }
+                    }
+                    div() {
+                        h3() { "Information" }
+                        div(class=demo_container_classes) {
+
+                        }
+                    }
+                    div() {
+                        h3() { "Information" }
+                        div(class=demo_container_classes) {
+
+                        }
                     }
                 }
             }

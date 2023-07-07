@@ -103,9 +103,9 @@ pub fn registration_page<'page, G: Html>(
 
     view! {context,
         Container(title="Registration") {
-            div(class="card registration-form") {
-                div(class="card-body") {
-                    h3(class="card-title display-6") {"Registration"}
+            div(class="registration-form") {
+                div(class="") {
+                    h3(class="display-6") {"Registration"}
                     form(on:submit=registration_handler) {
                         div(class="input-row") {
                             label(

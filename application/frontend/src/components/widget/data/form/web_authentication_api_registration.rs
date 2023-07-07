@@ -136,10 +136,5 @@ pub fn WebAuthenticationAPIRegistration<G: Html>(context: Scope) -> View<G> {
                 span() { "Register Security Key" }
             }
         }
-
-        button(class="filled-button", disabled=true) {
-            div(class="filled-button-icon", dangerously_set_inner_html=FINGERPRINT_SVG_HTML) {}
-            span() { "Register Fingerprint" }
-        }
     }
 }

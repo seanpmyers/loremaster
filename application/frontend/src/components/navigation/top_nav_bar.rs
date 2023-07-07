@@ -2,7 +2,7 @@ use sycamore::prelude::*;
 
 use crate::components::widget::date_time::DateTime;
 use crate::components::{
-    icon::{GIT_MERGE_SVG_HTML, GLOBE_SVG_HTML, SEARCH_SVG_HTML},
+    icon::{GIT_MERGE_SVG_HTML, GLOBE_SVG_HTML, SEARCH_SVG_HTML, USER_CIRCLE_SVH_HTML},
     widget::theme_toggle::ThemeToggle,
 };
 
@@ -20,8 +20,10 @@ pub fn TopNavBar<G: Html>(context: Scope) -> View<G> {
                 a(href=home_link.html_href, id=home_link.html_id, class="loremaster-banner-link") { (home_link.display_text)}
             }
             div(id="top-nav-version") {
-                span(dangerously_set_inner_html=GIT_MERGE_SVG_HTML) {}
-                span() { "1.0.0"}
+                div() {
+                    span(dangerously_set_inner_html=GIT_MERGE_SVG_HTML) {}
+                    span() { "2023.7.7"}
+                }
             }
             ThemeToggle()
             div() {
@@ -37,6 +39,15 @@ pub fn TopNavBar<G: Html>(context: Scope) -> View<G> {
                 ) {}
             }
             DateTime()
+            div(id="top-nav-user-icon") {
+                button(
+                    title="You"
+                ) {
+                    span(dangerously_set_inner_html=USER_CIRCLE_SVH_HTML) { }
+                    span() { "Sean" }
+                }
+
+            }
         }
     }
 }

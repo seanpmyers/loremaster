@@ -10,6 +10,7 @@
 	--dimmed-text-color: #a3a3a3;
 
 	--blue: #1a75ed;
+	--light-text: white;
 
 	--primary-background-gradient: linear-gradient(112deg, rgba(63, 74, 87, 1) 0%, rgba(28, 34, 40, 1) 100%);
 	--primary-background-color: #060402;
@@ -39,6 +40,7 @@
 	--dimmed-text-color: #535353;
 
 	--blue: #1a75ed;
+	--light-text: white;
 
 	--primary-background-gradient: linear-gradient(112deg, rgba(242, 239, 245, 1) 0%, rgba(199, 216, 238, 1) 100%);
 	--primary-background-color: #f9fbfd;
@@ -152,11 +154,11 @@ dialog {
 
 .loremaster-banner-link {
 	text-decoration: none;
-	padding: 2vmin;
+	padding: 1vmin;
 	margin: 1vmin;
 	color: var(--default-text-color);
 	border-radius: .8vmin;
-	font-size: 4vmin;
+	font-size: 2rem;
 }
 
 .loremaster-banner-link:hover {
@@ -222,15 +224,41 @@ dialog {
 	flex: 1;
 	display: flex;
 	align-items: center;
+	font-size: .8rem;
+	color: var(--light-text)
 }
 
-#top-nav-version span {
-	margin-right: 1vmin;
+#top-nav-version div {
+	display: flex;
+	align-items: center;
+	border: solid 1px var(--blue);
+	border-radius: var(--border-radius);
+	padding: .2vmin;
+	background: var(--blue);
 }
 
-#top-nav-version span svg {
-	width: 24px;
-	height: 24px;
+#top-nav-version div span {
+	margin-right: .3vmin;
+}
+
+#top-nav-version div span svg {
+	width: 18px;
+	height: 18px;
+}
+
+#top-nav-user-icon {
+	margin-right: 16px;
+}
+
+#top-nav-user-icon button {
+	display: flex;
+	flex-direction: column;
+	border: none;
+}
+
+#top-nav-user-icon button span svg {
+	width: 42px;
+	height: 42px;
 }
 
 .side-nav {
@@ -345,10 +373,7 @@ dialog {
 .active-card {
 	background-color: rgb(0, 123, 255);
 	border: solid 0.1rem rgb(0, 123, 255);
-}
-
-.text-light {
-	color: var(--default-text-color);
+	color: var(--light-text);
 }
 
 .m-1 {
@@ -435,12 +460,12 @@ dialog {
 
 
 .date-time-widget div:nth-child(2) {
-	font-size: .8rem;
+	font-size: .9rem;
 	margin: .25vmin 0;
 }
 
 .date-time-widget div:nth-child(3) {
-	font-size: .9rem;
+	font-size: .7rem;
 	color: var(--secondary-text-color);
 	margin: .2vmin 0;
 }
@@ -771,35 +796,15 @@ form .input-row label {}
 	border-radius: 50%;
 }
 
-.design-system {
-	background-color: var(--background);
-	height: 100%;
-	display: grid;
-	grid-template-areas: 'header header' 'nav content';
-	grid-template-rows: auto 1fr;
-	grid-template-columns: 100px 1fr;
-}
+.design-system {}
 
 .design-system-header {
-	grid-area: header;
-	background-color: var(--background);
 	max-height: 8vh;
 }
 
-.design-system-nav {
-	grid-area: nav;
-	border-right-width: 1px;
-	border-right-style: solid;
-	border-right-color: var(--background);
-	background-color: var(--background);
-	padding-top: .6rem;
-	max-height: 90vh;
-}
 
 .design-system-content {
-	grid-area: content;
 	padding: 1rem;
-	max-height: 90vh;
 	overflow: scroll;
 }
 

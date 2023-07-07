@@ -52,6 +52,18 @@ pub const USER_SVG_HTML: &str = r#"
 	</svg>
 "#;
 
+pub const USER_CIRCLE_SVH_HTML: &str = r#"
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 256 256">
+	<rect width="256" height="256" fill="none" />
+	<circle cx="128" cy="128" r="96" fill="none" stroke="currentColor" stroke-linecap="round"
+		stroke-linejoin="round" stroke-width="16" />
+	<circle cx="128" cy="120" r="40" fill="none" stroke="currentColor" stroke-linecap="round"
+		stroke-linejoin="round" stroke-width="16" />
+	<path d="M63.8,199.37a72,72,0,0,1,128.4,0" fill="none" stroke="currentColor"
+		stroke-linecap="round" stroke-linejoin="round" stroke-width="16" />
+</svg>
+"#;
+
 pub const BATTERY_CHARGING_SVG_HTML: &str = r#"
 <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor"
 	stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="feather feather-battery-charging">
