@@ -9,3 +9,4 @@
 | RON Configuration |2023-06-24| 58 minutes | Updating application configuration to use ron file. |
 | RON Configuration |2023-06-26| 9 minutes | Removing old configuration implementation |
 | Website grid layout |2023-07-04| 61 minutes | Changing the layout from flex to a grid |
+| Website grid layout |2023-07-06| 90 minutes | Updating general styling of nav bars and main content area. |

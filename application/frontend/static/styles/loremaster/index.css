@@ -1,5 +1,6 @@
 :root {
-	--background: #2d2d2d;
+	--background: #1c2128;
+	--background-canvas: #22272e;
 	--background-hover: #4d4d4d;
 	--border-color: #4d4d4d;
 	--border-radius: 6px;
@@ -28,6 +29,7 @@
 
 .light {
 	--background: #fff;
+	--background-canvas: #eee;
 	--background-hover: #eee;
 	--border-color: #eee;
 	--border-radius: 6px;
@@ -133,6 +135,10 @@ dialog {
 	padding: 1rem;
 	max-height: 90vh;
 	overflow: scroll;
+	border-top: solid var(--border-color) 1px;
+	border-top-left-radius: 8px;
+	border-left: solid var(--border-color) 1px;
+	background: var(--background-canvas);
 }
 
 .loremaster-text {
@@ -146,18 +152,15 @@ dialog {
 
 .loremaster-banner-link {
 	text-decoration: none;
-	padding: .6vmin 1vmin;
-	margin: .5vmin;
+	padding: 2vmin;
+	margin: 1vmin;
 	color: var(--default-text-color);
-	background: var(--fourth-background-color);
-	border: 2px solid var(--border-color);
 	border-radius: .8vmin;
-	font-size: 1.8vmin;
+	font-size: 4vmin;
 }
 
 .loremaster-banner-link:hover {
 	background: var(--button-hover-background-color);
-	border: 2px solid var(--border-color);
 }
 
 .hover-border-bottom {
@@ -208,43 +211,26 @@ dialog {
 
 .top-nav {
 	grid-area: header;
-	max-height: 8vh;
+	height: 12vh;
 	align-items: center;
 	display: flex;
 	flex-direction: row;
+	background: var(--background);
 }
 
-.top-nav ul {
+#top-nav-version {
+	flex: 1;
 	display: flex;
-	flex-direction: row;
-	flex-wrap: wrap;
-	padding: 0;
-	margin: 0;
-	list-style-type: none;
+	align-items: center;
 }
 
-.top-nav ul li {
-	margin: 0;
-	padding: 0 0 0 0;
-	display: inherit;
+#top-nav-version span {
+	margin-right: 1vmin;
 }
 
-.top-nav ul li a {
-	margin: 1vmin 1vmin 0vmin 1vmin;
-	padding: 1vmin;
-	text-decoration: none;
-	border: transparent 0.1vmin solid;
-	border-radius: 1vmin;
-}
-
-.top-nav ul li a.active-link {
-	border-bottom: #9fc0ff .3vmin solid;
-	border-radius: 0;
-}
-
-.top-nav ul li a:hover {
-	border: #0866aa5e .1vmin solid;
-	background-color: #0866aa12;
+#top-nav-version span svg {
+	width: 24px;
+	height: 24px;
 }
 
 .side-nav {
@@ -255,6 +241,7 @@ dialog {
 	background-color: var(--background);
 	padding-top: .6rem;
 	max-height: 90vh;
+	background: var(--background);
 }
 
 .side-nav-container {
@@ -438,27 +425,22 @@ dialog {
 	display: flex;
 	flex-direction: column;
 	align-items: center;
-	width: 12rem;
+	width: 200px;
 }
 
 .date-time-widget div:nth-child(1) {
 	font-size: 1rem;
-	color: var(--secondary-text-color);
 	margin: .25vmin 0;
 }
 
 
 .date-time-widget div:nth-child(2) {
-	font-size: 1rem;
+	font-size: .8rem;
 	margin: .25vmin 0;
 }
 
 .date-time-widget div:nth-child(3) {
-	font-size: 2.3rem;
-}
-
-.date-time-widget div:nth-child(4) {
-	font-size: .8rem;
+	font-size: .9rem;
 	color: var(--secondary-text-color);
 	margin: .2vmin 0;
 }

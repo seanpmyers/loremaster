@@ -56,15 +56,11 @@ pub fn DateTime<G: Html>(context: Scope) -> View<G> {
         });
     }
     let widget_classes = "date-time-widget";
-    let time_classes = "";
-    let date_classes = "";
-    let time_zone_classes = "";
     view! {context,
         section(class=widget_classes) {
-            div(class=time_classes) { (short_date.get()) }
-            div(class=date_classes) { (day_month.get()) }
-            div(class=time_classes) { (time.get()) }
-            div(class=time_zone_classes) { (time_zone.get()) }
+            div() { (day_month.get()) }
+            div() { (short_date.get()) }
+            div() { (time_zone.get()) }
         }
     }
 }

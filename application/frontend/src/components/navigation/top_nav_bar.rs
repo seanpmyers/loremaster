@@ -2,7 +2,7 @@ use sycamore::prelude::*;
 
 use crate::components::widget::date_time::DateTime;
 use crate::components::{
-    icon::{GLOBE_SVG_HTML, SEARCH_SVG_HTML},
+    icon::{GIT_MERGE_SVG_HTML, GLOBE_SVG_HTML, SEARCH_SVG_HTML},
     widget::theme_toggle::ThemeToggle,
 };
 
@@ -18,6 +18,10 @@ pub fn TopNavBar<G: Html>(context: Scope) -> View<G> {
         nav(class=nav_classes) {
             div(class="loremaster-banner") {
                 a(href=home_link.html_href, id=home_link.html_id, class="loremaster-banner-link") { (home_link.display_text)}
+            }
+            div(id="top-nav-version") {
+                span(dangerously_set_inner_html=GIT_MERGE_SVG_HTML) {}
+                span() { "1.0.0"}
             }
             ThemeToggle()
             div() {
