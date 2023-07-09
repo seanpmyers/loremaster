@@ -20,7 +20,7 @@ pub fn TopNavBar<G: Html>(context: Scope) -> View<G> {
                 a(href=home_link.html_href, id=home_link.html_id, class="loremaster-banner-link") { (home_link.display_text)}
             }
             div(id="top-nav-version") {
-                div() {
+                div(class="glass-blur") {
                     span(dangerously_set_inner_html=GIT_MERGE_SVG_HTML) {}
                     span() { "2023.7.7"}
                 }

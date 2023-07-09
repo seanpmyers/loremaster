@@ -15,10 +15,12 @@ pub fn Container<'a, G: Html>(
 ) -> View<G> {
     let children: View<G> = children.call(context);
     view! {context,
-        TopNavBar()
-        SideNavBar()
-        div(class="", id="loremaster-main", data-title=title) {
-            (children)
+        div(class="glass container") {
+            TopNavBar()
+            SideNavBar()
+            div(class="", id="loremaster-main", data-title=title) {
+                (children)
+            }
         }
     }
 }

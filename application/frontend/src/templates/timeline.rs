@@ -2,7 +2,7 @@ use js_sys::Date;
 use perseus::{engine_only_fn, template::Template};
 use sycamore::{
     prelude::{view, Html, Indexed, SsrNode, View},
-    reactive::{create_signal, BoundedScope, Scope, Signal},
+    reactive::{create_selector, create_signal, BoundedScope, ReadSignal, Scope, Signal},
 };
 
 use crate::{
@@ -11,6 +11,7 @@ use crate::{
 };
 
 pub const WEEKS_IN_YEAR: u16 = 52_u16;
+pub const ADULT_MINIMUM_AGE: i32 = 18_i32;
 
 const PAGE_ROUTE_PATH: &str = "timeline";
 const PAGE_TITLE: &str = "Timeline | Loremaster";
@@ -18,12 +19,34 @@ const PAGE_TITLE: &str = "Timeline | Loremaster";
 pub fn timeline_page<'page, G: Html>(context: BoundedScope<'_, 'page>) -> View<G> {
     let date: &Signal<String> = create_signal(context, String::from(""));
     let circles: &Signal<Vec<u16>> = create_signal(context, (1_u16..WEEKS_IN_YEAR).collect());
-    let year_start: &Signal<u32> = create_signal(context, 1996_u32);
-    let desired_life_length_years: u32 = 90_u32;
-    let life_years: &Signal<Vec<u32>> = create_signal(
+    let year_start: &Signal<String> = create_signal(
         context,
-        (*year_start.get()..(desired_life_length_years + *year_start.get())).collect(),
+        if G::IS_BROWSER {
+            (time::OffsetDateTime::now_local().unwrap().year() - ADULT_MINIMUM_AGE).to_string()
+        } else {
+            String::from("0")
+        },
     );
+
+    let year_start_number: &ReadSignal<i32> =
+        create_selector(context, move || year_start.get().parse::<i32>().unwrap());
+
+    let current_year: &Signal<i32> = create_signal(
+        context,
+        if G::IS_BROWSER {
+            time::OffsetDateTime::now_local().unwrap().year()
+        } else {
+            0
+        },
+    );
+
+    let desired_life_length_years: i32 = 90_i32;
+
+    let life_years: &ReadSignal<Vec<_>> = create_selector(context, move || {
+        let start = *year_start_number.get();
+        (start..(desired_life_length_years + start)).collect()
+    });
+
     if G::IS_BROWSER {
         let javascript_date: Date = Date::new_0();
         let day_of_week: String = get_day_of_week_from_integer(javascript_date.get_day());
@@ -36,30 +59,39 @@ pub fn timeline_page<'page, G: Html>(context: BoundedScope<'_, 'page>) -> View<G
             javascript_date.get_full_year()
         ));
     }
+
     view! { context,
         Container(title="Timeline") {
-            div(class="d-flex flex-column flex-grow-1 p-4") {
-                div(class="d-flex") {
-                    h3(class="fw-normal") { (date.get()) }
-
+            div(class="timeline-widget") {
+                div(class="timeline-header") {
+                    h3(class="") { (date.get()) }
                 }
-                div(class="d-flex flex-column") {
-                    div(class="d-flex align-items-center") {
-                        div(class="me-1 ms-1") { "Year" }
-                        div(class="me-1 ms-1") { "Age" }
-                        div(class="me-1 ms-1") { "Weeks" }
+                div(class="timeline-content") {
+                    div(class="timeline-inputs") {
+                        div(class="") {
+                            label() { "Birth Year" }
+                            input(type="number", bind:value=year_start) {}
+                        }
+                        div(class="") {
+                            label() { "Age" }
+                            input(disabled=true, value=(*current_year.get() - *year_start_number.get())) {}
+                        }
+                        div(class="") {
+                            label() { "Weeks" }
+                            input(disabled=true, value=((*current_year.get() - *year_start_number.get()) * WEEKS_IN_YEAR as i32)) {}
+                        }
                     }
                     Indexed(
                         iterable= life_years,
                         view= move |context, year| view! {context,
-                            div(class="d-flex align-items-center") {
-                                div(class="me-1 ms-1") { (year.to_string()) }
-                                div(class="me-1 ms-1") { ((year - *year_start.get()).to_string()) }
-                                div(class="d-flex me-1 ms-1") {
+                            div(class="timeline-row") {
+                                div(class="") { (year.to_string()) }
+                                div(class="") { ((year - *year_start_number.get()).to_string()) }
+                                div(class="") {
                                     Indexed(
                                         iterable=circles,
                                         view=move |context, _circle| view !{ context,
-                                            span(class="timeline-circle m-1") {}
+                                            span(class="timeline-circle") {}
                                         }
                                     )
                                 }
