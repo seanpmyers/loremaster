@@ -199,12 +199,12 @@ pub fn you_page<'page, G: Html>(
 
     view! {context,
         Container(title="You") {
-            div(class="d-flex flex-column flex-grow-1 p-4 align-items-center bg-light") {
+            div(class="", id="you-container") {
                 div() {
                     h1(class="display-3") { ( alias.get()) }
                     p() { "This is a page dedicated to you." }
                 }
-                div(class="d-flex flex-wrap") {
+                div(class="") {
                     form(on:submit=update_email_address_handler, class=(section_classes)) {
                         div(class="mb-3") {
                             label(class="form-label") {"Email Address"}

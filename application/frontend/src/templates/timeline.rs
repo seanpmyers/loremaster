@@ -28,8 +28,12 @@ pub fn timeline_page<'page, G: Html>(context: BoundedScope<'_, 'page>) -> View<G
         },
     );
 
-    let year_start_number: &ReadSignal<i32> =
-        create_selector(context, move || year_start.get().parse::<i32>().unwrap());
+    let year_start_number: &ReadSignal<i32> = create_selector(context, move || {
+        if year_start.get().is_empty() {
+            return 0_i32;
+        }
+        year_start.get().parse::<i32>().unwrap()
+    });
 
     let current_year: &Signal<i32> = create_signal(
         context,

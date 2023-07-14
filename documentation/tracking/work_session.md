@@ -12,3 +12,4 @@
 | Website grid layout |2023-07-06| 90 minutes | Updating general styling of nav bars and main content area. |
 | Site styling |2023-07-07| 40 minutes | Updating styling |
 | Site styling |2023-07-09| 240 minutes | Trying out glass styling and updating timeline page. |
+| Site styling |2023-07-13| 60 minutes | Updating glass styling and updating you page. |
