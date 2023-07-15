@@ -12,6 +12,8 @@ use crate::{
 
 pub const WEEKS_IN_YEAR: u16 = 52_u16;
 pub const ADULT_MINIMUM_AGE: i32 = 18_i32;
+pub const ADULT_AVERAGE_LIFE: i32 = 80_i32;
+pub const MAX_UI_ROWS: i32 = 200;
 
 const PAGE_ROUTE_PATH: &str = "timeline";
 const PAGE_TITLE: &str = "Timeline | Loremaster";
@@ -28,11 +30,29 @@ pub fn timeline_page<'page, G: Html>(context: BoundedScope<'_, 'page>) -> View<G
         },
     );
 
+    let year_end: &Signal<String> = create_signal(
+        context,
+        if G::IS_BROWSER {
+            (time::OffsetDateTime::now_local().unwrap().year()
+                + (ADULT_AVERAGE_LIFE - ADULT_MINIMUM_AGE))
+                .to_string()
+        } else {
+            String::from("0")
+        },
+    );
+
     let year_start_number: &ReadSignal<i32> = create_selector(context, move || {
         if year_start.get().is_empty() {
             return 0_i32;
         }
         year_start.get().parse::<i32>().unwrap()
+    });
+
+    let year_end_number: &ReadSignal<i32> = create_selector(context, move || {
+        if year_end.get().is_empty() {
+            return 0_i32;
+        }
+        year_end.get().parse::<i32>().unwrap()
     });
 
     let current_year: &Signal<i32> = create_signal(
@@ -44,11 +64,13 @@ pub fn timeline_page<'page, G: Html>(context: BoundedScope<'_, 'page>) -> View<G
         },
     );
 
-    let desired_life_length_years: i32 = 90_i32;
-
     let life_years: &ReadSignal<Vec<_>> = create_selector(context, move || {
-        let start = *year_start_number.get();
-        (start..(desired_life_length_years + start)).collect()
+        let start: i32 = *year_start_number.get();
+        let end: i32 = *year_end_number.get();
+        if end - start > MAX_UI_ROWS {
+            return (start..start + MAX_UI_ROWS).collect();
+        }
+        (start..end).collect()
     });
 
     if G::IS_BROWSER {
@@ -75,6 +97,10 @@ pub fn timeline_page<'page, G: Html>(context: BoundedScope<'_, 'page>) -> View<G
                         div(class="") {
                             label() { "Birth Year" }
                             input(type="number", bind:value=year_start) {}
+                        }
+                        div(class="") {
+                            label() { "Death Year" }
+                            input(type="number", bind:value=year_end) {}
                         }
                         div(class="") {
                             label() { "Age" }

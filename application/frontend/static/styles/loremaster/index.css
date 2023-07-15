@@ -1,5 +1,5 @@
 :root {
-	--background: #07101d;
+	--background: #002d48;
 	--background-canvas: rgba(255, 255, 255, 0.3);
 	--on-canvas: rgba(0, 0, 0, 0.3);
 	--background-hover: rgba(255, 255, 255, 0.32);
@@ -168,12 +168,15 @@ textarea {
 
 input {
 	color: var(--default-text-color);
-	background: var(--on-canvas);
-	border: solid 1px var(--border-color);
+	background: var(--fills-primary-dark, rgba(12, 12, 12, 0.30));
+	border: 1px solid var(--stroke-style-3, rgba(255, 255, 255, 0.05));
 	border-radius: var(--border-radius);
 	-webkit-backdrop-filter: blur(90px);
 	backdrop-filter: blur(90px);
 	padding: .4vmin;
+	/* Background/Input - Dark */
+	box-shadow: 0px 4px 4px 0px rgba(0, 0, 0, 0.25) inset;
+	backdrop-filter: blur(67.95500183105469px);
 }
 
 input:active {
