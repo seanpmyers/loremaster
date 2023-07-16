@@ -1,52 +1,94 @@
 use perseus::{prelude::*, state::GlobalStateCreator};
 use serde::{Deserialize, Serialize};
+use uuid::Uuid;
 
-pub fn get_global_state_creator() -> GlobalStateCreator {
-    GlobalStateCreator::new()
-        .build_state_fn(get_build_state)
-        .request_state_fn(get_request_state)
-        .amalgamate_states_fn(amalgamate_states)
+pub const LOCAL_STORAGE_KEY: &str = "chronilore_loremaster";
+
+#[derive(Clone, Serialize, Deserialize)]
+pub enum AuthenticationState {
+    Authenticated,
+    Anonymous,
+    None,
 }
 
 #[derive(Serialize, Deserialize, ReactiveState)]
-#[rx(alias = "AppStateRx")]
-pub struct AppState {
-    pub test: String,
+#[rx(alias = "ApplicationStateRx")]
+pub struct ApplicationState {
+    /// Authentication data accessible to all pages.
+    #[rx(nested)]
+    pub authentication: UserAuthentication,
 }
 
-// All the below functions can return either `AppState`, or `Result<AppState,
-// E>`, where `E` is some error type. For concision, these examples cannot
-// return errors. Request state and state amalgamation use `BlamedError`s if
-// they're fallible.
+#[derive(Serialize, Deserialize, ReactiveState)]
+#[rx(alias = "UserAuthenticationRx")]
+pub struct UserAuthentication {
+    pub authentication_state: AuthenticationState,
+    pub user_alias: String,
+    pub session_id: Uuid,
+}
 
-// Global state will be generated for each locale in your app (but we don't
-// worry about that in this example)
+#[derive(Serialize, Deserialize)]
+pub struct BrowserCache {
+    pub user_alias: String,
+}
+
+pub fn get_global_state_creator() -> GlobalStateCreator {
+    GlobalStateCreator::new().build_state_fn(get_build_state)
+}
+
 #[engine_only_fn]
-async fn get_build_state() -> AppState {
-    AppState {
-        test: "Hello from the build process!".to_string(),
+async fn get_build_state() -> ApplicationState {
+    ApplicationState {
+        authentication: UserAuthentication {
+            authentication_state: AuthenticationState::None,
+            user_alias: String::new(),
+            session_id: Uuid::new_v4(),
+        },
     }
 }
 
-// This will be executed every time there's a request to any page in your app
-// (you should avoid doing heavy work here if possible). Note that using *only*
-// request-time global state generation, without anything at build-time, would
-// prevent your app from accessing global state during the build process, so be
-// certain that's what you want if you go down that path.
-#[engine_only_fn]
-async fn get_request_state(_req: Request) -> AppState {
-    AppState {
-        test: "Hello from the server!".to_string(),
+impl UserAuthenticationRx {
+    pub fn to_browser_cache(&self) -> BrowserCache {
+        BrowserCache {
+            user_alias: String::from(self.user_alias.get().as_str()),
+        }
     }
-}
 
-// You can even combine build state with request state, just like in a template!
-#[engine_only_fn]
-async fn amalgamate_states(build_state: AppState, request_state: AppState) -> AppState {
-    AppState {
-        test: format!(
-            "Message from the builder: '{}' Message from the server: '{}'",
-            build_state.test, request_state.test,
-        ),
+    pub fn detect_state(&self) {
+        if let AuthenticationState::Authenticated | AuthenticationState::None =
+            *self.authentication_state.get()
+        {
+            return;
+        }
+
+        let storage: web_sys::Storage =
+            web_sys::window().unwrap().local_storage().unwrap().unwrap();
+
+        match storage.get(LOCAL_STORAGE_KEY).unwrap() {
+            Some(data) => {
+                let stored_authentication: BrowserCache = serde_json::from_str(&data).unwrap();
+            }
+            None => (),
+        }
+    }
+
+    pub fn update_user_alias(&self, new_alias: &str) {
+        self.user_alias.set(new_alias.to_string());
+    }
+
+    pub fn update_authentication(&self) {
+        let storage: web_sys::Storage =
+            web_sys::window().unwrap().local_storage().unwrap().unwrap();
+        let cache: BrowserCache = self.to_browser_cache();
+        let serialized_cache = serde_json::to_string(&cache).unwrap();
+        storage.set(LOCAL_STORAGE_KEY, &serialized_cache).unwrap();
+    }
+
+    pub fn logout(&self) {
+        let storage = web_sys::window().unwrap().local_storage().unwrap().unwrap();
+        storage.delete(LOCAL_STORAGE_KEY).unwrap();
+        self.authentication_state
+            .set(AuthenticationState::Anonymous);
+        self.user_alias.set(String::new());
     }
 }

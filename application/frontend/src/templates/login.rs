@@ -1,5 +1,6 @@
 use gloo_timers::future::TimeoutFuture;
 use perseus::prelude::{navigate, spawn_local_scoped, Html};
+use perseus::reactor::Reactor;
 use perseus::state::StateGeneratorInfo;
 use perseus::template::Template;
 use perseus::{engine_only_fn, ReactiveState};
@@ -17,6 +18,7 @@ use crate::components::state::validation::Validation;
 use crate::components::state::visibility::Visibility;
 use crate::components::widget::data::form::web_authentication_api_login::WebAuthenticationAPILogin;
 use crate::components::widget::notification::toast::{Toast, ToastProperties};
+use crate::global_state::{ApplicationState, ApplicationStateRx};
 use crate::utility::constants::API_LOGIN_URL;
 use crate::utility::http_service;
 
@@ -43,6 +45,8 @@ pub fn login_page<'page, G: Html>(
         password,
     }: &'page LoginPageStateRx,
 ) -> View<G> {
+    let ApplicationStateRx { authentication } =
+        Reactor::<G>::from_cx(context).get_global_state::<ApplicationStateRx>(context);
     let message_type: &Signal<MessageType> = create_signal(context, MessageType::Information);
     let toast_content: &Signal<String> = create_signal(context, String::new());
 

@@ -49,6 +49,7 @@ web-sys = { version = "0.3.64", features = [
 	"PublicKeyCredentialType",
 	"PublicKeyCredentialRpEntity",
 	"PublicKeyCredentialUserEntity",
+	"Storage",
 	"UserVerificationRequirement",
 	"Window",
 ] }

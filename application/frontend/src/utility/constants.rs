@@ -10,6 +10,7 @@ pub const API_PERSON_EMAIL_ADDRESS_UPDATE_ROUTE: &str = "person/update/email_add
 pub const API_ACTION_NEW_ROUTE: &str = "person/action-new";
 pub const API_ACTION_LIST_ROUTE: &str = "person/action-list";
 pub const API_FREQUENCY_LIST_ROUTE: &str = "person/frequency-list";
+pub const API_LOGOUT_ROUTE: &str = "authentication/logout";
 pub const API_GOAL_NEW_ROUTE: &str = "person/goal-new";
 pub const API_GOAL_LIST_ROUTE: &str = "person/goal-list";
 pub const API_WEBAUTHN_START_ROUTE: &str = "authentication/webauthn/start";
