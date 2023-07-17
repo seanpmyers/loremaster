@@ -65,7 +65,7 @@ tokio-test = { version = "0.4.2" }
 # Tower middleware and utilities for HTTP clients and servers
 tower-http = { version = "0.4.1", features = ["cors", "fs"] }
 # Implementation of Universally Unique Identifiers (Uuid)
-uuid = { version = "1.4.0", features = ["v4", "serde"] }
+uuid = { version = "1.4.1", features = ["v4", "serde"] }
 webauthn-rs = { version = "0.4.8", features = [
 	"danger-allow-state-serialisation",
 ] }
