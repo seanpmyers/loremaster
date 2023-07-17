@@ -25,7 +25,7 @@ time = { version = "0.3.23", features = [
 	"parsing",
 	"formatting",
 ] }
-uuid = { version = "1.4.0", features = ["serde", "v4", "js"] }
+uuid = { version = "1.4.1", features = ["serde", "v4", "js"] }
 wasm-bindgen = { version = "0.2.87" }
 wasm-bindgen-futures = { version = "0.4.37" }
 webauthn-rs-proto = { version = "0.4.9", default-features = false, features = [
