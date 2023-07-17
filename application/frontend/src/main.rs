@@ -39,5 +39,5 @@ pub fn main<G: Html>() -> PerseusApp<G> {
                 }
             }
         })
-        // .global_state_creator(crate::global_state::get_global_state_creator())
+        .global_state_creator(crate::global_state::get_global_state_creator())
 }

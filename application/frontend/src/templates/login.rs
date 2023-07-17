@@ -18,8 +18,8 @@ use crate::components::state::validation::Validation;
 use crate::components::state::visibility::Visibility;
 use crate::components::widget::data::form::web_authentication_api_login::WebAuthenticationAPILogin;
 use crate::components::widget::notification::toast::{Toast, ToastProperties};
-use crate::global_state::{ApplicationState, ApplicationStateRx};
-use crate::utility::constants::API_LOGIN_URL;
+use crate::global_state::ApplicationStateRx;
+use crate::utility::constants::{API_BASE_URL, API_LOGIN_URL, API_PERSON_META_DATA_ROUTE};
 use crate::utility::http_service;
 
 const PAGE_ROUTE_PATH: &str = "login";
@@ -113,6 +113,25 @@ pub fn login_page<'page, G: Html>(
                     200 => {
                         email_address.set(String::new());
                         password.set(String::new());
+
+                        // let mut query_response: Option<String> = http_service::get_endpoint(
+                        //     format!("{}/{}", API_BASE_URL, API_PERSON_META_DATA_ROUTE).as_str(),
+                        //     None,
+                        // )
+                        // .await;
+                        // match query_response {
+                        //     Some(response) => {
+                        //         let person_meta_data: PersonMeta =
+                        //             serde_json::from_str(&response).unwrap();
+                        //         email_address.set(person_meta_data.email_address);
+                        //         if let Some(existing_alias) = person_meta_data.alias {
+                        //             alias.set(existing_alias);
+                        //         }
+                        //     }
+                        //     None => todo!(),
+                        // }
+
+                        authentication.update_authentication();
 
                         message_type.set(MessageType::Success);
                         toast_content.set(String::from("Successfully logged in."));
