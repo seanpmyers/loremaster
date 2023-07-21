@@ -1,7 +1,7 @@
 use gloo_timers::future::TimeoutFuture;
 use perseus::{
-    engine_only_fn, prelude::spawn_local_scoped, state::StateGeneratorInfo, template::Template,
-    ReactiveState,
+    engine_only_fn, prelude::spawn_local_scoped, reactor::Reactor, state::StateGeneratorInfo,
+    template::Template, ReactiveState,
 };
 use serde::{Deserialize, Serialize};
 use sycamore::{
@@ -21,6 +21,7 @@ use crate::{
         },
     },
     data::entity::{action::Action, person_meta::PersonMeta, sleep_schedule::SleepSchedule},
+    global_state::ApplicationStateRx,
     utility::{
         constants::{
             API_ACTION_LIST_ROUTE, API_ACTION_NEW_ROUTE, API_BASE_URL, API_GOAL_NEW_ROUTE,
@@ -57,6 +58,8 @@ pub fn you_page<'page, G: Html>(
         sleep_end,
     }: &'page YouPageStateRx,
 ) -> View<G> {
+    let ApplicationStateRx { authentication } =
+        Reactor::<G>::from_cx(context).get_global_state::<ApplicationStateRx>(context);
     let login_success: &Signal<Option<bool>> = create_signal(context, None);
 
     let new_goal: &Signal<String> = create_signal(context, String::new());
@@ -73,6 +76,9 @@ pub fn you_page<'page, G: Html>(
                     let person_meta_data: PersonMeta = serde_json::from_str(&response).unwrap();
                     email_address.set(person_meta_data.email_address);
                     if let Some(existing_alias) = person_meta_data.alias {
+                        if !authentication.user_alias.get().as_str().eq(&existing_alias) {
+                            authentication.update_user_alias(&existing_alias.clone());
+                        }
                         alias.set(existing_alias);
                     }
                 }
@@ -133,11 +139,14 @@ pub fn you_page<'page, G: Html>(
     let update_meta_handler = move |event: Event| {
         event.prevent_default();
         spawn_local_scoped(context, async move {
-            http_service::post_html_form(
+            let update_meta_response = http_service::post_html_form(
                 &format!("{}/{}", API_BASE_URL, API_PERSON_META_UPDATE_ROUTE),
                 &vec![(String::from("alias"), alias.get().as_ref().to_string())],
             )
             .await;
+            if update_meta_response.is_some() {
+                authentication.update_user_alias(&alias.get());
+            }
         });
     };
 

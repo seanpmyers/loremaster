@@ -558,6 +558,11 @@ select {
 	align-items: start;
 }
 
+.chronicle-notes {
+	display: flex;
+	flex-direction: column;
+}
+
 .date-time-widget {
 	display: flex;
 	flex-direction: column;

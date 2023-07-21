@@ -1,15 +1,14 @@
 use gloo_timers::future::TimeoutFuture;
 use perseus::{
     prelude::{navigate, spawn_local_scoped},
+    reactor::Reactor,
     web_log,
 };
 use sycamore::prelude::*;
 use wasm_bindgen::JsValue;
 use wasm_bindgen_futures::JsFuture;
 use web_sys::{console::log_1, window, Event};
-use webauthn_rs_proto::{
-    PublicKeyCredential, RegisterPublicKeyCredential, RequestChallengeResponse,
-};
+use webauthn_rs_proto::{PublicKeyCredential, RequestChallengeResponse};
 
 use crate::{
     components::{
@@ -17,15 +16,21 @@ use crate::{
         icon::KEY_2_SVG_HTML,
         state::{message_type::MessageType, validation::Validation, visibility::Visibility},
     },
-    data::entity::webauthn::{PersonPublicKeyCredential, WebAuthenticationInput},
+    data::entity::{person_meta::PersonMeta, webauthn::PersonPublicKeyCredential},
+    global_state::ApplicationStateRx,
     utility::{
-        constants::{API_BASE_URL, API_WEBAUTHN_LOGIN_END_ROUTE, API_WEBAUTHN_LOGIN_START_ROUTE},
+        constants::{
+            API_BASE_URL, API_PERSON_META_DATA_ROUTE, API_WEBAUTHN_LOGIN_END_ROUTE,
+            API_WEBAUTHN_LOGIN_START_ROUTE,
+        },
         http_service,
     },
 };
 
 #[component]
 pub fn WebAuthenticationAPILogin<G: Html>(context: Scope) -> View<G> {
+    let ApplicationStateRx { authentication } =
+        Reactor::<G>::from_cx(context).get_global_state::<ApplicationStateRx>(context);
     let loading: &Signal<bool> = create_signal(context, false);
     let email_address: &Signal<String> = create_signal(context, String::new());
 
@@ -112,6 +117,27 @@ pub fn WebAuthenticationAPILogin<G: Html>(context: Scope) -> View<G> {
                         {
                             Some(response) => {
                                 if response.ok() {
+                                    let query_response: Option<String> =
+                                        http_service::get_endpoint(
+                                            format!(
+                                                "{}/{}",
+                                                API_BASE_URL, API_PERSON_META_DATA_ROUTE
+                                            )
+                                            .as_str(),
+                                            None,
+                                        )
+                                        .await;
+                                    match query_response {
+                                        Some(response) => {
+                                            let person_meta_data: PersonMeta =
+                                                serde_json::from_str(&response).unwrap();
+                                            email_address.set(person_meta_data.email_address);
+                                            if let Some(existing_alias) = person_meta_data.alias {
+                                                authentication.update_user_alias(&existing_alias);
+                                            }
+                                        }
+                                        None => todo!(),
+                                    }
                                     TimeoutFuture::new(4000_u32).await;
                                     navigate("/chronicle/");
                                 }

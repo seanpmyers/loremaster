@@ -1,3 +1,4 @@
+use perseus::reactor::Reactor;
 use sycamore::prelude::*;
 
 use crate::components::widget::date_time::DateTime;
@@ -5,11 +6,15 @@ use crate::components::{
     icon::{GIT_MERGE_SVG_HTML, GLOBE_SVG_HTML, SEARCH_SVG_HTML, USER_CIRCLE_SVH_HTML},
     widget::theme_toggle::ThemeToggle,
 };
+use crate::global_state::ApplicationStateRx;
 
 use super::{get_home_link, NavigationLink};
 
 #[component]
 pub fn TopNavBar<G: Html>(context: Scope) -> View<G> {
+    let user_authentication =
+        Reactor::<G>::from_cx(context).get_global_state::<ApplicationStateRx>(context);
+
     let nav_classes: &str = "top-nav";
 
     let home_link: NavigationLink = get_home_link();
@@ -44,7 +49,7 @@ pub fn TopNavBar<G: Html>(context: Scope) -> View<G> {
                     title="You"
                 ) {
                     span(dangerously_set_inner_html=USER_CIRCLE_SVH_HTML) { }
-                    span() { "Sean" }
+                    span() { (user_authentication.authentication.user_alias.get()) }
                 }
 
             }

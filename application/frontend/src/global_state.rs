@@ -3,11 +3,12 @@ use serde::{Deserialize, Serialize};
 use uuid::Uuid;
 
 pub const LOCAL_STORAGE_KEY: &str = "chronilore_loremaster";
+pub const DEFAULT_USER_ALIAS: &str = "You";
 
-#[derive(Clone, Serialize, Deserialize)]
+#[derive(PartialEq, Clone, Serialize, Deserialize)]
 pub enum AuthenticationState {
-    Authenticated,
     Anonymous,
+    Authenticated,
     None,
 }
 
@@ -41,7 +42,7 @@ async fn get_build_state() -> ApplicationState {
     ApplicationState {
         authentication: UserAuthentication {
             authentication_state: AuthenticationState::None,
-            user_alias: String::new(),
+            user_alias: String::from(DEFAULT_USER_ALIAS),
             session_id: Uuid::new_v4(),
         },
     }
@@ -64,16 +65,28 @@ impl UserAuthenticationRx {
         let storage: web_sys::Storage =
             web_sys::window().unwrap().local_storage().unwrap().unwrap();
 
-        match storage.get(LOCAL_STORAGE_KEY).unwrap() {
-            Some(data) => {
-                let stored_authentication: BrowserCache = serde_json::from_str(&data).unwrap();
-            }
-            None => (),
+        if let Some(cache_json) = storage.get(LOCAL_STORAGE_KEY).unwrap() {
+            let stored_authentication: BrowserCache = serde_json::from_str(&cache_json).unwrap();
+            self.user_alias.set(stored_authentication.user_alias);
         }
     }
 
+    pub fn update_authentication_state(&self, new_state: AuthenticationState) {
+        if *self.authentication_state.get().to_owned() == new_state {
+            return;
+        }
+
+        self.authentication_state.set(new_state);
+        self.update_authentication();
+    }
+
     pub fn update_user_alias(&self, new_alias: &str) {
+        if new_alias.eq(self.user_alias.get().as_str()) {
+            return;
+        }
+
         self.user_alias.set(new_alias.to_string());
+        self.update_authentication();
     }
 
     pub fn update_authentication(&self) {
@@ -89,6 +102,6 @@ impl UserAuthenticationRx {
         storage.delete(LOCAL_STORAGE_KEY).unwrap();
         self.authentication_state
             .set(AuthenticationState::Anonymous);
-        self.user_alias.set(String::new());
+        self.user_alias.set(String::from(DEFAULT_USER_ALIAS));
     }
 }

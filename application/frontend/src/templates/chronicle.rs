@@ -145,7 +145,7 @@ pub fn chronicle_page<'page, G: Html>(
                                 label() { "What do you intend to do today?" }
                             }
                             SleepWidget()
-                            div(class="d-flex flex-column") {
+                            div(class="chronicle-notes") {
                                 label() { "Notes" }
                                 textarea(class="border rounded bg-white", rows="4", cols="50") {}
                             }
