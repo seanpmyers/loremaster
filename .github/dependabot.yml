@@ -5,10 +5,10 @@ updates:
   schedule:
     interval: daily
     time: "05:30"
-  open-pull-requests-limit: 10
+  open-pull-requests-limit: 20
 - package-ecosystem: cargo
   directory: "/application/frontend"
   schedule:
     interval: daily
     time: "05:30"
-  open-pull-requests-limit: 10
+  open-pull-requests-limit: 20
