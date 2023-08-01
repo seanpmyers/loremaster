@@ -14,11 +14,13 @@ COPY . .
 RUN cargo build --release --bin loremaster
 
 # We do not need the Rust toolchain to run the binary!
-FROM ubuntu:latest AS runtime
+FROM ubuntu:20.04 AS runtime
 WORKDIR /app
 COPY --from=builder /app/target/release/loremaster /usr/local/bin
 COPY Loremaster.ron /usr/local/bin
 COPY certs/ /usr/local/bin/certs
 COPY frontend/dist/exported/ /usr/local/bin/frontend/dist/exported
-RUN apt-get update && apt install -y openssl
+RUN apt-get -y update
+RUN apt-get -y install openssl
+#RUN apt-get -y install libssl-dev
 ENTRYPOINT ["/usr/local/bin/loremaster"]
