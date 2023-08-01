@@ -8,6 +8,7 @@ loremaster.toml
 Loremaster.toml
 
 # Rust
+target/
 /application/target
 /application/frontend/target
 /application/frontend/dist
