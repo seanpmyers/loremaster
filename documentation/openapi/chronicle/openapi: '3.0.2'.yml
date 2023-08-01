@@ -7,7 +7,7 @@ info:
 servers:
   - url: https://loremaster.chronilore.day/api/v1
 paths:
-  /crhonicle/today:
+  /chronicle/today:
     get:
       responses:
         "200":

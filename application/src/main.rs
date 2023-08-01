@@ -1,6 +1,7 @@
 use std::{thread, time::Duration};
 
 use anyhow::Result;
+use configuration::application::LoremasterWebServerConfiguration;
 use log::info;
 
 mod api;
@@ -11,20 +12,24 @@ mod utility;
 
 #[tokio::main]
 async fn main() -> Result<()> {
-    configuration::application::configure().await?;
     info!("Starting up!");
+    let configuration: LoremasterWebServerConfiguration =
+        configuration::application::configure().await?;
 
-    // tokio::spawn(async move { scheduler().await });
+    match configuration.scheduler_state {
+        configuration::application::SchedulerState::On => {
+            let (web_server_result, scheduler_result) = tokio::join!(
+                tokio::spawn(async move { api::web_server::start(configuration).await }),
+                tokio::spawn(async move { scheduler().await })
+            );
 
-    // let result = tokio::join!(
-    //     tokio::spawn(async move { api::web_server::start().await }),
-    //     tokio::spawn(async move { scheduler().await })
-    // );
-
-    // result.0.unwrap_err();
-    // result.1.unwrap_err();
-
-    api::web_server::start().await?;
+            web_server_result.unwrap_err();
+            scheduler_result.unwrap_err();
+        }
+        configuration::application::SchedulerState::Off => {
+            api::web_server::start(configuration).await?
+        }
+    }
 
     info!("Shutting down.");
 

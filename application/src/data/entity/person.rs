@@ -8,7 +8,6 @@ pub struct Person {
     pub id: Uuid,
     pub email_address_id: Uuid,
     pub registration_date: OffsetDateTime,
-    pub encrypted_password: String,
     pub alias: Option<String>,
     pub chronicle_id: Option<Uuid>,
 }

@@ -13,7 +13,7 @@ use web_sys::Event;
 
 use crate::{
     components::{
-        container::{Container, ContainerProperties},
+        container::Container,
         widget::notification::alert::{Alert, AlertProperties},
         widget::{
             frequency_options::{FrequencyOptions, FrequencyOptionsProperties},
@@ -198,7 +198,7 @@ pub fn you_page<'page, G: Html>(
     let section_classes: &str = "border rounded bg-white shadow-sm p-2 m-2 ";
 
     view! {context,
-        Container(ContainerProperties{title: String::from("You"), children: view!{context,
+        Container(title="You") {
             div(class="d-flex flex-column flex-grow-1 p-4 align-items-center bg-light") {
                 div() {
                     h1(class="display-3") { ( alias.get()) }
@@ -373,7 +373,7 @@ pub fn you_page<'page, G: Html>(
             else {
                 view!{context, div() {""}}
             })
-        }})
+        }
     }
 }
 

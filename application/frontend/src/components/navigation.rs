@@ -4,6 +4,7 @@ use super::icon::{
 };
 
 pub mod side_nav_bar;
+pub mod tab;
 pub mod top_nav_bar;
 
 #[derive(Debug, Clone, PartialEq, Eq)]
@@ -24,7 +25,7 @@ pub fn get_home_link() -> NavigationLink {
 }
 
 pub fn get_navigation_links() -> Vec<NavigationLink> {
-    return vec![
+    vec![
         NavigationLink {
             html_id: String::from("you-link"),
             html_href: String::from("/you/"),
@@ -73,15 +74,12 @@ pub fn get_navigation_links() -> Vec<NavigationLink> {
             display_text: String::from("About"),
             svg_html: HELP_CIRCLE_SVG_HTML,
         },
-    ];
+    ]
 }
 
 pub fn get_navigation_link_by_name(name: String) -> Option<NavigationLink> {
-    match get_navigation_links()
+    get_navigation_links()
         .iter()
         .find(|link| link.display_text == name)
-    {
-        Some(link) => Some(link.to_owned()),
-        None => None,
-    }
+        .map(|link| link.to_owned())
 }

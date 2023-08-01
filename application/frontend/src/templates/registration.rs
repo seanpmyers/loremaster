@@ -9,8 +9,12 @@ use sycamore::reactive::{create_signal, BoundedScope, Scope};
 use sycamore::web::SsrNode;
 use web_sys::Event;
 
-use crate::components::container::{Container, ContainerProperties};
-use crate::components::widget::data::form::security_key_authentication::SecurityKeyAuthentication;
+use crate::components::container::Container;
+use crate::components::form::input_validation::InputValidation;
+use crate::components::state::message_type::MessageType;
+use crate::components::state::validation::Validation;
+use crate::components::state::visibility::Visibility;
+use crate::components::widget::data::form::web_authentication_api_registration::WebAuthenticationAPIRegistration;
 use crate::utility::constants::{ACCEPTED_HTTP_STATUS_CODE, API_REGISTER_URL, OK_HTTP_STATUS_CODE};
 use crate::utility::http_service;
 
@@ -40,12 +44,30 @@ pub fn registration_page<'page, G: Html>(
     let password: &Signal<String> = &state.password;
     let form_message: &Signal<FormMessageState> = create_signal(context, FormMessageState::Hidden);
 
+    let email_address_validation_content: &Signal<String> = create_signal(context, String::new());
+    let email_address_validation_visibility: &Signal<Visibility> =
+        create_signal(context, Visibility::Hidden);
+    let email_address_validity: &Signal<Validation> = create_signal(context, Validation::Valid);
+    let email_address_message_type: &Signal<MessageType> =
+        create_signal(context, MessageType::Information);
+
     let registration_handler = move |event: Event| {
         event.prevent_default();
         spawn_local_scoped(context, async move {
             if loading.get().as_ref() == &true {
                 return;
             }
+
+            if email_address.get().is_empty() {
+                email_address_validation_content
+                    .set(String::from("Email address cannot be empty."));
+                email_address_validation_visibility.set(Visibility::Visible);
+                email_address_message_type.set(MessageType::Error);
+                email_address_validity.set(Validation::Invalid);
+                loading.set(false);
+                return;
+            }
+
             loading.set(true);
             let potential_response = http_service::post_html_form(
                 &String::from(API_REGISTER_URL),
@@ -80,50 +102,52 @@ pub fn registration_page<'page, G: Html>(
     };
 
     view! {context,
-        Container(ContainerProperties{
-            title: String::from("Registration"),
-            children: view! { context,
-                div(class="card registration-form") {
-                    div(class="card-body") {
-                        h3(class="card-title display-6") {"Registration"}
-                        form(on:submit=registration_handler) {
-                            div(class="input-row") {
-                                label(
-                                    name="email_address",
-                                    class="form-label") { "Email Address" }
-                                input(
-                                    type="email",
-                                    class="form-control",
-                                    bind:value= email_address,
-                                    placeholder = "Enter your email address",
-                                    disabled=*loading.get()
-                                ) {}
+        Container(title="Registration") {
+            div(class="card registration-form") {
+                div(class="card-body") {
+                    h3(class="card-title display-6") {"Registration"}
+                    form(on:submit=registration_handler) {
+                        div(class="input-row") {
+                            label(
+                                name="email_address",
+                                class="form-label") { "Email Address" }
+                            input(
+                                type="email",
+                                class="form-control",
+                                bind:value= email_address,
+                                placeholder = "Enter your email address",
+                                disabled=*loading.get()
+                            ) {}
+                            InputValidation(
+                                content= email_address_validation_content,
+                                visibility= email_address_validation_visibility,
+                                validity= email_address_validity,
+                                message_type= email_address_message_type)
                             }
-                            div(class="input-row") {
-                                label(
-                                    name="password",
-                                    class="form-label"
-                                ) { "Password" }
-                                input(
-                                    type="password",
-                                    class="form-control",
-                                    bind:value= password,
-                                    placeholder = "Enter your password",
-                                    disabled=*loading.get()
-                                ) {}
-                            }
-                            button(class="btn btn-primary", type="submit", disabled=*loading.get()){ "Submit"}
+                        div(class="input-row") {
+                            label(
+                                name="password",
+                                class="form-label"
+                            ) { "Password" }
+                            input(
+                                type="password",
+                                class="form-control",
+                                bind:value= password,
+                                placeholder = "Enter your password",
+                                disabled=*loading.get()
+                            ) {}
                         }
-                        (match *form_message.get() {
-                            FormMessageState::Hidden => view!{context,  div() {}},
-                            FormMessageState::Success => view!{context, div(class="badge bg-success rounded") {"Successfully registered."}},
-                            FormMessageState::Failure => view!{context, div(class="badge bg-danger rounded") {"Unable to register with the provided credentials."}}
-                        })
-                        SecurityKeyAuthentication()
+                        button(class="btn btn-primary", type="submit", disabled=*loading.get()){ "Submit"}
                     }
+                    (match *form_message.get() {
+                        FormMessageState::Hidden => view!{context,  div() {}},
+                        FormMessageState::Success => view!{context, div(class="badge bg-success rounded") {"Successfully registered."}},
+                        FormMessageState::Failure => view!{context, div(class="badge bg-danger rounded") {"Unable to register with the provided credentials."}}
+                    })
+                    WebAuthenticationAPIRegistration()
                 }
             }
-        })
+            }
     }
 }
 

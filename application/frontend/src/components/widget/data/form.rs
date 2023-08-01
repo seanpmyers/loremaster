@@ -1,1 +1,2 @@
-pub mod security_key_authentication;
+pub mod web_authentication_api_login;
+pub mod web_authentication_api_registration;

@@ -1,6 +1,8 @@
 pub mod action_is_related;
 pub mod add_action;
 pub mod add_goal;
+pub mod add_password;
+pub mod add_web_authentication_key;
 pub mod alias_by_id;
 pub mod create_person;
 pub mod credential_by_email_address;
@@ -12,6 +14,7 @@ pub mod remove_one_goal;
 pub mod update_email_address;
 pub mod update_meta_by_id;
 pub mod update_person_sleep_schedule;
+
 // #[cfg(test)]
 // mod tests {
 //     use anyhow::Result;

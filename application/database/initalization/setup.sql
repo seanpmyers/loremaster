@@ -15,6 +15,10 @@
 \i database/table/dictionary.sql
 \i database/table/term.sql
 \i database/table/schedule.sql
+\i database/table/web_authentication_register.sql
+\i database/table/web_authentication_login.sql
+\i database/table/web_authentication_key.sql
+\i database/table/password.sql
 
 -- Relation Tables
 \i database/table/person_action.sql
@@ -28,6 +32,8 @@
 \i database/table/intention_instance.sql
 \i database/table/person_intention_schedule.sql
 \i database/table/person_dictionary.sql
+\i database/table/person_password.sql
+\i database/table/person_web_authentication_key.sql
 
 
 -- Relations

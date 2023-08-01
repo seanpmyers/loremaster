@@ -12,7 +12,7 @@ pub fn get_error_pages<G: Html>() -> ErrorViews<G> {
     // position of the error.
     //
     // The `ErrorContext` is the most important thing to take account of, after the
-    // error itself, as it will twll you what you have access to. For example, if
+    // error itself, as it will will you what you have access to. For example, if
     // an error occurs while trying to set up translations, you won't have access to
     // a translator, which can be a problem if you're using i18n. Alternately, in a
     // critical error, you might not even have access to a `Reactor`, meaning no

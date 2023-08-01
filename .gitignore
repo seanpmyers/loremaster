@@ -2,6 +2,8 @@
 Rocket.toml
 
 # Application Configuration File
+Loremaster.ron
+loremaster.ron
 loremaster.toml
 Loremaster.toml
 
@@ -9,6 +11,7 @@ Loremaster.toml
 /application/target
 /application/frontend/target
 /application/frontend/dist
+/application/frontend/pkg
 
 # Environment files
 .env
@@ -22,3 +25,7 @@ application/frontend/resources/styles/library/*
 .terraform/
 *.tfstate
 application/database/.project
+
+.DS_Store
+application/.DS_Store
+application/frontend/.DS_Store

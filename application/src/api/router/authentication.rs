@@ -1,11 +1,11 @@
-use std::{net::SocketAddr, str::FromStr};
+use std::{net::SocketAddr, str::FromStr, sync::Arc};
 
 use anyhow::anyhow;
 use axum::{
     extract::{ConnectInfo, State},
     http::StatusCode,
     response::{IntoResponse, Response},
-    routing::{get, post},
+    routing::post,
     Json, Router,
 };
 use axum_extra::extract::{
@@ -14,12 +14,19 @@ use axum_extra::extract::{
 };
 use email_address::EmailAddress;
 use log::{info, warn};
-use serde::Deserialize;
+use serde::{Deserialize, Serialize};
+use webauthn_rs::{
+    prelude::{PublicKeyCredential, RegisterPublicKeyCredential},
+    Webauthn,
+};
 
 use crate::{
     api::{
         handler::authentication::{
-            handle_register_security_key, register_handler, security_key_challenge_handler,
+            register_handler, web_authentication_api_login_finish_handler,
+            web_authentication_api_login_start_handler,
+            web_authentication_api_register_finish_handler,
+            web_authentication_api_register_start_handler, AuthenticationResult,
             RegistrationResult,
         },
         response::ApiError,
@@ -29,7 +36,6 @@ use crate::{
         entity::person::Credentials, postgres_handler::PostgresHandler,
         query::person::credential_by_email_address::credential_by_email_address_query,
     },
-    security::authentication::security_key::{SecurityKeyChallenge, SecurityKeyService},
     utility::{
         constants::{
             cookie_fields, BLOCKED_EMAIL_MESSAGE, FAILED_LOGIN_MESSAGE, INVALID_EMAIL_MESSAGE,
@@ -60,7 +66,7 @@ async fn register(
     )
     .await?
     {
-        RegistrationResult::Success => Ok((
+        RegistrationResult::Valid => Ok((
             StatusCode::ACCEPTED,
             REGISTRATION_SUCCESS_MESSAGE.to_string(),
         )
@@ -140,33 +146,169 @@ async fn logout(cookie_jar: PrivateCookieJar) -> Result<Response, ApiError> {
     Ok((updated_cookie_jar, "Successfully logged out.").into_response())
 }
 
-async fn security_key_challenge(
-    State(security_key_service): State<SecurityKeyService>,
-) -> Result<Json<SecurityKeyChallenge>, ApiError> {
-    info!("API CALL: /authentication/security-key-challenge");
-    let result: SecurityKeyChallenge =
-        security_key_challenge_handler(&security_key_service).await?;
-    Ok(Json(result))
+#[derive(Deserialize, Debug)]
+struct WebAuthenticationRegistrationForm {
+    email_address: String,
+    alias: String,
 }
 
-async fn register_security_key(
-    State(security_key_service): State<SecurityKeyService>,
+async fn web_authentication_api_register_start(
+    State(postgres_service): State<PostgresHandler>,
+    State(web_authentication_service): State<Arc<Webauthn>>,
+    Form(web_authentication_registration_form): Form<WebAuthenticationRegistrationForm>,
 ) -> Result<Response, ApiError> {
-    handle_register_security_key(&security_key_service, &String::new()).await?;
+    info!("API CALL: /authentication/webauthn/start");
+    match web_authentication_api_register_start_handler(
+        &postgres_service.database_pool,
+        &web_authentication_service,
+        &web_authentication_registration_form.email_address,
+        &web_authentication_registration_form.alias,
+    )
+    .await?
+    {
+        (RegistrationResult::Valid, Some(credential_challenge)) => {
+            Ok((StatusCode::ACCEPTED, Json(Some(credential_challenge))).into_response())
+        }
+        (RegistrationResult::InvalidEmailAddress, _) => {
+            Ok((StatusCode::BAD_REQUEST, INVALID_EMAIL_MESSAGE).into_response())
+        }
+        (RegistrationResult::BlockedEmailAddress, _) => {
+            Ok((StatusCode::FORBIDDEN, String::from(BLOCKED_EMAIL_MESSAGE)).into_response())
+        }
+        (RegistrationResult::EmailAddressInUse, _) => Ok((
+            StatusCode::ACCEPTED,
+            REGISTRATION_SUCCESS_MESSAGE.to_string(),
+        )
+            .into_response()),
+        //TODO: Log it
+        (_, _) => Ok((
+            StatusCode::INTERNAL_SERVER_ERROR,
+            "Something went wrong on our side.",
+        )
+            .into_response()),
+    }
+}
+
+//TODO: Rename
+#[derive(Debug, Clone, Deserialize, Serialize)]
+struct RegistrationInput {
+    pub email_address: String,
+    pub user_credential_json: RegisterPublicKeyCredential,
+}
+
+async fn web_authentication_api_register_finish(
+    State(postgres_service): State<PostgresHandler>,
+    State(web_authentication_service): State<Arc<Webauthn>>,
+    Json(registration_input): Json<RegistrationInput>,
+) -> Result<Response, ApiError> {
+    info!("API CALL: /authentication/webauthn/finish");
+    web_authentication_api_register_finish_handler(
+        &postgres_service.database_pool,
+        &web_authentication_service,
+        &registration_input.email_address,
+        &registration_input.user_credential_json,
+    )
+    .await?;
     Ok((StatusCode::CREATED, "Successfully registered security key").into_response())
+}
+
+#[derive(Deserialize, Debug)]
+struct WebAuthenticationLoginStartForm {
+    email_address: String,
+}
+
+async fn web_authentication_api_login_start(
+    State(postgres_service): State<PostgresHandler>,
+    State(web_authentication_service): State<Arc<Webauthn>>,
+    Form(request_input): Form<WebAuthenticationLoginStartForm>,
+) -> Result<Response, ApiError> {
+    match web_authentication_api_login_start_handler(
+        &postgres_service.database_pool,
+        &web_authentication_service,
+        &request_input.email_address,
+    )
+    .await?
+    {
+        (AuthenticationResult::InvalidEmailAddress, _) => {
+            Ok((StatusCode::BAD_REQUEST, INVALID_EMAIL_MESSAGE).into_response())
+        }
+        (AuthenticationResult::InvalidInput, _) => {
+            Ok((StatusCode::BAD_REQUEST, INVALID_EMAIL_MESSAGE).into_response())
+        }
+        (AuthenticationResult::InvalidKey, _) => {
+            Ok((StatusCode::BAD_REQUEST, INVALID_PASSWORD_MESSAGE).into_response())
+        }
+        (AuthenticationResult::Valid, Some(challenge)) => {
+            Ok((StatusCode::ACCEPTED, Json(Some(challenge))).into_response())
+        }
+        (_, _) => Ok((StatusCode::BAD_REQUEST, INVALID_EMAIL_MESSAGE).into_response()),
+    }
+}
+
+#[derive(Deserialize, Debug)]
+struct PersonPublicKeyCredential {
+    email_address: String,
+    public_key_credential: PublicKeyCredential,
+}
+
+async fn web_authentication_api_login_finish(
+    State(postgres_service): State<PostgresHandler>,
+    State(web_authentication_service): State<Arc<Webauthn>>,
+    cookie_jar: PrivateCookieJar,
+    Json(request_input): Json<PersonPublicKeyCredential>,
+) -> Result<Response, ApiError> {
+    match web_authentication_api_login_finish_handler(
+        &postgres_service.database_pool,
+        &web_authentication_service,
+        &request_input.email_address,
+        &request_input.public_key_credential,
+    )
+    .await?
+    {
+        (AuthenticationResult::InvalidEmailAddress, None) => {
+            Ok((StatusCode::BAD_REQUEST, INVALID_EMAIL_MESSAGE).into_response())
+        }
+        (AuthenticationResult::InvalidInput, None) => {
+            Ok((StatusCode::BAD_REQUEST, "Bad Input").into_response())
+        }
+        (AuthenticationResult::InvalidKey, None) => {
+            Ok((StatusCode::BAD_REQUEST, "Bad key").into_response())
+        }
+        (AuthenticationResult::Valid, Some(person_id)) => {
+            let updated_cookie_jar: PrivateCookieJar = cookie_jar.add(
+                Cookie::build(cookie_fields::USER_ID, person_id.to_string())
+                    .same_site(SameSite::Strict)
+                    .path("/")
+                    .http_only(true)
+                    .secure(true)
+                    .finish(),
+            );
+
+            Ok((updated_cookie_jar, SUCCESSFUL_LOGIN_MESSAGE.to_string()).into_response())
+        }
+        (_, _) => Ok((StatusCode::BAD_REQUEST, "Bad Input").into_response()),
+    }
 }
 
 pub fn router() -> Router<ApplicationState> {
     Router::new()
         .route(
-            "/authentication/security-key-challenge",
-            get(security_key_challenge),
+            "/authentication/webauthn/start",
+            post(web_authentication_api_register_start),
         )
         .route("/authentication/authenticate", post(authenticate))
         .route("/authentication/logout", post(logout))
         .route("/authentication/register", post(register))
         .route(
-            "/authentication/register-security-key",
-            post(register_security_key),
+            "/authentication/webauthn/finish",
+            post(web_authentication_api_register_finish),
+        )
+        .route(
+            "/authentication/webauthn/login/start",
+            post(web_authentication_api_login_start),
+        )
+        .route(
+            "/authentication/webauthn/login/finish/person_public_key_credential.json",
+            post(web_authentication_api_login_finish),
         )
 }

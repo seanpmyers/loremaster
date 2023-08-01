@@ -29,9 +29,9 @@ pub fn SleepWidget<G: Html>(context: Scope) -> View<G> {
 
     if G::IS_BROWSER {
         spawn_local_scoped(context, async move {
-            let query_response =
+            let query_response: Option<String> =
                 http_service::get_endpoint(API_PERSON_SLEEP_SCHEDULE_ROUTE, None).await;
-            let current_date = Date::new_0();
+            let current_date: Date = Date::new_0();
             match query_response {
                 Some(response) => {
                     let potential_sleep_schedule: Option<SleepSchedule> =

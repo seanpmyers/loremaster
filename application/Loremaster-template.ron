@@ -1,0 +1,18 @@
+LoremasterWebServerConfiguration(
+	environment: Local,
+	scheduler_state: Off,
+	web_server: WebServer(
+		ipv4_address: (127, 0, 0, 1),
+		port: 8000,
+	),
+	database: Database(
+		postgresql_connection_string: "postgres://postgres:postgres@localhost/postgres",
+	),
+	encryption: Encryption(
+		hash_iterations: 2,
+		site_secret: "replace with a secret",
+	),
+	front_end: FrontEnd(
+		port: 8080
+	),
+)

@@ -1,13 +1,19 @@
 {
    "cSpell.words": [
       "chrono",
+      "cose",
       "ctap",
       "fidokey",
       "Hasher",
+      "openapi",
       "reqwasm",
-      "Rustls"
+      "Rustls",
+      "webauthn"
    ],
    "editor.insertSpaces": false,
    "editor.tabSize": 2,
-   "git.enableCommitSigning": true
+   "git.enableCommitSigning": true,
+   "yaml.schemas": {
+      "openapi:v3": "file:///home/naes/github/loremaster/documentation/openapi/chronicle/openapi%3A%20%273.0.2%27.yml"
+   }
 }

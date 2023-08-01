@@ -16,7 +16,7 @@ use wasm_bindgen::JsValue;
 
 use crate::{
     components::{
-        container::{Container, ContainerProperties},
+        container::Container,
         widget::{
             calendar::week::Week, calendar::week::WeekProperties, goal_list::GoalList,
             goal_list::GoalListProperties, sleep::SleepWidget,
@@ -87,7 +87,7 @@ pub fn chronicle_page<'page, G: Html>(
                         state.user_alias.set(alias);
                     }
                 }
-                None => (),
+                None => todo!(),
             }
 
             match javascript_date.get_hours() {
@@ -127,45 +127,42 @@ pub fn chronicle_page<'page, G: Html>(
     let local_date: time::OffsetDateTime = now_utc_date.to_offset(time::macros::offset!(-5));
 
     view! {context,
-            Container(ContainerProperties {
-                title: String::from("Chronicle"),
-                children: view! {context,
-                    div(class="", id="chronicle-container") {
-                        div(class="row flex-grow-1 text-black"){
-                            div(class="col-9 bg-light p-5 border-0 rounded") {
-                                div(class="d-flex align-items-baseline") {
-                                    h2(class="fw-normal flex-grow-1") { "Chronicle - "(state.date_display.get()) }
-                                }
-                                h3(class="fw-normal") { (state.greeting.get()) }
-                                div() {
-                                    Week(WeekProperties{
-                                        days: create_signal(context, vec![]),
-                                        selected_date: create_signal(context, local_date),
-                                    })
-                                }
-                                div() {
-                                    label() { "What do you intend to do today?" }
-                                }
-                                SleepWidget()
-                                div(class="d-flex flex-column") {
-                                    label() { "Notes" }
-                                    textarea(class="border rounded bg-white", rows="4", cols="50") {}
-                                }
+            Container(title="Chronicle") {
+                div(class="", id="chronicle-container") {
+                    div(class="row flex-grow-1 text-black"){
+                        div(class="col-9 bg-light p-5 border-0 rounded") {
+                            div(class="d-flex align-items-baseline") {
+                                h2(class="fw-normal flex-grow-1") { "Chronicle - "(state.date_display.get()) }
                             }
-                            div(class="col-3 border-start") {
-                                div(class="card shadow-sm border-0 rounded mt-2") {
-                                    div(class="card-body") {
-                                        h3(class="card-title") { "Goals" }
-                                        p(class="card-text") {
-                                            GoalList(GoalListProperties{goals: create_signal(context, Vec::new())})
-                                        }
+                            h3(class="fw-normal") { (state.greeting.get()) }
+                            div() {
+                                Week(WeekProperties{
+                                    days: create_signal(context, vec![]),
+                                    selected_date: create_signal(context, local_date),
+                                })
+                            }
+                            div() {
+                                label() { "What do you intend to do today?" }
+                            }
+                            SleepWidget()
+                            div(class="d-flex flex-column") {
+                                label() { "Notes" }
+                                textarea(class="border rounded bg-white", rows="4", cols="50") {}
+                            }
+                        }
+                        div(class="col-3 border-start") {
+                            div(class="card shadow-sm border-0 rounded mt-2") {
+                                div(class="card-body") {
+                                    h3(class="card-title") { "Goals" }
+                                    p(class="card-text") {
+                                        GoalList(GoalListProperties{goals: create_signal(context, Vec::new())})
                                     }
                                 }
                             }
                         }
                     }
-            },
-        })
+                }
+            }
     }
 }
 
