@@ -14,7 +14,7 @@ use crate::{
         accordion::{Accordion, AccordionItem},
         combobox::{ComboBox, ComboBoxOption},
         container::Container,
-        modal::Modal,
+        modal::{Modal, ModalType},
         navigation::tab::tab_panel::{TabIndex, TabPanel},
         navigation::tab::{tab_button::TabButton, tab_section::TabSection},
         switch::Switch,
@@ -70,6 +70,8 @@ pub fn design_system_page<'page, G: Html>(context: BoundedScope<'_, 'page>) -> V
         }
         .to_combobox_option(),
     ];
+
+    let modal_type: &Signal<ModalType> = create_signal(context, ModalType::Default);
 
     view! {context,
         Container(title="Design System") {
@@ -158,7 +160,20 @@ pub fn design_system_page<'page, G: Html>(context: BoundedScope<'_, 'page>) -> V
                     div() {
                         h3() { "Modal" }
                         div(class=demo_container_classes) {
-                            Modal(html_class=empty_class, button_label="Open modal") {
+                            div() {
+                                button(on:click=move |_| { modal_type.set(ModalType::Default); }) { "Default" }
+                                button(on:click=move |_| { modal_type.set(ModalType::SidePanelRight); }) { "Side Panel - Right"}
+                                button(on:click=move |_| { modal_type.set(ModalType::SidePanelLeft); }) { "Side Panel - Left"}
+                            }
+                            div() {
+                                label() { "Current Modal Type"}
+                                div() { (match modal_type.get().as_ref() {
+                                    ModalType::Default => "Default".to_string(),
+                                    ModalType::SidePanelRight => "Side Panel - Right".to_string(),
+                                    ModalType::SidePanelLeft => "Side Panel - Left".to_string(),
+                                }) }
+                            }
+                            Modal(html_class=empty_class, button_label="Open modal", modal_type=modal_type) {
                                 div() { "Test" }
                             }
                         }
