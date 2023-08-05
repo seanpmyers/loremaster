@@ -13,6 +13,10 @@ use web_sys::Event;
 use crate::components::container::Container;
 
 use crate::components::form::input_validation::{InputValidation, InputValidationProperties};
+use crate::components::icon::{PASSWORD_SVH_HTML, YUBIKEY_SVG_HTML};
+use crate::components::navigation::tab::tab_button::TabButton;
+use crate::components::navigation::tab::tab_panel::{TabIndex, TabPanel};
+use crate::components::navigation::tab::tab_section::TabSection;
 use crate::components::state::message_type::MessageType;
 use crate::components::state::validation::Validation;
 use crate::components::state::visibility::Visibility;
@@ -48,6 +52,12 @@ pub fn login_page<'page, G: Html>(
 ) -> View<G> {
     let ApplicationStateRx { authentication } =
         Reactor::<G>::from_cx(context).get_global_state::<ApplicationStateRx>(context);
+
+    let tab_panel_classes = create_signal(context, String::new());
+    let tab_button_classes = create_signal(context, String::new());
+    let tab_section_classes = create_signal(context, String::new());
+    let active_tab: &Signal<TabIndex> = create_signal(context, 0_u32);
+
     let message_type: &Signal<MessageType> = create_signal(context, MessageType::Information);
     let toast_content: &Signal<String> = create_signal(context, String::new());
 
@@ -163,59 +173,67 @@ pub fn login_page<'page, G: Html>(
 
     view! {context,
         Container(title="Login") {
-            div(class="") {
-                div(class="card-body") {
-                    h3(class="card-title display-6") {"Login"}
-                    form(on:submit=login_handler) {
-                        div(class="input-row") {
-                            label(
-                                name="email_address",
-                                class="form-label") { "Email Address" }
-                            input(
-                                type="email",
-                                class="form-control",
-                                bind:value=email_address,
-                                placeholder = "Enter your email address",
-                                disabled=loading.get().as_ref().to_owned()
-                            ) {}
-                            InputValidation(InputValidationProperties{
-                                content: email_address_validation_content,
-                                visibility: email_address_validation_visibility,
-                                validity: email_address_validity,
-                                message_type: email_address_message_type
-                            })
+            div(class="login-page") {
+                div(class="") {
+                    h3(class="") { "Login" }
+                    TabPanel(active_tab=active_tab, classes=tab_panel_classes) {
+                        div(class="tab-button-group") {
+                            TabButton(title=String::from("Password/OPAQUE"), index=0_u32, classes=tab_button_classes, icon=Some(PASSWORD_SVH_HTML))
+                            TabButton(title=String::from("WebAuthn"), index=1_u32, classes=tab_button_classes, icon=Some(YUBIKEY_SVG_HTML))
                         }
-                        div(class="input-row") {
-                            label(
-                                name="password",
-                                class="form-label"
-                            ) { "Password" }
-                            input(
-                                type="password",
-                                class="form-control",
-                                bind:value=password,
-                                placeholder = "Enter your password",
-                                disabled=loading.get().as_ref().to_owned()
-                            ) {}
+                        TabSection(title=String::from("tab1"), index=0_u32, classes=tab_section_classes){
+                            form(on:submit=login_handler) {
+                                div(class="input-row") {
+                                    label(
+                                        name="email_address",
+                                        class="form-label") { "Email Address" }
+                                    input(
+                                        type="email",
+                                        class="",
+                                        bind:value=email_address,
+                                        placeholder = "Enter your email address",
+                                        disabled=loading.get().as_ref().to_owned()
+                                    ) {}
+                                    InputValidation(InputValidationProperties{
+                                        content: email_address_validation_content,
+                                        visibility: email_address_validation_visibility,
+                                        validity: email_address_validity,
+                                        message_type: email_address_message_type
+                                    })
+                                }
+                                div(class="input-row") {
+                                    label(
+                                        name="password",
+                                        class="form-label"
+                                    ) { "Password" }
+                                    input(
+                                        type="password",
+                                        class="",
+                                        bind:value=password,
+                                        placeholder = "Enter your password",
+                                        disabled=loading.get().as_ref().to_owned()
+                                    ) {}
 
+                                }
+                                button(
+                                    class="btn btn-primary",
+                                    type="submit",
+                                    disabled=loading.get().as_ref().to_owned()
+                                ) {
+                                    "Submit"
+                                }
+                                (match *form_message.get() {
+                                    FormMessageState::Hidden => view!{context, },
+                                    FormMessageState::Visible => {
+                                        return view! {context, Toast(ToastProperties{content: toast_content, message_type})};
+                                    },
+                                })
+                            }
                         }
-                        button(
-                            class="btn btn-primary",
-                            type="submit",
-                            disabled=loading.get().as_ref().to_owned()
-                        ) {
-                            "Submit"
+                        TabSection(title=String::from("tab2"), index=1_u32, classes=tab_section_classes){
+                            WebAuthenticationAPILogin()
                         }
-                        (match *form_message.get() {
-                            FormMessageState::Hidden => view!{context, },
-                            FormMessageState::Visible => {
-                                return view! {context, Toast(ToastProperties{content: toast_content, message_type})};
-                            },
-                        })
                     }
-                }
-                div() {
-                    WebAuthenticationAPILogin()
                 }
             }
         }

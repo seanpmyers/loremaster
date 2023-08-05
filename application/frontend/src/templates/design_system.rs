@@ -14,6 +14,7 @@ use crate::{
         accordion::{Accordion, AccordionItem},
         combobox::{ComboBox, ComboBoxOption},
         container::Container,
+        icon::{PASSWORD_SVH_HTML, YUBIKEY_SVG_HTML},
         modal::{Modal, ModalType},
         navigation::tab::tab_panel::{TabIndex, TabPanel},
         navigation::tab::{tab_button::TabButton, tab_section::TabSection},
@@ -111,9 +112,9 @@ pub fn design_system_page<'page, G: Html>(context: BoundedScope<'_, 'page>) -> V
                         div(class=demo_container_classes) {
                             TabPanel(active_tab=active_tab, classes=tab_panel_classes) {
                                 div(class="tab-button-group") {
-                                    TabButton(title=String::from("First"), index=0_u32, classes=tab_button_classes)
-                                    TabButton(title=String::from("Second"), index=1_u32, classes=tab_button_classes)
-                                    TabButton(title=String::from("Third"), index=2_u32, classes=tab_button_classes)
+                                    TabButton(title=String::from("First"), index=0_u32, classes=tab_button_classes, icon=Some(PASSWORD_SVH_HTML))
+                                    TabButton(title=String::from("Second"), index=1_u32, classes=tab_button_classes, icon=Some(YUBIKEY_SVG_HTML))
+                                    TabButton(title=String::from("Third"), index=2_u32, classes=tab_button_classes, icon=None)
                                 }
                                 TabSection(title=String::from("tab1"), index=0_u32, classes=tab_section_classes){
                                     div() {"First"}

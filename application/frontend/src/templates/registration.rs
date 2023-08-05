@@ -11,6 +11,10 @@ use web_sys::Event;
 
 use crate::components::container::Container;
 use crate::components::form::input_validation::InputValidation;
+use crate::components::icon::{PASSWORD_SVH_HTML, YUBIKEY_SVG_HTML};
+use crate::components::navigation::tab::tab_button::TabButton;
+use crate::components::navigation::tab::tab_panel::{TabIndex, TabPanel};
+use crate::components::navigation::tab::tab_section::TabSection;
 use crate::components::state::message_type::MessageType;
 use crate::components::state::validation::Validation;
 use crate::components::state::visibility::Visibility;
@@ -39,6 +43,11 @@ pub fn registration_page<'page, G: Html>(
     context: BoundedScope<'_, 'page>,
     state: &'page RegistrationPageStateRx,
 ) -> View<G> {
+    let tab_panel_classes = create_signal(context, String::new());
+    let tab_button_classes = create_signal(context, String::new());
+    let tab_section_classes: &Signal<String> = create_signal(context, String::new());
+    let active_tab: &Signal<TabIndex> = create_signal(context, 0_u32);
+
     let loading: &Signal<bool> = create_signal(context, false);
     let email_address: &Signal<String> = &state.email_address;
     let password: &Signal<String> = &state.password;
@@ -103,48 +112,58 @@ pub fn registration_page<'page, G: Html>(
 
     view! {context,
         Container(title="Registration") {
-            div(class="registration-form") {
+            div(class="registration-page") {
                 div(class="") {
-                    h3(class="display-6") {"Registration"}
-                    form(on:submit=registration_handler) {
-                        div(class="input-row") {
-                            label(
-                                name="email_address",
-                                class="form-label") { "Email Address" }
-                            input(
-                                type="email",
-                                class="form-control",
-                                bind:value= email_address,
-                                placeholder = "Enter your email address",
-                                disabled=*loading.get()
-                            ) {}
-                            InputValidation(
-                                content= email_address_validation_content,
-                                visibility= email_address_validation_visibility,
-                                validity= email_address_validity,
-                                message_type= email_address_message_type)
-                            }
-                        div(class="input-row") {
-                            label(
-                                name="password",
-                                class="form-label"
-                            ) { "Password" }
-                            input(
-                                type="password",
-                                class="form-control",
-                                bind:value= password,
-                                placeholder = "Enter your password",
-                                disabled=*loading.get()
-                            ) {}
+                    h3(class="") {"Registration"}
+                    TabPanel(active_tab=active_tab, classes=tab_panel_classes) {
+                        div(class="tab-button-group") {
+                            TabButton(title=String::from("Password/OPAQUE"), index=0_u32, classes=tab_button_classes, icon=Some(PASSWORD_SVH_HTML))
+                            TabButton(title=String::from("WebAuthn"), index=1_u32, classes=tab_button_classes, icon=Some(YUBIKEY_SVG_HTML))
                         }
-                        button(class="btn btn-primary", type="submit", disabled=*loading.get()){ "Submit"}
+                        TabSection(title=String::from("tab1"), index=0_u32, classes=tab_section_classes){
+                            form(on:submit=registration_handler) {
+                                div(class="input-row") {
+                                    label(
+                                        name="email_address",
+                                        class="form-label") { "Email Address" }
+                                    input(
+                                        type="email",
+                                        class="form-control",
+                                        bind:value= email_address,
+                                        placeholder = "Enter your email address",
+                                        disabled=*loading.get()
+                                    ) {}
+                                    InputValidation(
+                                        content= email_address_validation_content,
+                                        visibility= email_address_validation_visibility,
+                                        validity= email_address_validity,
+                                        message_type= email_address_message_type)
+                                    }
+                                div(class="input-row") {
+                                    label(
+                                        name="password",
+                                        class="form-label"
+                                    ) { "Password" }
+                                    input(
+                                        type="password",
+                                        class="form-control",
+                                        bind:value= password,
+                                        placeholder = "Enter your password",
+                                        disabled=*loading.get()
+                                    ) {}
+                                }
+                                button(class="btn btn-primary", type="submit", disabled=*loading.get()){ "Submit"}
+                            }
+                            (match *form_message.get() {
+                                FormMessageState::Hidden => view!{context,  div() {}},
+                                FormMessageState::Success => view!{context, div(class="badge bg-success rounded") {"Successfully registered."}},
+                                FormMessageState::Failure => view!{context, div(class="badge bg-danger rounded") {"Unable to register with the provided credentials."}}
+                            })
+                        }
+                        TabSection(title=String::from("tab2"), index=1_u32, classes=tab_section_classes){
+                            WebAuthenticationAPIRegistration()
+                        }
                     }
-                    (match *form_message.get() {
-                        FormMessageState::Hidden => view!{context,  div() {}},
-                        FormMessageState::Success => view!{context, div(class="badge bg-success rounded") {"Successfully registered."}},
-                        FormMessageState::Failure => view!{context, div(class="badge bg-danger rounded") {"Unable to register with the provided credentials."}}
-                    })
-                    WebAuthenticationAPIRegistration()
                 }
             }
             }

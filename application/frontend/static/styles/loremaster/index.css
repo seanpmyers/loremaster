@@ -207,11 +207,13 @@ select {
 	grid-area: content;
 	padding: 1rem;
 	max-height: 90vh;
+
 	overflow: scroll;
+
 	border-radius: 45.902px 0 0 0px;
-	background: linear-gradient(137deg, rgba(255, 255, 255, 0.37) 0%, rgba(114, 114, 114, 0.42) 95.31%);
-	box-shadow: 0px 0.8534755706787109px 20.48341178894043px -0.8534755706787109px rgba(0, 0, 0, 0.18), 0px 1.9199997186660767px 5.7599992752075195px 0px rgba(255, 255, 255, 0.25) inset;
-	backdrop-filter: blur(49.43999481201172px);
+	background: linear-gradient(137deg, rgba(163, 163, 163, 0.37) 0%, rgba(114, 114, 114, 0.42) 95.31%);
+	box-shadow: 0px 0.32970792055130005px 7.912988662719727px -0.32970792055130005px rgba(0, 0, 0, 0.18), 0px 0.7417190074920654px 2.2251572608947754px 0px rgba(255, 255, 255, 0.25) inset;
+	backdrop-filter: blur(32.25739669799805px);
 }
 
 .loremaster-text {
@@ -750,7 +752,6 @@ form .input-row label {}
 	display: flex;
 	margin: 0;
 	padding: 0;
-	background: var(--third-background-color);
 }
 
 .accordion-item-title button {
@@ -795,61 +796,51 @@ form .input-row label {}
 
 .tab-button-group {
 	display: flex;
+	gap: 20px;
 	flex-direction: row;
-	background-color: var(--background);
-	border-width: 1px;
-	border-style: solid;
-	border-color: transparent;
-	border-radius: var(--border-radius);
-	margin-bottom: .6rem;
-	box-shadow: var(--small-box-shadow);
-}
+	align-items: center;
+	flex-shrink: 0;
 
-.tab-button-group .tab-button:first-of-type {
-	border-left-width: 0;
-	border-left-style: none;
-	border-top-left-radius: var(--border-radius);
-	border-bottom-left-radius: var(--border-radius);
-}
+	padding: 12.241px;
 
-.tab-button-group .tab-button:last-of-type {
-	border-right-width: 0;
-	border-right-style: none;
-	border-top-right-radius: var(--border-radius);
-	border-bottom-right-radius: var(--border-radius);
+	border-radius: 23.473px;
+	background: linear-gradient(137deg, rgba(70, 70, 70, 0.22) 0%, rgba(70, 70, 70, 0.60) 0.01%, rgba(70, 70, 70, 0.25) 99.99%, rgba(70, 70, 70, 0.60) 100.00%);
+	box-shadow: 2.2533891201019287px 2.2533891201019287px 10.140252113342285px 0px rgba(0, 0, 0, 0.25) inset;
+	backdrop-filter: blur(12.111967086791992px);
 }
 
 .tab-button {
+	display: flex;
+	align-items: center;
+
+	gap: .3em;
+
 	margin: 0;
-	border-radius: 0;
-	border-color: var(--background);
-	border-style: solid;
-	border-top-width: 0;
-	border-bottom-width: 0;
-	border-left-width: 0;
+
+	border-radius: inherit;
+
 	background: transparent;
-	padding: 1rem;
-	font-size: var(--medium-text);
-	color: var(--dimmed-text-color);
+	padding: .4rem;
+
+	backdrop-filter: none;
+	/* font-size: var(--medium-text); */
 }
 
 .tab-button:hover {
-	background-color: var(--background-hover);
+	background: rgba(255, 255, 255, 0.20);
 }
 
 .tab-button.active-tab {
-	color: var(--text-color);
-	border-bottom-color: var(--blue);
-	border-bottom-style: solid;
-	border-bottom-width: 2px;
-	border-bottom-left-radius: 0 !important;
-	border-bottom-right-radius: 0 !important;
+	background: rgba(255, 255, 255, 0.20);
+}
+
+.tab-button span svg {
+	width: 24px;
+	height: 24px;
 }
 
 .tab-section {
-	background: var(--background);
 	color: var(--default-text-color);
-	border-radius: 4px;
 	padding: 1rem;
 }
 
@@ -933,10 +924,10 @@ form .input-row label {}
 	display: flex;
 	flex-direction: column;
 
-	border-radius: 55px;
-	background: linear-gradient(137deg, rgba(163, 163, 163, 0.37) 0%, rgba(114, 114, 114, 0.42) 95.31%);
-	box-shadow: 0px 0.5008366703987122px 12.020078659057617px -0.5008366703987122px rgba(0, 0, 0, 0.18), 0px 1.1266945600509644px 3.3800840377807617px 0px rgba(255, 255, 255, 0.25) inset;
-	backdrop-filter: blur(49px);
+	border-radius: 32px;
+	background: linear-gradient(154deg, rgba(28, 28, 28, 0.40) 0%, rgba(80, 80, 80, 0.00) 100%);
+	box-shadow: 0px 17.165912628173828px 21.45738983154297px 0px rgba(0, 0, 0, 0.05), 0px 0.715246319770813px 0.715246319770813px 0px rgba(255, 255, 255, 0.25) inset, 0px -0.715246319770813px 0.715246319770813px 0px rgba(255, 255, 255, 0.25) inset;
+	backdrop-filter: blur(15.5px);
 
 	min-width: 20vw;
 	min-height: 20vh;
@@ -966,9 +957,9 @@ form .input-row label {}
 	width: 20vw;
 
 	border-radius: 55px;
-	background: linear-gradient(137deg, rgba(163, 163, 163, 0.37) 0%, rgba(114, 114, 114, 0.42) 95.31%);
-	box-shadow: 0px 0.5008366703987122px 12.020078659057617px -0.5008366703987122px rgba(0, 0, 0, 0.18), 0px 1.1266945600509644px 3.3800840377807617px 0px rgba(255, 255, 255, 0.25) inset;
-	backdrop-filter: blur(49px);
+	background: linear-gradient(154deg, rgba(28, 28, 28, 0.40) 0%, rgba(80, 80, 80, 0.00) 100%);
+	box-shadow: 0px 17.165912628173828px 21.45738983154297px 0px rgba(0, 0, 0, 0.05), 0px 0.715246319770813px 0.715246319770813px 0px rgba(255, 255, 255, 0.25) inset, 0px -0.715246319770813px 0.715246319770813px 0px rgba(255, 255, 255, 0.25) inset;
+	backdrop-filter: blur(15.5px);
 
 	border-top-right-radius: 0;
 	border-bottom-right-radius: 0;
@@ -985,12 +976,46 @@ form .input-row label {}
 	width: 20vw;
 
 	border-radius: 55px;
-	background: linear-gradient(137deg, rgba(163, 163, 163, 0.37) 0%, rgba(114, 114, 114, 0.42) 95.31%);
-	box-shadow: 0px 0.5008366703987122px 12.020078659057617px -0.5008366703987122px rgba(0, 0, 0, 0.18), 0px 1.1266945600509644px 3.3800840377807617px 0px rgba(255, 255, 255, 0.25) inset;
-	backdrop-filter: blur(49px);
+	background: linear-gradient(154deg, rgba(28, 28, 28, 0.40) 0%, rgba(80, 80, 80, 0.00) 100%);
+	box-shadow: 0px 17.165912628173828px 21.45738983154297px 0px rgba(0, 0, 0, 0.05), 0px 0.715246319770813px 0.715246319770813px 0px rgba(255, 255, 255, 0.25) inset, 0px -0.715246319770813px 0.715246319770813px 0px rgba(255, 255, 255, 0.25) inset;
+	backdrop-filter: blur(15.5px);
 
 	border-top-left-radius: 0;
 	border-bottom-left-radius: 0;
+}
+
+.login-page {
+	display: flex;
+	flex-direction: column;
+	align-items: center;
+}
+
+.login-page>div {
+	display: flex;
+	flex-direction: column;
+	align-items: center;
+
+	padding: 1rem;
+
+	border-radius: 32px;
+	background: rgba(36, 36, 36, 0.60);
+}
+
+.registration-page {
+	display: flex;
+	flex-direction: column;
+	align-items: center;
+}
+
+.registration-page>div {
+	display: flex;
+	flex-direction: column;
+	align-items: center;
+
+	padding: 1rem;
+
+	border-radius: 32px;
+	background: rgba(36, 36, 36, 0.60);
 }
 
 

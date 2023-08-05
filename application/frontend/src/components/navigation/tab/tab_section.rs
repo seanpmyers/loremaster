@@ -31,7 +31,7 @@ pub fn TabSection<'tab, G: Html>(
     view! {context,
         (match active_tab.get().as_ref() == &index {
             true => {
-                view! {context, div(class=(classes.get()), id="", on:click=clicked) {
+                view! {context, div(class=(format!("tab-section {}", classes.get())), id="", on:click=clicked) {
                     (children)
                 }}
             },

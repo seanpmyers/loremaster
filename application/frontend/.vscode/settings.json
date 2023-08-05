@@ -6,6 +6,7 @@
 		"gloo",
 		"proto",
 		"reqwasm",
-		"webauthn"
+		"webauthn",
+		"YUBIKEY"
 	]
 }

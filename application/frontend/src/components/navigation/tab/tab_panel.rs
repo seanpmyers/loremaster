@@ -18,7 +18,7 @@ pub fn TabPanel<'tab_panel, G: Html>(
     let children: View<G> = properties.children.call(context);
 
     view! {context,
-        div(class=properties.classes) {
+        div(class=(format!("tab-panel {}", properties.classes.get()))) {
             (children)
         }
     }

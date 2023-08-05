@@ -1,4 +1,6 @@
-pub const FEATHER_SVG_HTML: &str = r#"
+pub type SvgIcon = &'static str;
+
+pub const FEATHER_SVG_HTML: SvgIcon = r#"
 	<svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor"
 		stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="feather feather-feather">
 			<path d="M20.24 12.24a6 6 0 0 0-8.49-8.49L5 10.5V19h8.5z"></path>
@@ -6,21 +8,21 @@ pub const FEATHER_SVG_HTML: &str = r#"
 			<line x1="17.5" y1="15" x2="9" y2="15"></line>
 	</svg>
 "#;
-pub const BOOK_SVG_HTML: &str = r#"
+pub const BOOK_SVG_HTML: SvgIcon = r#"
 	<svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor"
 		stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="feather feather-book">
 		<path d="M4 19.5A2.5 2.5 0 0 1 6.5 17H20"></path>
 		<path d="M6.5 2H20v20H6.5A2.5 2.5 0 0 1 4 19.5v-15A2.5 2.5 0 0 1 6.5 2z"></path>
 	</svg>
 "#;
-pub const CLOCK_SVG_HTML: &str = r#"
+pub const CLOCK_SVG_HTML: SvgIcon = r#"
 	<svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor"
 		stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="feather feather-clock">
 		<circle cx="12" cy="12" r="10"></circle>
 		<polyline points="12 6 12 12 16 14"></polyline>
 	</svg>
 "#;
-pub const HELP_CIRCLE_SVG_HTML: &str = r#"
+pub const HELP_CIRCLE_SVG_HTML: SvgIcon = r#"
 	<svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor"
 		stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="feather feather-help-circle">
 		<circle cx="12" cy="12" r="10"></circle>
@@ -28,7 +30,7 @@ pub const HELP_CIRCLE_SVG_HTML: &str = r#"
 		<line x1="12" y1="17" x2="12.01" y2="17"></line>
 	</svg>
 "#;
-pub const ARCHIVE_SVG_HTML: &str = r#"
+pub const ARCHIVE_SVG_HTML: SvgIcon = r#"
 	<svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor"
 		stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="feather feather-archive">
 		<polyline points="21 8 21 21 3 21 3 8"></polyline>
@@ -36,7 +38,7 @@ pub const ARCHIVE_SVG_HTML: &str = r#"
 		<line x1="10" y1="12" x2="14" y2="12"></line>
 	</svg>
 "#;
-pub const HOME_SVG_HTML: &str = r#"
+pub const HOME_SVG_HTML: SvgIcon = r#"
 	<svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor"
 		stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="feather feather-home">
 		<path d="M3 9l9-7 9 7v11a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2z"></path>
@@ -44,7 +46,7 @@ pub const HOME_SVG_HTML: &str = r#"
 	</svg>
 "#;
 
-pub const USER_SVG_HTML: &str = r#"
+pub const USER_SVG_HTML: SvgIcon = r#"
 	<svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor"
 		stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="feather feather-user">
 		<path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2"></path>
@@ -52,7 +54,7 @@ pub const USER_SVG_HTML: &str = r#"
 	</svg>
 "#;
 
-pub const USER_CIRCLE_SVH_HTML: &str = r#"
+pub const USER_CIRCLE_SVH_HTML: SvgIcon = r#"
 <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 256 256">
 	<rect width="256" height="256" fill="none" />
 	<circle cx="128" cy="128" r="96" fill="none" stroke="currentColor" stroke-linecap="round"
@@ -64,7 +66,7 @@ pub const USER_CIRCLE_SVH_HTML: &str = r#"
 </svg>
 "#;
 
-pub const BATTERY_CHARGING_SVG_HTML: &str = r#"
+pub const BATTERY_CHARGING_SVG_HTML: SvgIcon = r#"
 <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor"
 	stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="feather feather-battery-charging">
 	<path d="M5 18H3a2 2 0 0 1-2-2V8a2 2 0 0 1 2-2h3.19M15 6h2a2 2 0 0 1 2 2v8a2 2 0 0 1-2 2h-3.19"></path>
@@ -73,14 +75,14 @@ pub const BATTERY_CHARGING_SVG_HTML: &str = r#"
 </svg>
 "#;
 
-pub const MOON_SVG_HTML: &str = r#"
+pub const MOON_SVG_HTML: SvgIcon = r#"
 <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor"
 	stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="feather feather-moon">
 	<path d="M21 12.79A9 9 0 1 1 11.21 3 7 7 0 0 0 21 12.79z"></path>
 </svg>
 "#;
 
-pub const SUN_SVG_HTML: &str = r#"
+pub const SUN_SVG_HTML: SvgIcon = r#"
 <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor"
 	stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="feather feather-sun">
 	<circle cx="12" cy="12" r="5"></circle>
@@ -95,7 +97,7 @@ pub const SUN_SVG_HTML: &str = r#"
 </svg>
 "#;
 
-pub const FINGERPRINT_SVG_HTML: &str = r#"
+pub const FINGERPRINT_SVG_HTML: SvgIcon = r#"
 <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24"
 	style="fill: currentColor;transform: ;msFilter:;">
 	<path
@@ -110,7 +112,7 @@ pub const FINGERPRINT_SVG_HTML: &str = r#"
 </svg>
 "#;
 
-pub const KEY_1_SVG_HTML: &str = r#"
+pub const KEY_1_SVG_HTML: SvgIcon = r#"
 <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24"
 	style="fill: currentColor;transform: ;msFilter:;">
 	<path
@@ -119,7 +121,7 @@ pub const KEY_1_SVG_HTML: &str = r#"
 </svg>
 "#;
 
-pub const KEY_2_SVG_HTML: &str = r#"
+pub const KEY_2_SVG_HTML: SvgIcon = r#"
 <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24"
 	style="fill: currentColor;transform: ;msFilter:;">
 	<path
@@ -128,7 +130,7 @@ pub const KEY_2_SVG_HTML: &str = r#"
 </svg>
 "#;
 
-pub const YUBIKEY_SVG_HTML: &str = r#"
+pub const YUBIKEY_SVG_HTML: SvgIcon = r#"
 <svg viewBox="0 0 48 48" width="24" height="24" xmlns="http://www.w3.org/2000/svg" fill="currentColor">
 	<g id="SVGRepo_bgCarrier" stroke-width="0"></g>
 	<g id="SVGRepo_tracerCarrier" stroke-linecap="round" stroke-linejoin="round"></g>
@@ -151,7 +153,7 @@ pub const YUBIKEY_SVG_HTML: &str = r#"
 </svg>
 "#;
 
-pub const LOGIN_SVG_HTML: &str = r#"
+pub const LOGIN_SVG_HTML: SvgIcon = r#"
 <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor"
 	stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="feather feather-log-in">
 	<path d="M15 3h4a2 2 0 0 1 2 2v14a2 2 0 0 1-2 2h-4"></path>
@@ -160,7 +162,7 @@ pub const LOGIN_SVG_HTML: &str = r#"
 </svg>
 "#;
 
-pub const USER_PLUS_SVG_HTML: &str = r#"
+pub const USER_PLUS_SVG_HTML: SvgIcon = r#"
 <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor"
 	stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="feather feather-user-plus">
 	<path d="M16 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2"></path>
@@ -170,7 +172,7 @@ pub const USER_PLUS_SVG_HTML: &str = r#"
 </svg>
 "#;
 
-pub const GLOBE_SVG_HTML: &str = r#"
+pub const GLOBE_SVG_HTML: SvgIcon = r#"
 <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor"
 	stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="feather feather-globe">
 	<circle cx="12" cy="12" r="10"></circle>
@@ -179,7 +181,7 @@ pub const GLOBE_SVG_HTML: &str = r#"
 </svg>
 "#;
 
-pub const COPY_SVG_HTML: &str = r#"
+pub const COPY_SVG_HTML: SvgIcon = r#"
 <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor"
 	stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="feather feather-copy">
 	<rect x="9" y="9" width="13" height="13" rx="2" ry="2"></rect>
@@ -187,7 +189,7 @@ pub const COPY_SVG_HTML: &str = r#"
 </svg>
 "#;
 
-pub const SEARCH_SVG_HTML: &str = r#"
+pub const SEARCH_SVG_HTML: SvgIcon = r#"
 <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor"
 	stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="feather feather-search">
 	<circle cx="11" cy="11" r="8"></circle>
@@ -195,7 +197,7 @@ pub const SEARCH_SVG_HTML: &str = r#"
 </svg>
 "#;
 
-pub const ALERT_TRIANGLE_SVG_HTML: &str = r#"
+pub const ALERT_TRIANGLE_SVG_HTML: SvgIcon = r#"
 <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor"
 	stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="feather feather-alert-triangle">
 	<path d="M10.29 3.86L1.82 18a2 2 0 0 0 1.71 3h16.94a2 2 0 0 0 1.71-3L13.71 3.86a2 2 0 0 0-3.42 0z"></path>
@@ -204,14 +206,14 @@ pub const ALERT_TRIANGLE_SVG_HTML: &str = r#"
 </svg>
 "#;
 
-pub const CHECK_SVG_HTML: &str = r#"
+pub const CHECK_SVG_HTML: SvgIcon = r#"
 <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor"
 	stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="feather feather-check">
 	<polyline points="20 6 9 17 4 12"></polyline>
 </svg>
 "#;
 
-pub const INFO_SVG_HTML: &str = r#"
+pub const INFO_SVG_HTML: SvgIcon = r#"
 <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor"
 	stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="feather feather-info">
 	<circle cx="12" cy="12" r="10"></circle>
@@ -220,7 +222,7 @@ pub const INFO_SVG_HTML: &str = r#"
 </svg>
 "#;
 
-pub const ALERT_OCTAGON_SVG_HTML: &str = r#"
+pub const ALERT_OCTAGON_SVG_HTML: SvgIcon = r#"
 <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor"
 	stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="feather feather-alert-octagon">
 	<polygon points="7.86 2 16.14 2 22 7.86 22 16.14 16.14 22 7.86 22 2 16.14 2 7.86 7.86 2"></polygon>
@@ -229,21 +231,21 @@ pub const ALERT_OCTAGON_SVG_HTML: &str = r#"
 </svg>
 "#;
 
-pub const CHEVRON_UP_SVG_HTML: &str = r#"
+pub const CHEVRON_UP_SVG_HTML: SvgIcon = r#"
 <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor"
 	stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="feather feather-chevron-up">
 	<polyline points="18 15 12 9 6 15"></polyline>
 </svg>
 "#;
 
-pub const CHEVRON_DOWN_SVG_HTML: &str = r#"
+pub const CHEVRON_DOWN_SVG_HTML: SvgIcon = r#"
 <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor"
 	stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="feather feather-chevron-down">
 	<polyline points="6 9 12 15 18 9"></polyline>
 </svg>
 "#;
 
-pub const GIT_MERGE_SVG_HTML: &str = r#"
+pub const GIT_MERGE_SVG_HTML: SvgIcon = r#"
 <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 256 256">
 	<rect width="24" height="24" fill="none" />
 	<circle cx="80" cy="200" r="24" fill="none" stroke="currentColor" stroke-linecap="round"
@@ -256,12 +258,40 @@ pub const GIT_MERGE_SVG_HTML: &str = r#"
 		stroke-linecap="round" stroke-linejoin="round" stroke-width="16" />
 </svg>"#;
 
-pub const CLOSE_X_SVG_HTML: &str = r#"
+pub const CLOSE_X_SVG_HTML: SvgIcon = r#"
 <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 256 256">
 	<rect width="256" height="256" fill="none" />
 	<line x1="200" y1="56" x2="56" y2="200" stroke="currentColor" stroke-linecap="round"
 		stroke-linejoin="round" stroke-width="16" />
 	<line x1="200" y1="200" x2="56" y2="56" stroke="currentColor" stroke-linecap="round"
 		stroke-linejoin="round" stroke-width="16" />
+</svg>
+"#;
+
+pub const PASSWORD_SVH_HTML: SvgIcon = r#"
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 256 256">
+	<rect width="256" height="256" fill="none" />
+	<line x1="40" y1="56" x2="40" y2="200" fill="none" stroke="currentColor" stroke-linecap="round"
+		stroke-linejoin="round" stroke-width="16" />
+	<line x1="104" y1="96" x2="104" y2="128" fill="none" stroke="currentColor" stroke-linecap="round"
+		stroke-linejoin="round" stroke-width="16" />
+	<line x1="73.57" y1="118.11" x2="104" y2="128" fill="none" stroke="currentColor"
+		stroke-linecap="round" stroke-linejoin="round" stroke-width="16" />
+	<line x1="85.19" y1="153.89" x2="104" y2="128" fill="none" stroke="currentColor"
+		stroke-linecap="round" stroke-linejoin="round" stroke-width="16" />
+	<line x1="122.81" y1="153.89" x2="104" y2="128" fill="none" stroke="currentColor"
+		stroke-linecap="round" stroke-linejoin="round" stroke-width="16" />
+	<line x1="134.43" y1="118.11" x2="104" y2="128" fill="none" stroke="currentColor"
+		stroke-linecap="round" stroke-linejoin="round" stroke-width="16" />
+	<line x1="200" y1="96" x2="200" y2="128" fill="none" stroke="currentColor" stroke-linecap="round"
+		stroke-linejoin="round" stroke-width="16" />
+	<line x1="169.57" y1="118.11" x2="200" y2="128" fill="none" stroke="currentColor"
+		stroke-linecap="round" stroke-linejoin="round" stroke-width="16" />
+	<line x1="181.19" y1="153.89" x2="200" y2="128" fill="none" stroke="currentColor"
+		stroke-linecap="round" stroke-linejoin="round" stroke-width="16" />
+	<line x1="218.81" y1="153.89" x2="200" y2="128" fill="none" stroke="currentColor"
+		stroke-linecap="round" stroke-linejoin="round" stroke-width="16" />
+	<line x1="230.43" y1="118.11" x2="200" y2="128" fill="none" stroke="currentColor"
+		stroke-linecap="round" stroke-linejoin="round" stroke-width="16" />
 </svg>
 "#;
