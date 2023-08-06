@@ -1,5 +1,5 @@
 [package]
-name = "loremaster"
+name = "loremaster-web-server"
 version = "0.1.0"
 authors = ["Sean Myers <spmyers@protonmail.com>"]
 edition = "2021"

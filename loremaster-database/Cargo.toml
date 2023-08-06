@@ -1,0 +1,28 @@
+[package]
+name = "loremaster-database"
+version = "0.1.0"
+edition = "2021"
+
+# See more keys and their definitions at https://doc.rust-lang.org/cargo/reference/manifest.html
+
+[dependencies]
+# Error handling
+anyhow = "1.0.72"
+# Provides async programming foundational functionality
+futures = "0.3.28"
+# Database client/pool/toolkit
+sqlx = { version = "0.6.3", features = [
+	"json",
+	"macros",
+	"migrate",
+	# "offline",
+	"postgres",
+	"runtime-tokio-native-tls",
+	"time",
+	"tls",
+	"uuid",
+] }
+# Error/exception handling
+thiserror = "1.0.44"
+# Backend async I/O functionality
+tokio = { version = "1.29.1", features = ["full"] }

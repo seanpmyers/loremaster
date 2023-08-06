@@ -1,6 +1,6 @@
 # loremaster
 
-[![Backend Build](https://github.com/seanpmyers/loremaster/actions/workflows/backend_build.yml/badge.svg)](https://github.com/seanpmyers/loremaster/actions/workflows/backend_build.yml)
+[![Web Server Build](https://github.com/seanpmyers/loremaster/actions/workflows/web_server_build.yml/badge.svg)](https://github.com/seanpmyers/loremaster/actions/workflows/web_server_build.yml)
 [![Front-End Build](https://github.com/seanpmyers/loremaster/actions/workflows/front_end_build.yaml/badge.svg)](https://github.com/seanpmyers/loremaster/actions/workflows/front_end_build.yaml)
 [![rust-clippy analyze](https://github.com/seanpmyers/loremaster/workflows/rust-clippy%20analyze/badge.svg)](https://github.com/seanpmyers/loremaster/actions)
 

@@ -1,4 +1,4 @@
-name: Back-End Build
+name: Web Server Build
 
 on:
   push:
@@ -20,6 +20,6 @@ jobs:
       run: sudo apt-get update && sudo apt-get install libudev-dev
     - name: Build
       run: cargo build --verbose
-      working-directory: application
+      working-directory: loremaster-web-server
     #- name: Run tests
     #  run: cargo test --verbose
