@@ -1,8 +1,6 @@
 use anyhow::Result;
-use postgres_handler::PostgresHandler;
+use loremaster::data::postgres_handler::PostgresHandler;
 use sqlx::PgPool;
-
-pub mod postgres_handler;
 
 const CONNECTION_STRING_ENVIRONMENT_VARIABLE_KEY: &str = "POSTGRES_CONNECTION_STRING";
 const DATABASE_FOLDER_PATH: &str = "../database/";
@@ -17,6 +15,10 @@ async fn main() -> Result<()> {
 
     if postgres_connection_string.is_empty() {
         panic!("Postgresql connection string is empty!");
+    }
+
+    if !std::path::Path::new(DATABASE_FOLDER_PATH).exists() {
+        panic!("Database folder path does not exist!");
     }
 
     let postgres_handler: PostgresHandler =
