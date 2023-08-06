@@ -1,14 +1,20 @@
 version: 2
 updates:
 - package-ecosystem: cargo
-  directory: "/application/"
+  directory: "/loremaster-database"
   schedule:
     interval: daily
     time: "05:30"
-  open-pull-requests-limit: 10
+  open-pull-requests-limit: 50
 - package-ecosystem: cargo
-  directory: "/application/frontend"
+  directory: "/loremaster-frontend"
   schedule:
     interval: daily
     time: "05:30"
-  open-pull-requests-limit: 10
+  open-pull-requests-limit: 50
+- package-ecosystem: cargo
+  directory: "/loremaster-web-server"
+  schedule:
+    interval: daily
+    time: "05:30"
+  open-pull-requests-limit: 50

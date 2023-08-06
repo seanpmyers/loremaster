@@ -8,17 +8,18 @@ loremaster.toml
 Loremaster.toml
 
 # Rust
-/application/target
-/application/frontend/target
-/application/frontend/dist
-/application/frontend/pkg
+target/
+/loremaster-web-server/target
+/loremaster-web-interface/target
+/loremaster-web-interface/dist
+/loremaster-web-interface/pkg
 
 # Environment files
 .env
 
 # Third Party CSS Frameworks/Stylesheets
-application/frontend/static/bootstrap-5.2.0-dist/
-application/frontend/resources/styles/library/*
+/loremaster-web-interface/static/bootstrap-5.2.0-dist/
+/loremaster-web-interface/resources/styles/library/*
 
 # Terraform
 *.gcp-service-account.json
@@ -27,5 +28,5 @@ application/frontend/resources/styles/library/*
 application/database/.project
 
 .DS_Store
-application/.DS_Store
-application/frontend/.DS_Store
+loremaster-web-server/.DS_Store
+/loremaster-web-interface/.DS_Store
