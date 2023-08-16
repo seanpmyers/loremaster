@@ -7,7 +7,7 @@ edition = "2021"
 
 [dependencies]
 # Error handling
-anyhow = "1.0.72"
+anyhow = "1.0.74"
 # Provides async programming foundational functionality
 futures = "0.3.28"
 # Database client/pool/toolkit
