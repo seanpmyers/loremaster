@@ -31,7 +31,7 @@ futures = "0.3.28"
 # Logging
 log = { version = "0.4.20" }
 # Rust Object Notation
-ron = { version = "0.8.0" }
+ron = { version = "0.8.1" }
 # Random nubmer generation
 rand = "0.8.5"
 # Serialization
