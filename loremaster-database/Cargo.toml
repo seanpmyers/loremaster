@@ -25,4 +25,4 @@ sqlx = { version = "0.6.3", features = [
 # Error/exception handling
 thiserror = "1.0.46"
 # Backend async I/O functionality
-tokio = { version = "1.31.0", features = ["full"] }
+tokio = { version = "1.32.0", features = ["full"] }
