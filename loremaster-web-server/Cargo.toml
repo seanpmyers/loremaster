@@ -8,7 +8,7 @@ edition = "2021"
 
 [dependencies]
 # Error handling
-anyhow = "1.0.74"
+anyhow = "1.0.75"
 # Password Encryption
 argon2 = "0.5.0"
 # A web application framework that focuses on ergonomics and modularity.
@@ -31,7 +31,7 @@ futures = "0.3.28"
 # Logging
 log = { version = "0.4.20" }
 # Rust Object Notation
-ron = { version = "0.8.0" }
+ron = { version = "0.8.1" }
 # Random nubmer generation
 rand = "0.8.5"
 # Serialization
@@ -52,12 +52,12 @@ sqlx = { version = "0.6.3", features = [
 # NewSQL database -- to be used as an alternative to postgresql for this app
 # surrealdb = { version = "1.0.0-beta.8" }
 # Error/exception handling
-thiserror = "1.0.46"
+thiserror = "1.0.47"
 # Time
 time = { version = "0.3.25", features = ["serde", "std", "parsing"] }
 time-tz = { version = "1.0.3" }
 # Backend async I/O functionality
-tokio = { version = "1.31.0", features = ["full"] }
+tokio = { version = "1.32.0", features = ["full"] }
 tokio-stream = { version = "0.1.14" }
 tokio-test = { version = "0.4.2" }
 # Tower middleware and utilities for HTTP clients and servers
