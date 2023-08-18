@@ -23,6 +23,6 @@ sqlx = { version = "0.6.3", features = [
 	"uuid",
 ] }
 # Error/exception handling
-thiserror = "1.0.46"
+thiserror = "1.0.47"
 # Backend async I/O functionality
 tokio = { version = "1.32.0", features = ["full"] }
