@@ -7,7 +7,7 @@ edition = "2021"
 
 [dependencies]
 # Error handling
-anyhow = "1.0.72"
+anyhow = "1.0.74"
 # Provides async programming foundational functionality
 futures = "0.3.28"
 loremaster = { path = "../loremaster" }
@@ -24,6 +24,6 @@ sqlx = { version = "0.6.3", features = [
 	"uuid",
 ] }
 # Error/exception handling
-thiserror = "1.0.44"
+thiserror = "1.0.46"
 # Backend async I/O functionality
-tokio = { version = "1.29.1", features = ["full"] }
+tokio = { version = "1.31.0", features = ["full"] }
