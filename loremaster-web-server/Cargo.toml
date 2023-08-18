@@ -57,7 +57,7 @@ thiserror = "1.0.47"
 time = { version = "0.3.25", features = ["serde", "std", "parsing"] }
 time-tz = { version = "1.0.3" }
 # Backend async I/O functionality
-tokio = { version = "1.31.0", features = ["full"] }
+tokio = { version = "1.32.0", features = ["full"] }
 tokio-stream = { version = "0.1.14" }
 tokio-test = { version = "0.4.2" }
 # Tower middleware and utilities for HTTP clients and servers
