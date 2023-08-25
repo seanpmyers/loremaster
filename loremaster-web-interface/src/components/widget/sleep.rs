@@ -109,7 +109,7 @@ pub fn SleepWidget<G: Html>(context: Scope) -> View<G> {
                div(class="sleep-widget") { "No sleep schedule found." }
            },
            ComponentState::Loading => view! { context,
-               div(class="sleep-widget") { "Loading..." }
+               div(class="sleep-widget skeleton skeleton-body") { "" }
            },
        })
     }

@@ -237,23 +237,96 @@ pub async fn update_sleep_schedule(
 }
 
 #[derive(Deserialize, Serialize, Debug)]
+pub enum InvestmentFrequency {
+    Monthly,
+    Annually,
+}
+
+#[derive(Deserialize, Serialize, Debug)]
 pub struct CompoundingInterestInputs {
     pub duration_in_years: u16,
     pub start_age: u8,
-    pub initial_amount: f32, // TODO: need 64?
-    pub annual_percent_interest: f32,
+    pub initial_amount: f32,
+    pub percent_interest: f32,
+    pub interest_frequency: InvestmentFrequency,
+    pub contribution_amount: f32,
+    pub contribution_frequency: InvestmentFrequency,
+}
+
+#[derive(Deserialize, Serialize, Debug)]
+pub struct InvestmentStatus {
+    pub total_value: f32,
+    pub interest_value: f32,
+    pub contribution_value: f32,
 }
 
 #[derive(Deserialize, Serialize, Debug)]
 pub struct CompoundingInterestResult {
-    pub duration_in_years: u16,
+    pub inputs: CompoundingInterestInputs,
+    pub results: Vec<InvestmentStatus>,
 }
 
 pub async fn compounding_interest_calculator(
     Form(input_form): Form<CompoundingInterestInputs>,
 ) -> Result<Response, ApiError> {
+    if input_form.duration_in_years == 0 {
+        return Ok((StatusCode::BAD_REQUEST, "Years cannot be zero.").into_response());
+    }
+    const MONTHS_IN_A_YEAR: u32 = 12;
+    const ITERATION_START: u32 = 1;
+    let mut results: Vec<InvestmentStatus> =
+        Vec::with_capacity(input_form.duration_in_years as usize);
+
+    let mut current_value: f32 = input_form.initial_amount;
+    let mut current_interest_value: f32 = 0_f32;
+    let mut current_contribution_value: f32 = 0_f32;
+
+    let iterations: u32 = match (
+        &input_form.contribution_frequency,
+        &input_form.interest_frequency,
+    ) {
+        (_, InvestmentFrequency::Monthly) => input_form.duration_in_years as u32 * MONTHS_IN_A_YEAR,
+        (InvestmentFrequency::Monthly, _) => input_form.duration_in_years as u32 * MONTHS_IN_A_YEAR,
+        (_, _) => input_form.duration_in_years as u32,
+    };
+
+    for index in ITERATION_START..iterations {
+        let is_year = index % MONTHS_IN_A_YEAR == 0 && index != 0;
+
+        match (&input_form.interest_frequency, is_year) {
+            (InvestmentFrequency::Annually, true) => {
+                current_interest_value += current_value * input_form.percent_interest;
+                current_value += current_value * input_form.percent_interest;
+            }
+            (InvestmentFrequency::Annually, false) => (),
+            (_, _) => {
+                current_interest_value += current_value * input_form.percent_interest;
+                current_value += current_value * input_form.percent_interest;
+            }
+        }
+
+        match (&input_form.contribution_frequency, is_year) {
+            (InvestmentFrequency::Annually, true) => {
+                current_contribution_value += &input_form.contribution_amount;
+                current_value += &input_form.contribution_amount;
+            }
+            (InvestmentFrequency::Annually, false) => (),
+            (_, _) => {
+                current_contribution_value += &input_form.contribution_amount;
+                current_value += &input_form.contribution_amount;
+            }
+        }
+
+        results.push(InvestmentStatus {
+            total_value: current_value,
+            interest_value: current_interest_value,
+            contribution_value: current_contribution_value,
+        });
+    }
+
     let result: CompoundingInterestResult = CompoundingInterestResult {
-        duration_in_years: input_form.duration_in_years,
+        inputs: input_form,
+        results,
     };
     Ok((StatusCode::OK, Json(result)).into_response())
 }

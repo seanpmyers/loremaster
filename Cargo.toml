@@ -2,3 +2,4 @@
 members = ["loremaster", "loremaster-database", "loremaster-web-server"]
 default-members = ["loremaster", "loremaster-database", "loremaster-web-server"]
 exclude = ["loremaster-web-interface"]
+resolver = "2"

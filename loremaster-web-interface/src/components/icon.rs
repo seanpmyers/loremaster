@@ -268,7 +268,7 @@ pub const CLOSE_X_SVG_HTML: SvgIcon = r#"
 </svg>
 "#;
 
-pub const PASSWORD_SVH_HTML: SvgIcon = r#"
+pub const PASSWORD_SVG_HTML: SvgIcon = r#"
 <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 256 256">
 	<rect width="256" height="256" fill="none" />
 	<line x1="40" y1="56" x2="40" y2="200" fill="none" stroke="currentColor" stroke-linecap="round"
@@ -292,6 +292,18 @@ pub const PASSWORD_SVH_HTML: SvgIcon = r#"
 	<line x1="218.81" y1="153.89" x2="200" y2="128" fill="none" stroke="currentColor"
 		stroke-linecap="round" stroke-linejoin="round" stroke-width="16" />
 	<line x1="230.43" y1="118.11" x2="200" y2="128" fill="none" stroke="currentColor"
+		stroke-linecap="round" stroke-linejoin="round" stroke-width="16" />
+</svg>
+"#;
+
+pub const LAYOUT_SVG_HTML: SvgIcon = r#"
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 256 256">
+	<rect width="256" height="256" fill="none" />
+	<line x1="104" y1="104" x2="104" y2="208" fill="none" stroke="currentColor" stroke-linecap="round"
+		stroke-linejoin="round" stroke-width="16" />
+	<line x1="32" y1="104" x2="224" y2="104" fill="none" stroke="currentColor" stroke-linecap="round"
+		stroke-linejoin="round" stroke-width="16" />
+	<rect x="32" y="48" width="192" height="160" rx="8" fill="none" stroke="currentColor"
 		stroke-linecap="round" stroke-linejoin="round" stroke-width="16" />
 </svg>
 "#;
