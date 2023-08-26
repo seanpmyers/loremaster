@@ -243,21 +243,25 @@ pub enum InvestmentFrequency {
 }
 
 #[derive(Deserialize, Serialize, Debug)]
+#[serde(rename_all = "camelCase")]
 pub struct CompoundingInterestInputs {
     pub duration_in_years: u16,
-    pub start_age: u8,
     pub initial_amount: f32,
     pub percent_interest: f32,
     pub interest_frequency: InvestmentFrequency,
     pub contribution_amount: f32,
     pub contribution_frequency: InvestmentFrequency,
+    pub percent_inflation: f32,
 }
 
 #[derive(Deserialize, Serialize, Debug)]
 pub struct InvestmentStatus {
     pub total_value: f32,
+    pub total_principal: f32,
     pub interest_value: f32,
     pub contribution_value: f32,
+    pub deflated_value: f32,
+    pub deflation_difference: f32,
 }
 
 #[derive(Deserialize, Serialize, Debug)]
@@ -267,15 +271,18 @@ pub struct CompoundingInterestResult {
 }
 
 pub async fn compounding_interest_calculator(
-    Form(input_form): Form<CompoundingInterestInputs>,
+    Json(input_form): Json<CompoundingInterestInputs>,
 ) -> Result<Response, ApiError> {
     if input_form.duration_in_years == 0 {
         return Ok((StatusCode::BAD_REQUEST, "Years cannot be zero.").into_response());
     }
+    let years = (input_form.duration_in_years + 1) as u32;
+
     const MONTHS_IN_A_YEAR: u32 = 12;
     const ITERATION_START: u32 = 1;
-    let mut results: Vec<InvestmentStatus> =
-        Vec::with_capacity(input_form.duration_in_years as usize);
+    const PERCENTAGE_MULTIPLIER: f32 = 0.01_f32;
+
+    let mut results: Vec<InvestmentStatus> = Vec::with_capacity(years as usize);
 
     let mut current_value: f32 = input_form.initial_amount;
     let mut current_interest_value: f32 = 0_f32;
@@ -285,23 +292,33 @@ pub async fn compounding_interest_calculator(
         &input_form.contribution_frequency,
         &input_form.interest_frequency,
     ) {
-        (_, InvestmentFrequency::Monthly) => input_form.duration_in_years as u32 * MONTHS_IN_A_YEAR,
-        (InvestmentFrequency::Monthly, _) => input_form.duration_in_years as u32 * MONTHS_IN_A_YEAR,
-        (_, _) => input_form.duration_in_years as u32,
+        (_, InvestmentFrequency::Monthly) => years * MONTHS_IN_A_YEAR,
+        (InvestmentFrequency::Monthly, _) => years * MONTHS_IN_A_YEAR,
+        (_, _) => years,
     };
 
     for index in ITERATION_START..iterations {
-        let is_year = index % MONTHS_IN_A_YEAR == 0 && index != 0;
+        let is_year = match (
+            &input_form.contribution_frequency,
+            &input_form.interest_frequency,
+        ) {
+            (InvestmentFrequency::Annually, InvestmentFrequency::Annually) => true,
+            (_, _) => index % MONTHS_IN_A_YEAR == 0 && index != 0,
+        };
 
         match (&input_form.interest_frequency, is_year) {
             (InvestmentFrequency::Annually, true) => {
-                current_interest_value += current_value * input_form.percent_interest;
-                current_value += current_value * input_form.percent_interest;
+                current_interest_value +=
+                    current_value * input_form.percent_interest * PERCENTAGE_MULTIPLIER;
+                current_value +=
+                    current_value * input_form.percent_interest * PERCENTAGE_MULTIPLIER;
             }
             (InvestmentFrequency::Annually, false) => (),
             (_, _) => {
-                current_interest_value += current_value * input_form.percent_interest;
-                current_value += current_value * input_form.percent_interest;
+                current_interest_value +=
+                    current_value * input_form.percent_interest * PERCENTAGE_MULTIPLIER;
+                current_value +=
+                    current_value * input_form.percent_interest * PERCENTAGE_MULTIPLIER;
             }
         }
 
@@ -319,8 +336,14 @@ pub async fn compounding_interest_calculator(
 
         results.push(InvestmentStatus {
             total_value: current_value,
+            total_principal: current_value - current_interest_value,
             interest_value: current_interest_value,
             contribution_value: current_contribution_value,
+            deflated_value: current_value
+                - current_value * input_form.percent_inflation * PERCENTAGE_MULTIPLIER,
+            deflation_difference: current_value
+                - (current_value
+                    - current_value * input_form.percent_inflation * PERCENTAGE_MULTIPLIER),
         });
     }
 
