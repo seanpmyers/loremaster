@@ -936,6 +936,8 @@ form .input-row label {}
 
 	min-width: 20vw;
 	min-height: 20vh;
+
+	padding: 0;
 }
 
 .modal::backdrop {
@@ -949,6 +951,14 @@ form .input-row label {}
 .modal-close svg {
 	height: 24px;
 	width: 24px;
+}
+
+.modal-container {
+	display: flex;
+	flex-direction: column;
+	padding: 1rem 1.5rem;
+
+	flex-grow: 1;
 }
 
 .modal-side-panel-right:modal {

@@ -73,6 +73,7 @@ pub fn design_system_page<'page, G: Html>(context: BoundedScope<'_, 'page>) -> V
     ];
 
     let modal_type: &Signal<ModalType> = create_signal(context, ModalType::Default);
+    let click_to_close: &Signal<bool> = create_signal(context, false);
 
     view! {context,
         Container(title="Design System") {
@@ -173,10 +174,17 @@ pub fn design_system_page<'page, G: Html>(context: BoundedScope<'_, 'page>) -> V
                                     ModalType::SidePanelRight => "Side Panel - Right".to_string(),
                                     ModalType::SidePanelLeft => "Side Panel - Left".to_string(),
                                 }) }
+                                label() { "Click to Close"}
+                                div() {
+                                    Switch(toggled=click_to_close, classes=switch_classes)
+                                }
                             }
-                            Modal(html_class=empty_class, button_label="Open modal", modal_type=modal_type) {
-                                div() { "Test" }
-                            }
+                            Modal(
+                                html_class=empty_class,
+                                button_label="Open modal",
+                                modal_type=modal_type,
+                                close_on_click_outside=click_to_close
+                            ) { div() { "Test" } }
                         }
                     }
                     div() {
