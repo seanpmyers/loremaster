@@ -31,8 +31,6 @@ const SYCAMORE_GITHUB_URL: &str = "https://github.com/sycamore-rs/sycamore";
 const PERSEUS_GITHUB_URL: &str = "https://github.com/framesurge/perseus";
 
 pub fn design_system_page<'page, G: Html>(context: BoundedScope<'_, 'page>) -> View<G> {
-    let empty_class: &Signal<String> = create_signal(context, String::from(""));
-
     let first_item: &Signal<String> = create_signal(context, String::from("First"));
     let second_item: &Signal<String> = create_signal(context, String::from("Second"));
 
@@ -43,6 +41,7 @@ pub fn design_system_page<'page, G: Html>(context: BoundedScope<'_, 'page>) -> V
 
     let switch_on: &Signal<bool> = create_signal(context, false);
     let switch_classes: &Signal<String> = create_signal(context, String::from("switch"));
+    let empty_class: &Signal<String> = create_signal(context, String::new());
 
     let demo_container_classes: &Signal<String> = create_signal(context, String::from("card"));
 
@@ -174,9 +173,9 @@ pub fn design_system_page<'page, G: Html>(context: BoundedScope<'_, 'page>) -> V
                                     ModalType::SidePanelRight => "Side Panel - Right".to_string(),
                                     ModalType::SidePanelLeft => "Side Panel - Left".to_string(),
                                 }) }
-                                label() { "Click to Close"}
                                 div() {
-                                    Switch(toggled=click_to_close, classes=switch_classes)
+                                    Switch(toggled=click_to_close, classes=empty_class)
+                                    label() { "Click to Close"}
                                 }
                             }
                             Modal(
@@ -185,48 +184,6 @@ pub fn design_system_page<'page, G: Html>(context: BoundedScope<'_, 'page>) -> V
                                 modal_type=modal_type,
                                 close_on_click_outside=click_to_close
                             ) { div() { "Test" } }
-                        }
-                    }
-                    div() {
-                        h3() { "Information" }
-                        div(class=demo_container_classes) {
-
-                        }
-                    }
-                    div() {
-                        h3() { "Information" }
-                        div(class=demo_container_classes) {
-
-                        }
-                    }
-                    div() {
-                        h3() { "Information" }
-                        div(class=demo_container_classes) {
-
-                        }
-                    }
-                    div() {
-                        h3() { "Information" }
-                        div(class=demo_container_classes) {
-
-                        }
-                    }
-                    div() {
-                        h3() { "Information" }
-                        div(class=demo_container_classes) {
-
-                        }
-                    }
-                    div() {
-                        h3() { "Information" }
-                        div(class=demo_container_classes) {
-
-                        }
-                    }
-                    div() {
-                        h3() { "Information" }
-                        div(class=demo_container_classes) {
-
                         }
                     }
                     div() {
