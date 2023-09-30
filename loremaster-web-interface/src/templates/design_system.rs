@@ -168,11 +168,11 @@ pub fn design_system_page<'page, G: Html>(context: BoundedScope<'_, 'page>) -> V
                             }
                             div() {
                                 label() { "Current Modal Type"}
-                                div() { (match modal_type.get().as_ref() {
+                                input(disabled=true, type="text", value=(match modal_type.get().as_ref() {
                                     ModalType::Default => "Default".to_string(),
                                     ModalType::SidePanelRight => "Side Panel - Right".to_string(),
                                     ModalType::SidePanelLeft => "Side Panel - Left".to_string(),
-                                }) }
+                                })) {  }
                                 div() {
                                     Switch(toggled=click_to_close, classes=empty_class)
                                     label() { "Click to Close"}

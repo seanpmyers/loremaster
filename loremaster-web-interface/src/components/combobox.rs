@@ -51,26 +51,29 @@ pub fn ComboBox<'combobox, G: Html>(
     });
 
     view! {context,
-        div(class=classes) {
-            label() { (label) }
-            input(type="text", bind:value=query) {}
+        label() { (label) }
+        div(class=format!("{} combobox", classes)) {
+            input(type="text", bind:value=query, class="combobox-input") {}
             input(type="hidden", value=(match selected.get().as_ref() {
                 Some(option) => option.to_string(),
                 None => String::new(),
             }), name=selected_html_input_name)
-            select() {
+            ul(class="combobox-options ", role="listbox", aria-label=label) {
                 Keyed(
                     iterable=filtered_options,
-                    view= move |context, option| view! { context,
-                        option(
-                            class=COMBOBOX_OPTION_CSS_CLASSES,
-                            value=option.id.to_string(),
-                            title=option.description,
-                            on:click=move |event: Event| {
+                    view= move |context, option| {
+                        let display_text = option.display_text.clone();
+                        view! { context,
+                            li(
+                                class=COMBOBOX_OPTION_CSS_CLASSES,
+                                value=option.id.to_string(),
+                                title=option.description
+                            ) { button(on:click=move |event: Event| {
                                 event.prevent_default();
-                                selected.set(Some(option.id))
-                            }
-                        ) { (option.display_text) }
+                                selected.set(Some(option.id));
+                                query.set(display_text.to_owned());
+                            }) { (option.display_text) } }
+                        }
                     },
                     key=|option| option.id
                 )
