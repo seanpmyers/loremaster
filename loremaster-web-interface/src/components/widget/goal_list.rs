@@ -27,7 +27,7 @@ pub fn GoalList<'a, 'b: 'a, G: Html>(
         });
     }
     view! { context,
-        (if *create_selector(context, || !goals.get().is_empty()).get() {
+        (if !goals.get().is_empty() {
             view! { context,
                 ul(class=" goal_list", id="") {
                     Keyed(
