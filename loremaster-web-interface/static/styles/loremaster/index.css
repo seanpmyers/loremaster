@@ -80,6 +80,7 @@ html {
 	background: var(--background);
 	color: var(--default-text-color);
 	height: 100%;
+	font-weight: normal;
 }
 
 #root,
@@ -181,6 +182,10 @@ input {
 
 input:active {
 	border: solid 1px var(--border-color);
+}
+
+label {
+	font-weight:bold;
 }
 
 select {
@@ -1059,7 +1064,7 @@ form .input-row label {}
 .combobox {
 	display: flex;
 	flex-direction: column;
-	align-items: start;
+	width: 10rem;
 }
 
 .combobox-options {
@@ -1071,7 +1076,11 @@ form .input-row label {}
 .combobox-options li {
 	display: flex;
 	flex-direction: column;
+}
 
+.combobox-options li button {
+	margin: 0;
+	border-radius: 0;
 }
 
 @keyframes skeleton-loading {
