@@ -129,15 +129,15 @@ pub fn registration_page<'page, G: Html>(
                                     input(
                                         type="email",
                                         class="form-control",
-                                        bind:value= email_address,
-                                        placeholder = "Enter your email address",
+                                        bind:value=email_address,
+                                        placeholder="Enter your email address",
                                         disabled=*loading.get()
                                     ) {}
                                     InputValidation(
-                                        content= email_address_validation_content,
-                                        visibility= email_address_validation_visibility,
-                                        validity= email_address_validity,
-                                        message_type= email_address_message_type)
+                                        content=email_address_validation_content,
+                                        visibility=email_address_validation_visibility,
+                                        validity=email_address_validity,
+                                        message_type=email_address_message_type)
                                     }
                                 div(class="input-row") {
                                     label(

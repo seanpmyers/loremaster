@@ -22,16 +22,12 @@ pub fn TabSection<'tab, G: Html>(
     }: TabSectionProperties<'tab, G>,
 ) -> View<G> {
     let active_tab: &Signal<TabIndex> = use_context::<Signal<TabIndex>>(context);
-    let clicked = move |event: Event| {
-        event.prevent_default();
-        create_effect(context, move || active_tab.set(index));
-    };
 
     let children: View<G> = children.call(context);
     view! {context,
         (match active_tab.get().as_ref() == &index {
             true => {
-                view! {context, div(class=(format!("tab-section {}", classes.get())), id="", on:click=clicked) {
+                view! {context, div(class=(format!("tab-section {}", classes.get())), id="") {
                     (children)
                 }}
             },
