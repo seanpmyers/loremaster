@@ -1,9 +1,8 @@
 use anyhow::Result;
 use log::info;
 use sqlx::{query_as, PgPool};
-use uuid::Uuid;
 
-use crate::data::entity::goal::Goal;
+use crate::data::entity::{goal::Goal, person::PersonId};
 
 const QUERY: &str = "
 	SELECT
@@ -27,7 +26,7 @@ const PERSON_QUERY: &str = "
 
 pub async fn get_goal_list_query(
     database_connection: &PgPool,
-    person_id: Option<&Uuid>,
+    person_id: Option<&PersonId>,
 ) -> Result<Vec<Goal>> {
     info!("QUERY CALL: get_goal_list_query");
 

@@ -1,8 +1,7 @@
 use anyhow::Result;
 use sqlx::{query_as, PgPool};
-use uuid::Uuid;
 
-use crate::data::entity::person::PersonMeta;
+use crate::data::entity::person::{PersonId, PersonMeta};
 
 const QUERY: &str = "
 SELECT
@@ -22,7 +21,7 @@ LIMIT
 
 pub async fn meta_by_id_query(
     database_connection: &PgPool,
-    person_id: &Uuid,
+    person_id: &PersonId,
 ) -> Result<Option<PersonMeta>> {
     let query_result: Option<PersonMeta> = query_as::<_, PersonMeta>(QUERY)
         .bind(person_id)

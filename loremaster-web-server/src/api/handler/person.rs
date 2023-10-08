@@ -8,7 +8,11 @@ use uuid::Uuid;
 use crate::{
     data::{
         entity::{
-            self, action::Action, goal::Goal, person::PersonMeta, sleep_schedule::SleepSchedule,
+            self,
+            action::Action,
+            goal::{Goal, GoalId},
+            person::{PersonId, PersonMeta},
+            sleep_schedule::SleepSchedule,
         },
         query::{
             action::{
@@ -60,14 +64,14 @@ pub enum EmailAddressUpdateResult {
 
 pub async fn get_person_meta_data(
     database_pool: &Pool<Postgres>,
-    person_id: &Uuid,
+    person_id: &PersonId,
 ) -> Result<Option<PersonMeta>> {
     meta_by_id_query(database_pool, person_id).await
 }
 
 pub async fn get_sleep_schedule_handler(
     database_pool: &Pool<Postgres>,
-    person_id: &Uuid,
+    person_id: &PersonId,
 ) -> Result<Option<SleepSchedule>> {
     let potential_sleep_schedule: Option<SleepSchedule> =
         get_person_sleep_schedule_query(database_pool, person_id).await?;
@@ -81,14 +85,14 @@ pub async fn get_action_list_handler(database_pool: &Pool<Postgres>) -> Result<V
 
 pub async fn get_goal_list_handler(
     database_pool: &Pool<Postgres>,
-    person_id: Option<&Uuid>,
+    person_id: Option<&PersonId>,
 ) -> Result<Vec<Goal>> {
     get_goal_list_query(database_pool, person_id).await
 }
 
 pub async fn create_action(
     database_pool: &Pool<Postgres>,
-    person_id: &Uuid,
+    person_id: &PersonId,
     action: &String,
 ) -> Result<UniqueEntryResult> {
     let sanitized_action: String = action.trim().to_ascii_lowercase();
@@ -122,7 +126,7 @@ pub async fn create_action(
 
 pub async fn create_goal(
     database_pool: &Pool<Postgres>,
-    person_id: &Uuid,
+    person_id: &PersonId,
     goal: &String,
 ) -> Result<UniqueEntryResult> {
     let sanitized_goal: String = goal.trim().to_ascii_lowercase();
@@ -174,7 +178,7 @@ pub async fn update_person_meta_handler(
 
 pub async fn update_email_handler(
     database_pool: &Pool<Postgres>,
-    person_id: &Uuid,
+    person_id: &PersonId,
     email_address: &str,
 ) -> Result<EmailAddressUpdateResult> {
     let sanitized_email_address: String = email_address.trim().to_ascii_lowercase();
@@ -204,7 +208,7 @@ pub async fn update_email_handler(
 
 pub async fn update_sleep_schedule_handler(
     database_pool: &Pool<Postgres>,
-    person_id: &Uuid,
+    person_id: &PersonId,
     start_time: &str,
     end_time: &str,
 ) -> Result<SleepSchedule> {
@@ -231,8 +235,8 @@ pub async fn update_sleep_schedule_handler(
 
 pub async fn remove_one_goal_handler(
     database_pool: &Pool<Postgres>,
-    person_id: &Uuid,
-    goal_id: &Uuid,
+    person_id: &PersonId,
+    goal_id: &GoalId,
 ) -> Result<bool> {
     let relation_exists: bool = goal_is_related_query(database_pool, person_id, goal_id).await?;
     match relation_exists {

@@ -4,14 +4,25 @@ use time::{format_description::well_known::Rfc3339, Date, Duration, OffsetDateTi
 use time_tz::OffsetDateTimeExt;
 use uuid::Uuid;
 
+use super::person::PersonId;
+
 #[derive(Deserialize, Serialize, Debug, Clone, sqlx::FromRow)]
 #[serde(rename_all = "camelCase")]
 pub struct Chronicle {
-    pub id: Uuid,
-    pub person_id: Uuid,
+    pub id: ChronicleId,
+    pub person_id: PersonId,
     pub date_recorded: Date,
     pub notes: Option<String>,
     pub creation_time: Option<OffsetDateTime>,
+}
+
+#[derive(Deserialize, Serialize, Debug, Clone, sqlx::Decode, sqlx::Encode)]
+pub struct ChronicleId(pub Uuid);
+
+impl sqlx::Type<sqlx::Postgres> for ChronicleId {
+    fn type_info() -> <sqlx::Postgres as sqlx::Database>::TypeInfo {
+        <Uuid as sqlx::Type<sqlx::Postgres>>::type_info()
+    }
 }
 
 pub fn current_server_time() -> Result<OffsetDateTime> {

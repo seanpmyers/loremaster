@@ -8,7 +8,6 @@ use axum::{
 use axum_extra::extract::Form;
 use log::info;
 use serde::{Deserialize, Serialize};
-use uuid::Uuid;
 
 use crate::{
     api::{
@@ -23,7 +22,12 @@ use crate::{
         web_server::ApplicationState,
     },
     data::{
-        entity::{action::Action, person::PersonMeta, sleep_schedule::SleepSchedule},
+        entity::{
+            action::Action,
+            goal::GoalId,
+            person::{PersonId, PersonMeta},
+            sleep_schedule::SleepSchedule,
+        },
         postgres_handler::PostgresHandler,
     },
 };
@@ -33,7 +37,7 @@ pub async fn meta(
     user: User,
 ) -> Result<Response, ApiError> {
     let result: Option<PersonMeta> =
-        get_person_meta_data(&postgres_service.database_pool, &user.0).await?;
+        get_person_meta_data(&postgres_service.database_pool, &PersonId(user.0)).await?;
     match result {
         Some(person) => Ok((StatusCode::OK, Json(person)).into_response()),
         None => Ok((
@@ -86,7 +90,7 @@ pub async fn update_email_address(
     info!("API Call: update_email_address");
     match update_email_handler(
         &postgres_service.database_pool,
-        &user.0,
+        &PersonId(user.0),
         &form.email_address,
     )
     .await?
@@ -113,8 +117,12 @@ pub async fn new_action(
     user: User,
     Form(form): Form<NewActionForm>,
 ) -> Result<Response, ApiError> {
-    let result: UniqueEntryResult =
-        create_action(&postgres_service.database_pool, &user.0, &form.action).await?;
+    let result: UniqueEntryResult = create_action(
+        &postgres_service.database_pool,
+        &PersonId(user.0),
+        &form.action,
+    )
+    .await?;
     match result {
         UniqueEntryResult::Created => {
             Ok((StatusCode::CREATED, "New action successfully created!").into_response())
@@ -149,8 +157,12 @@ pub async fn new_goal(
     user: User,
     Form(form): Form<NewGoalForm>,
 ) -> Result<Response, ApiError> {
-    let result: UniqueEntryResult =
-        create_goal(&postgres_service.database_pool, &user.0, &form.goal).await?;
+    let result: UniqueEntryResult = create_goal(
+        &postgres_service.database_pool,
+        &PersonId(user.0),
+        &form.goal,
+    )
+    .await?;
     match result {
         UniqueEntryResult::Created => {
             Ok((StatusCode::CREATED, "New Goal successfully created!").into_response())
@@ -169,7 +181,7 @@ pub async fn new_goal(
 
 #[derive(Deserialize, Debug)]
 pub struct GoalQueryParameters {
-    goal_id: Uuid,
+    goal_id: GoalId,
 }
 
 pub async fn remove_goal(
@@ -180,7 +192,7 @@ pub async fn remove_goal(
     info!("API Call: remove_goal");
     let result: bool = remove_one_goal_handler(
         &postgres_service.database_pool,
-        &user.0,
+        &PersonId(user.0),
         &parameters.goal_id,
     )
     .await?;
@@ -200,7 +212,9 @@ pub async fn get_goal_list(
 ) -> Result<Response, ApiError> {
     Ok((
         StatusCode::OK,
-        Json(get_goal_list_handler(&postgres_service.database_pool, Some(&user.0)).await?),
+        Json(
+            get_goal_list_handler(&postgres_service.database_pool, Some(&PersonId(user.0))).await?,
+        ),
     )
         .into_response())
 }
@@ -210,7 +224,7 @@ pub async fn get_sleep_schedule(
     user: User,
 ) -> Result<Response, ApiError> {
     let result: Option<SleepSchedule> =
-        get_sleep_schedule_handler(&postgres_service.database_pool, &user.0).await?;
+        get_sleep_schedule_handler(&postgres_service.database_pool, &PersonId(user.0)).await?;
     Ok((StatusCode::OK, Json(result)).into_response())
 }
 
@@ -227,7 +241,7 @@ pub async fn update_sleep_schedule(
 ) -> Result<Response, ApiError> {
     let result: SleepSchedule = update_sleep_schedule_handler(
         &postgres_service.database_pool,
-        &user.0,
+        &PersonId(user.0),
         &form.start_time,
         &form.end_time,
     )

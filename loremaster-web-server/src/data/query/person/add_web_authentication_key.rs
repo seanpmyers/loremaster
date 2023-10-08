@@ -1,7 +1,8 @@
 use anyhow::Result;
 use log::info;
 use sqlx::{query, PgPool};
-use uuid::Uuid;
+
+use crate::data::entity::{person::PersonId, web_authentication_key::WebAuthenticationKeyId};
 
 const QUERY: &str = "
     INSERT INTO
@@ -15,8 +16,8 @@ const QUERY: &str = "
 
 pub async fn add_web_authentication_key_query(
     database_connection: &PgPool,
-    person_id: &Uuid,
-    web_authentication_key_id: &Uuid,
+    person_id: &PersonId,
+    web_authentication_key_id: &WebAuthenticationKeyId,
 ) -> Result<()> {
     info!("QUERY CALL: add_web_authentication_key_query");
 

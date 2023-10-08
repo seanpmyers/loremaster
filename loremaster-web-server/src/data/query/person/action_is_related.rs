@@ -2,7 +2,7 @@ use anyhow::Result;
 use log::info;
 use sqlx::{postgres::PgRow, query, PgPool};
 
-use uuid::Uuid;
+use crate::data::entity::{action::ActionId, person::PersonId};
 
 const QUERY: &str = "
 	SELECT
@@ -18,8 +18,8 @@ const QUERY: &str = "
 
 pub async fn action_is_related_query(
     database_connection: &PgPool,
-    person_id: &Uuid,
-    action_id: &Uuid,
+    person_id: &PersonId,
+    action_id: &ActionId,
 ) -> Result<bool> {
     info!("QUERY CALL: action_is_related_query");
 

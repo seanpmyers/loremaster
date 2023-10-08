@@ -25,7 +25,7 @@ pub async fn add_web_authentication_register_query(
 ) -> Result<WebAuthenticationRegister> {
     info!("QUERY CALL: add_web_authentication_register_query");
     let query_result: WebAuthenticationRegister = query_as::<_, WebAuthenticationRegister>(QUERY)
-        .bind(web_authentication_register.id)
+        .bind(&web_authentication_register.id)
         .bind(&web_authentication_register.user_name)
         .bind(&web_authentication_register.passkey)
         .fetch_one(database_connection)
