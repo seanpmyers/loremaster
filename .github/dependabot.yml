@@ -7,7 +7,7 @@ updates:
     time: "05:30"
   open-pull-requests-limit: 50
 - package-ecosystem: cargo
-  directory: "/loremaster-frontend"
+  directory: "/loremaster-web-interface"
   schedule:
     interval: daily
     time: "05:30"
