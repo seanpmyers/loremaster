@@ -23,7 +23,7 @@ pub async fn add_web_authentication_login_query(
     web_authentication_challenge: &WebAuthenticationLogin,
 ) -> Result<WebAuthenticationLogin> {
     let query_result: WebAuthenticationLogin = query_as::<_, WebAuthenticationLogin>(QUERY)
-        .bind(web_authentication_challenge.id)
+        .bind(&web_authentication_challenge.id)
         .bind(&web_authentication_challenge.user_name)
         .bind(&web_authentication_challenge.passkey)
         .fetch_one(database_connection)

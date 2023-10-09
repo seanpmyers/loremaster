@@ -1,8 +1,10 @@
 use anyhow::Result;
 use sqlx::{query_as, PgPool};
-use uuid::Uuid;
 
-use crate::data::entity::person::Person;
+use crate::data::entity::{
+    email_address::EmailAddressId,
+    person::{Person, PersonId},
+};
 
 const QUERY: &str = "
 UPDATE
@@ -22,8 +24,8 @@ RETURNING
 
 pub async fn update_email_address_query(
     database_connection: &PgPool,
-    person_id: &Uuid,
-    email_address_id: &Uuid,
+    person_id: &PersonId,
+    email_address_id: &EmailAddressId,
 ) -> Result<Person> {
     let query_result: Person = query_as::<_, Person>(QUERY)
         .bind(person_id)

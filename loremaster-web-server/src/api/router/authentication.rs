@@ -5,7 +5,7 @@ use axum::{
     extract::{ConnectInfo, State},
     http::StatusCode,
     response::{IntoResponse, Response},
-    routing::post,
+    routing::{get, post},
     Json, Router,
 };
 use axum_extra::extract::{
@@ -22,6 +22,7 @@ use webauthn_rs::{
 
 use crate::{
     api::{
+        guards::user::User,
         handler::authentication::{
             register_handler, web_authentication_api_login_finish_handler,
             web_authentication_api_login_start_handler,
@@ -126,7 +127,7 @@ async fn authenticate(
     }
 
     let updated_cookie_jar: PrivateCookieJar = cookie_jar.add(
-        Cookie::build(cookie_fields::USER_ID, person.id.to_string())
+        Cookie::build(cookie_fields::USER_ID, person.id.0.to_string())
             .same_site(SameSite::Strict)
             .path("/")
             .http_only(true)
@@ -144,6 +145,10 @@ async fn logout(cookie_jar: PrivateCookieJar) -> Result<Response, ApiError> {
         .remove(Cookie::named(cookie_fields::USER_ID))
         .remove(Cookie::named(cookie_fields::SESSION_ID));
     Ok((updated_cookie_jar, "Successfully logged out.").into_response())
+}
+
+async fn check_session(_: User) -> Result<Response, ApiError> {
+    Ok((StatusCode::OK, "Session is active.").into_response())
 }
 
 #[derive(Deserialize, Debug)]
@@ -299,6 +304,7 @@ pub fn router() -> Router<ApplicationState> {
         .route("/authentication/authenticate", post(authenticate))
         .route("/authentication/logout", post(logout))
         .route("/authentication/register", post(register))
+        .route("/authentication/check-session", get(check_session))
         .route(
             "/authentication/webauthn/finish",
             post(web_authentication_api_register_finish),

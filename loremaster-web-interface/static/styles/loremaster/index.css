@@ -80,6 +80,7 @@ html {
 	background: var(--background);
 	color: var(--default-text-color);
 	height: 100%;
+	font-weight: normal;
 }
 
 #root,
@@ -181,6 +182,10 @@ input {
 
 input:active {
 	border: solid 1px var(--border-color);
+}
+
+label {
+	font-weight:bold;
 }
 
 select {
@@ -426,6 +431,11 @@ select {
 .big-nav-button-text,
 .big-nav-button-icon {
 	margin: .25vmin;
+}
+
+.big-nav-button-icon {
+	width: 24px;
+	height: 24px;
 }
 
 .popover-button+.popover:active,
@@ -931,6 +941,8 @@ form .input-row label {}
 
 	min-width: 20vw;
 	min-height: 20vh;
+
+	padding: 0;
 }
 
 .modal::backdrop {
@@ -944,6 +956,14 @@ form .input-row label {}
 .modal-close svg {
 	height: 24px;
 	width: 24px;
+}
+
+.modal-container {
+	display: flex;
+	flex-direction: column;
+	padding: 1rem 1.5rem;
+
+	flex-grow: 1;
 }
 
 .modal-side-panel-right:modal {
@@ -1016,6 +1036,80 @@ form .input-row label {}
 
 	border-radius: 32px;
 	background: rgba(36, 36, 36, 0.60);
+}
+
+.skeleton {
+	animation: skeleton-loading 1.5s linear infinite alternate;
+}
+
+.skeleton-text {
+	width: 100%;
+	height: 0.7rem;
+	margin-bottom: 0.5rem;
+	border-radius: 0.25rem;
+}
+
+.skeleton-text__body {
+	width: 75%;
+}
+
+.skeleton-block {
+	width: 400px;
+}
+
+.skeleton-footer {
+	width: 30%;
+}
+
+.combobox {
+	display: flex;
+	flex-direction: column;
+	width: 10rem;
+}
+
+.combobox-options {
+	list-style: none;
+	margin: 0;
+	padding: 0;
+}
+
+.combobox-options li {
+	display: flex;
+	flex-direction: column;
+}
+
+.combobox-options li button {
+	margin: 0;
+	border-radius: 0;
+}
+
+.month-widget {
+	display: flex;
+}
+
+.month-widget .today {
+	width: 10rem;
+}
+
+.month-widget .calendar {
+	display: flex;
+	flex-direction: column;
+}
+
+.month-widget .calendar .weekdays-header {
+	display: flex;
+	flex-direction: row;
+	gap: 1rem;
+}
+
+@keyframes skeleton-loading {
+	0% {
+		background-color: var(--on-canvas);
+	}
+
+	100% {
+		background-color: var(--background-hover);
+	}
 }
 
 

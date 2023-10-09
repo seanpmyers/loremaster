@@ -13,7 +13,8 @@ use crate::{
     api::{guards::user::User, handler, response::ApiError, web_server::ApplicationState},
     data::{
         entity::{
-            chronicle::{current_sever_time_string, Chronicle},
+            chronicle::{current_sever_time_string, Chronicle, ChronicleId},
+            person::PersonId,
             transfer::person_chronicle::PersonChronicle,
         },
         postgres_handler::PostgresHandler,
@@ -56,8 +57,8 @@ pub async fn by_date(
             .await
             .map_err(|error| anyhow!("{}", error))?;
 
-    let Some(result) = query_result  else {
-        return Ok(Json(None))
+    let Some(result) = query_result else {
+        return Ok(Json(None));
     };
 
     Ok(Json(Some(result)))
@@ -85,9 +86,9 @@ pub async fn server_time() -> Result<String, ApiError> {
 
 pub async fn example() -> Result<Json<Chronicle>, ApiError> {
     let result: Chronicle = Chronicle {
-        id: Uuid::nil(),
+        id: ChronicleId(Uuid::nil()),
         date_recorded: OffsetDateTime::now_utc().date(),
-        person_id: Uuid::nil(),
+        person_id: PersonId(Uuid::nil()),
         notes: Some("Here are some notes".to_string()),
         creation_time: Some(OffsetDateTime::now_utc()),
     };

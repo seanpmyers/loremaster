@@ -1,4 +1,5 @@
 [workspace]
-members = ["loremaster-database", "loremaster-web-server"]
-default-members = ["loremaster-database", "loremaster-web-server"]
+members = ["loremaster", "loremaster-database", "loremaster-web-server"]
+default-members = ["loremaster", "loremaster-database", "loremaster-web-server"]
 exclude = ["loremaster-web-interface"]
+resolver = "2"

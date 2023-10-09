@@ -1,19 +1,28 @@
 {
    "cSpell.words": [
+      "bindgen",
       "chrono",
+      "Combobox",
       "cose",
       "ctap",
       "fidokey",
+      "gloo",
       "Hasher",
+      "listbox",
       "openapi",
       "reqwasm",
       "Rustls",
-      "webauthn"
+      "webauthn",
+      "YUBIKEY"
    ],
    "editor.insertSpaces": false,
    "editor.tabSize": 2,
    "git.enableCommitSigning": true,
    "yaml.schemas": {
       "openapi:v3": "file:///home/naes/github/loremaster/documentation/openapi/chronicle/openapi%3A%20%273.0.2%27.yml"
-   }
+   },
+   "rust-analyzer.linkedProjects": [
+      "./loremaster-web-interface/Cargo.toml",
+      "./loremaster-web-server/Cargo.toml"
+   ]
 }

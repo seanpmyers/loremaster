@@ -29,7 +29,7 @@ The application is primarily written in Rust.
 Docker compose command
 
 ```sh
-docker-compose -f infrastructure/docker-compose.yml up
+docker-compose -f ../database/docker-compose.yml up
 ```
 
 You can generate a site secret for testing with the following openssl command:

@@ -1,9 +1,8 @@
 use anyhow::Result;
 use log::info;
 use sqlx::{query_as, PgPool};
-use uuid::Uuid;
 
-use crate::data::entity::sleep_schedule::SleepSchedule;
+use crate::data::entity::{person::PersonId, sleep_schedule::SleepSchedule};
 
 const QUERY: &str = "
 SELECT
@@ -22,7 +21,7 @@ LIMIT
 
 pub async fn get_person_sleep_schedule_query(
     database_connection: &PgPool,
-    person_id: &Uuid,
+    person_id: &PersonId,
 ) -> Result<Option<SleepSchedule>> {
     info!("QUERY CALL: get_person_sleep_schedule_query");
     let query_result: Option<SleepSchedule> = query_as::<_, SleepSchedule>(QUERY)

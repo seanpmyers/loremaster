@@ -2,6 +2,8 @@ use perseus::{prelude::*, state::GlobalStateCreator};
 use serde::{Deserialize, Serialize};
 use uuid::Uuid;
 
+use crate::utility::http_service;
+
 pub const LOCAL_STORAGE_KEY: &str = "chronilore_loremaster";
 pub const DEFAULT_USER_ALIAS: &str = "You";
 
@@ -55,11 +57,16 @@ impl UserAuthenticationRx {
         }
     }
 
-    pub fn detect_state(&self) {
-        if let AuthenticationState::Authenticated | AuthenticationState::None =
-            *self.authentication_state.get()
-        {
+    pub async fn detect_state(&self) {
+        if let AuthenticationState::Anonymous = *self.authentication_state.get() {
             return;
+        }
+
+        if let AuthenticationState::None = *self.authentication_state.get() {
+            //make a request for now to determine if the cookie is alive
+            let _ = http_service::get_endpoint("/authentication/check-session", None).await;
+            self.authentication_state
+                .set(AuthenticationState::Authenticated);
         }
 
         let storage: web_sys::Storage =

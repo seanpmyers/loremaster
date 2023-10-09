@@ -13,7 +13,7 @@ use web_sys::Event;
 use crate::components::container::Container;
 
 use crate::components::form::input_validation::{InputValidation, InputValidationProperties};
-use crate::components::icon::{PASSWORD_SVH_HTML, YUBIKEY_SVG_HTML};
+use crate::components::icon::{PASSWORD_SVG_HTML, YUBIKEY_SVG_HTML};
 use crate::components::navigation::tab::tab_button::TabButton;
 use crate::components::navigation::tab::tab_panel::{TabIndex, TabPanel};
 use crate::components::navigation::tab::tab_section::TabSection;
@@ -178,7 +178,7 @@ pub fn login_page<'page, G: Html>(
                     h3(class="") { "Login" }
                     TabPanel(active_tab=active_tab, classes=tab_panel_classes) {
                         div(class="tab-button-group") {
-                            TabButton(title=String::from("Password/OPAQUE"), index=0_u32, classes=tab_button_classes, icon=Some(PASSWORD_SVH_HTML))
+                            TabButton(title=String::from("Password/OPAQUE"), index=0_u32, classes=tab_button_classes, icon=Some(PASSWORD_SVG_HTML))
                             TabButton(title=String::from("WebAuthn"), index=1_u32, classes=tab_button_classes, icon=Some(YUBIKEY_SVG_HTML))
                         }
                         TabSection(title=String::from("tab1"), index=0_u32, classes=tab_section_classes){

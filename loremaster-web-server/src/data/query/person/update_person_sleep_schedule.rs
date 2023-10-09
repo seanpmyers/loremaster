@@ -1,7 +1,8 @@
 use anyhow::{anyhow, Result};
 use log::info;
 use sqlx::{query, PgPool};
-use uuid::Uuid;
+
+use crate::data::entity::{person::PersonId, sleep_schedule::SleepScheduleId};
 
 const QUERY: &str = "
 INSERT INTO
@@ -15,8 +16,8 @@ VALUES
 
 pub async fn update_person_sleep_schedule_query(
     database_connection: &PgPool,
-    schedule_id: &Uuid,
-    person_id: &Uuid,
+    schedule_id: &SleepScheduleId,
+    person_id: &PersonId,
 ) -> Result<()> {
     info!("QUERY CALL: update_person_sleep_schedule_query");
 

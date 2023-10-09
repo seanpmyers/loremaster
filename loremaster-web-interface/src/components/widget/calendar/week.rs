@@ -33,7 +33,7 @@ pub fn Week<'a, 'b: 'a, G: Html>(
                     view= |context, day: WeekDayInformation|
                    {
                     let mut day_div_classes = String::from("card");
-                    if &day.number == &selected_date.get().day() { day_div_classes.push_str(" active-card text-light") ;}
+                    if day.number == selected_date.get().day() { day_div_classes.push_str(" active-card text-light") ;}
                     else { day_div_classes.push_str(" bg-white")}
                     view!{ context,
                         div(class=(day_div_classes)) {

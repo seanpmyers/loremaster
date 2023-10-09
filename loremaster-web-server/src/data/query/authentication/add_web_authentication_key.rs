@@ -23,7 +23,7 @@ pub async fn add_web_authentication_key_query(
     info!("QUERY CALL: add_web_authentication_key_query");
 
     query(QUERY)
-        .bind(web_authentication_key.id)
+        .bind(&web_authentication_key.id)
         .bind(&web_authentication_key.credential_id)
         .bind(web_authentication_key.cose_algorithm)
         .bind(&web_authentication_key.passkey)

@@ -2,7 +2,7 @@ use anyhow::{anyhow, Result};
 use log::info;
 use sqlx::{query, PgPool};
 
-use uuid::Uuid;
+use crate::data::entity::{action::ActionId, person::PersonId};
 
 const QUERY: &str = "
 	INSERT INTO
@@ -16,8 +16,8 @@ const QUERY: &str = "
 
 pub async fn add_action_query(
     database_connection: &PgPool,
-    person_id: &Uuid,
-    action_id: &Uuid,
+    person_id: &PersonId,
+    action_id: &ActionId,
 ) -> Result<()> {
     info!("QUERY CALL: add_action_query");
 

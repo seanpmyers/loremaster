@@ -14,7 +14,7 @@ use crate::{
         accordion::{Accordion, AccordionItem},
         combobox::{ComboBox, ComboBoxOption},
         container::Container,
-        icon::{PASSWORD_SVH_HTML, YUBIKEY_SVG_HTML},
+        icon::{PASSWORD_SVG_HTML, YUBIKEY_SVG_HTML},
         modal::{Modal, ModalType},
         navigation::tab::tab_panel::{TabIndex, TabPanel},
         navigation::tab::{tab_button::TabButton, tab_section::TabSection},
@@ -31,8 +31,6 @@ const SYCAMORE_GITHUB_URL: &str = "https://github.com/sycamore-rs/sycamore";
 const PERSEUS_GITHUB_URL: &str = "https://github.com/framesurge/perseus";
 
 pub fn design_system_page<'page, G: Html>(context: BoundedScope<'_, 'page>) -> View<G> {
-    let empty_class: &Signal<String> = create_signal(context, String::from(""));
-
     let first_item: &Signal<String> = create_signal(context, String::from("First"));
     let second_item: &Signal<String> = create_signal(context, String::from("Second"));
 
@@ -43,6 +41,7 @@ pub fn design_system_page<'page, G: Html>(context: BoundedScope<'_, 'page>) -> V
 
     let switch_on: &Signal<bool> = create_signal(context, false);
     let switch_classes: &Signal<String> = create_signal(context, String::from("switch"));
+    let empty_class: &Signal<String> = create_signal(context, String::new());
 
     let demo_container_classes: &Signal<String> = create_signal(context, String::from("card"));
 
@@ -73,6 +72,7 @@ pub fn design_system_page<'page, G: Html>(context: BoundedScope<'_, 'page>) -> V
     ];
 
     let modal_type: &Signal<ModalType> = create_signal(context, ModalType::Default);
+    let click_to_close: &Signal<bool> = create_signal(context, false);
 
     view! {context,
         Container(title="Design System") {
@@ -112,7 +112,7 @@ pub fn design_system_page<'page, G: Html>(context: BoundedScope<'_, 'page>) -> V
                         div(class=demo_container_classes) {
                             TabPanel(active_tab=active_tab, classes=tab_panel_classes) {
                                 div(class="tab-button-group") {
-                                    TabButton(title=String::from("First"), index=0_u32, classes=tab_button_classes, icon=Some(PASSWORD_SVH_HTML))
+                                    TabButton(title=String::from("First"), index=0_u32, classes=tab_button_classes, icon=Some(PASSWORD_SVG_HTML))
                                     TabButton(title=String::from("Second"), index=1_u32, classes=tab_button_classes, icon=Some(YUBIKEY_SVG_HTML))
                                     TabButton(title=String::from("Third"), index=2_u32, classes=tab_button_classes, icon=None)
                                 }
@@ -168,57 +168,22 @@ pub fn design_system_page<'page, G: Html>(context: BoundedScope<'_, 'page>) -> V
                             }
                             div() {
                                 label() { "Current Modal Type"}
-                                div() { (match modal_type.get().as_ref() {
+                                input(disabled=true, type="text", value=(match modal_type.get().as_ref() {
                                     ModalType::Default => "Default".to_string(),
                                     ModalType::SidePanelRight => "Side Panel - Right".to_string(),
                                     ModalType::SidePanelLeft => "Side Panel - Left".to_string(),
-                                }) }
+                                })) {  }
+                                div() {
+                                    Switch(toggled=click_to_close, classes=empty_class)
+                                    label() { "Click to Close"}
+                                }
                             }
-                            Modal(html_class=empty_class, button_label="Open modal", modal_type=modal_type) {
-                                div() { "Test" }
-                            }
-                        }
-                    }
-                    div() {
-                        h3() { "Information" }
-                        div(class=demo_container_classes) {
-
-                        }
-                    }
-                    div() {
-                        h3() { "Information" }
-                        div(class=demo_container_classes) {
-
-                        }
-                    }
-                    div() {
-                        h3() { "Information" }
-                        div(class=demo_container_classes) {
-
-                        }
-                    }
-                    div() {
-                        h3() { "Information" }
-                        div(class=demo_container_classes) {
-
-                        }
-                    }
-                    div() {
-                        h3() { "Information" }
-                        div(class=demo_container_classes) {
-
-                        }
-                    }
-                    div() {
-                        h3() { "Information" }
-                        div(class=demo_container_classes) {
-
-                        }
-                    }
-                    div() {
-                        h3() { "Information" }
-                        div(class=demo_container_classes) {
-
+                            Modal(
+                                html_class=empty_class,
+                                button_label="Open modal",
+                                modal_type=modal_type,
+                                close_on_click_outside=click_to_close
+                            ) { div() { "Test" } }
                         }
                     }
                     div() {

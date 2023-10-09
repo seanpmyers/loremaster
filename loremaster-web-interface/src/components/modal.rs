@@ -18,6 +18,7 @@ pub struct ModalProperties<'modal, G: Html> {
     pub children: Children<'modal, G>,
     pub button_label: &'static str,
     pub modal_type: &'modal ReadSignal<ModalType>,
+    pub close_on_click_outside: &'modal ReadSignal<bool>,
 }
 
 #[component]
@@ -28,6 +29,7 @@ pub fn Modal<'modal, G: Html>(
         html_class,
         button_label,
         modal_type,
+        close_on_click_outside,
     }: ModalProperties<'modal, G>,
 ) -> View<G> {
     let children = children.call(context);
@@ -41,6 +43,17 @@ pub fn Modal<'modal, G: Html>(
         close_dialog(&dialog_id.to_string());
     };
 
+    let on_modal_click_handler = move |event: Event| {
+        if !*close_on_click_outside.get() {
+            return;
+        }
+        if let Some(html_element) = event.target() {
+            if html_element.dyn_ref::<HtmlDialogElement>().is_some() {
+                close_dialog(&dialog_id.to_string())
+            }
+        }
+    };
+
     view! {context,
         button(on:click=open_click_handler, class=html_class) { (button_label) }
         dialog(
@@ -49,11 +62,14 @@ pub fn Modal<'modal, G: Html>(
                 ModalType::Default => "modal",
                 ModalType::SidePanelRight => "modal-side-panel-right",
                 ModalType::SidePanelLeft => "modal-side-panel-left",
-            })
+            }),
+            on:click=on_modal_click_handler
         ) {
-            button(title="close",on:click=close_click_handler, class="modal-close", dangerously_set_inner_html=CLOSE_X_SVG_HTML) { }
-            div() {
-                (children)
+            div(class="modal-container") {
+                button(title="close",on:click=close_click_handler, class="modal-close", dangerously_set_inner_html=CLOSE_X_SVG_HTML) { }
+                div() {
+                    (children)
+                }
             }
         }
     }

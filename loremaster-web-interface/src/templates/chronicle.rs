@@ -105,7 +105,7 @@ pub fn chronicle_page<'page, G: Html>(
                     .set(format!("Hello, {}", state.user_alias.get())),
             }
 
-            IntervalStream::new(1_000)
+            IntervalStream::new(60_000)
                 .for_each(|_| {
                     let javascript_date: Date = Date::new_0();
 
@@ -129,12 +129,12 @@ pub fn chronicle_page<'page, G: Html>(
     view! {context,
             Container(title="Chronicle") {
                 div(class="", id="chronicle-container") {
-                    div(class="row flex-grow-1 text-black"){
-                        div(class="col-9 bg-light p-5 border-0 rounded") {
-                            div(class="d-flex align-items-baseline") {
-                                h2(class="fw-normal flex-grow-1") { "Chronicle - "(state.date_display.get()) }
+                    div(class="text-black"){
+                        div(class="") {
+                            div(class="") {
+                                h2(class="") { "Chronicle - "(state.date_display.get()) }
                             }
-                            h3(class="fw-normal") { (state.greeting.get()) }
+                            h3(class="") { (state.greeting.get()) }
                             div() {
                                 Week(WeekProperties{
                                     days: create_signal(context, vec![]),
@@ -147,10 +147,10 @@ pub fn chronicle_page<'page, G: Html>(
                             SleepWidget()
                             div(class="chronicle-notes") {
                                 label() { "Notes" }
-                                textarea(class="border rounded bg-white", rows="4", cols="50") {}
+                                textarea(class="", rows="4", cols="50") {}
                             }
                         }
-                        div(class="col-3 border-start") {
+                        div(class="") {
                             div(class="card shadow-sm border-0 rounded mt-2") {
                                 div(class="card-body") {
                                     h3(class="card-title") { "Goals" }
