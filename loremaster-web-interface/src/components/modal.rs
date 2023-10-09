@@ -1,7 +1,7 @@
 use sycamore::prelude::*;
 use uuid::Uuid;
 use wasm_bindgen::JsCast;
-use web_sys::{console::log_1, Event, HtmlDialogElement};
+use web_sys::{Event, HtmlDialogElement};
 
 use crate::components::icon::CLOSE_X_SVG_HTML;
 

@@ -1083,6 +1083,25 @@ form .input-row label {}
 	border-radius: 0;
 }
 
+.month-widget {
+	display: flex;
+}
+
+.month-widget .today {
+	width: 10rem;
+}
+
+.month-widget .calendar {
+	display: flex;
+	flex-direction: column;
+}
+
+.month-widget .calendar .weekdays-header {
+	display: flex;
+	flex-direction: row;
+	gap: 1rem;
+}
+
 @keyframes skeleton-loading {
 	0% {
 		background-color: var(--on-canvas);

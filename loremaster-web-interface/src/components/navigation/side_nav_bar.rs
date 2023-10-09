@@ -22,7 +22,7 @@ pub fn SideNavBar<G: Html>(context: Scope) -> View<G> {
         nav(class=NAV_CLASSES) {
             ul(class=NAV_UL_CLASSES) {
                 Indexed(
-                    iterable= links,
+                    iterable=links,
                     view= move |context, link|
                     {
                         if link.html_href.eq("/you/") {

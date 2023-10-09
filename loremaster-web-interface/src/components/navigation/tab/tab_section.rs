@@ -1,5 +1,4 @@
 use sycamore::prelude::*;
-use web_sys::Event;
 
 use crate::components::navigation::tab::tab_panel::TabIndex;
 
