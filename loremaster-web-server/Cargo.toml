@@ -27,7 +27,7 @@ email_address = { version = "0.2.4" }
 # Logging
 env_logger = "0.10.0"
 # Provides async programming foundational functionality
-futures = "0.3.28"
+futures = "0.3.29"
 # Logging
 log = { version = "0.4.20" }
 # Rust Object Notation
