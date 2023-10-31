@@ -36,7 +36,7 @@ ron = { version = "0.8.1" }
 rand = "0.8.5"
 # Serialization
 serde = { version = "1.0.190", features = ["derive"] }
-serde_json = "1.0.107"
+serde_json = "1.0.108"
 # Database client/pool/toolkit
 sqlx = { version = "0.6.3", features = [
 	"json",
