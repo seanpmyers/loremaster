@@ -33,7 +33,7 @@ log = { version = "0.4.20" }
 # Rust Object Notation
 ron = { version = "0.8.1" }
 # Random nubmer generation
-rand = "0.8.5"
+rand = { version = "0.8.5" }
 # Serialization
 serde = { version = "1.0.192", features = ["derive"] }
 serde_json = "1.0.108"

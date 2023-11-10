@@ -5,6 +5,7 @@
       "Combobox",
       "cose",
       "ctap",
+      "dflt",
       "fidokey",
       "gloo",
       "Hasher",
@@ -12,6 +13,7 @@
       "openapi",
       "reqwasm",
       "Rustls",
+      "stylesheet",
       "webauthn",
       "YUBIKEY"
    ],

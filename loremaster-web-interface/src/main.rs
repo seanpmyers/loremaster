@@ -22,7 +22,7 @@ pub fn main<G: Html>() -> PerseusApp<G> {
         .error_views(crate::error_pages::get_error_pages())
         .index_view(|context| {
             sycamore::view! { context,
-                // We don't need a `<!DOCTYPE html>`, that's added automatically by Perseus (though that can be overriden if you really want by using `.index_view_str()`)
+                // We don't need a `<!DOCTYPE html>`, that's added automatically by Perseus (though that can be overridden if you really want by using `.index_view_str()`)
                 // We need a `<head>` and a `<body>` at the absolute minimum for Perseus to work properly (otherwise certain script injections will fail)
                 link(rel="icon", type="image/x-icon", href="/.perseus/static/favicon_io/favicon.ico") {}
                 link(rel="stylesheet", href="/.perseus/static/styles/loremaster/index.css"){}
