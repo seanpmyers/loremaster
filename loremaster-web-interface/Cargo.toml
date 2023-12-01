@@ -9,7 +9,7 @@ authors = ["Sean Myers <spmyers@protonmail.com>"]
 [dependencies]
 futures-util = { version = "0.3.29" }
 gloo-timers = { version = "0.3.0", features = ["futures"] }
-js-sys = { version = "0.3.65" }
+js-sys = { version = "0.3.66" }
 log = { version = "0.4.20" }
 perseus = { version = "0.4.2", features = ["hydrate"] }
 reqwasm = { version = "0.5.0" }
