@@ -31,7 +31,7 @@ wasm-bindgen-futures = { version = "0.4.38" }
 webauthn-rs-proto = { version = "0.4.9", default-features = false, features = [
 	"wasm",
 ] }
-web-sys = { version = "0.3.65", features = [
+web-sys = { version = "0.3.66", features = [
 	"AttestationConveyancePreference",
 	"AuthenticatorSelectionCriteria",
 	"AuthenticatorAttachment",
