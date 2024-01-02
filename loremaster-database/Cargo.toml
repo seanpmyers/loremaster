@@ -9,7 +9,7 @@ edition = "2021"
 # Error handling
 anyhow = "1.0.79"
 # Provides async programming foundational functionality
-futures = "0.3.29"
+futures = "0.3.30"
 loremaster = { path = "../loremaster" }
 # Database client/pool/toolkit
 sqlx = { version = "0.6.3", features = [
