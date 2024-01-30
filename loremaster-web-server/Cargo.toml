@@ -25,7 +25,7 @@ axum-server = { version = "0.5.1", features = ["tls-rustls"] }
 # Email adderss validation
 email_address = { version = "0.2.4" }
 # Logging
-env_logger = "0.11.0"
+env_logger = "0.11.1"
 # Provides async programming foundational functionality
 futures = "0.3.30"
 # Logging
