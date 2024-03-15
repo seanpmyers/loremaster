@@ -58,7 +58,7 @@ time = { version = "0.3.34", features = ["serde", "std", "parsing"] }
 time-tz = { version = "1.0.3" }
 # Backend async I/O functionality
 tokio = { version = "1.36.0", features = ["full"] }
-tokio-stream = { version = "0.1.14" }
+tokio-stream = { version = "0.1.15" }
 tokio-test = { version = "0.4.3" }
 # Tower middleware and utilities for HTTP clients and servers
 tower-http = { version = "0.4.4", features = ["cors", "fs"] }
