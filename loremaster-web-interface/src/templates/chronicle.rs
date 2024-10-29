@@ -18,8 +18,11 @@ use crate::{
     components::{
         container::Container,
         widget::{
-            calendar::week::Week, calendar::week::WeekProperties, goal_list::GoalList,
-            goal_list::GoalListProperties, sleep::SleepWidget,
+            calendar::week::Week,
+            calendar::{month::MonthWidget, week::WeekProperties},
+            goal_list::GoalList,
+            goal_list::GoalListProperties,
+            sleep::SleepWidget,
         },
     },
     data::entity::person_chronicle::PersonChronicle,
@@ -141,6 +144,7 @@ pub fn chronicle_page<'page, G: Html>(
                                     selected_date: create_signal(context, local_date),
                                 })
                             }
+                            MonthWidget()
                             div() {
                                 label() { "What do you intend to do today?" }
                             }
